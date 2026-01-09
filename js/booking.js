@@ -2,7 +2,62 @@
    BOOKING.JS - Buchungslogik
    =================================== */
 
-// Preisberechnung
+// ========================================
+// ZUSATZANGEBOTE (EXTRAS)
+// ========================================
+
+/**
+ * Definiert alle verfügbaren Zusatzangebote mit IDs und Namen
+ * Diese werden beim Buchen in der Datenbank gespeichert
+ */
+const EXTRAS_CONFIG = {
+    extraBikeRack: 'Fahrradhalter',
+    extraFurniture: 'Camping-Möbel',
+    extraTent: 'Erweiterungszelt',
+    extraAwning: 'Sonnendach',
+    extraBedding: 'Bettwäsche-Set',
+    extraTowels: 'Handtücher-Set'
+};
+
+/**
+ * Sammelt alle ausgewählten Zusatzangebote
+ * @returns {Array} Array von Objekten mit {id, name, price}
+ */
+function getSelectedExtras() {
+    const selectedExtras = [];
+    
+    // Durchlaufe alle konfigurierten Extras
+    for (const [id, name] of Object.entries(EXTRAS_CONFIG)) {
+        const checkbox = document.getElementById(id);
+        if (checkbox && checkbox.checked) {
+            selectedExtras.push({
+                id: id,
+                name: name,
+                price: parseInt(checkbox.dataset.price) || 0
+            });
+        }
+    }
+    
+    return selectedExtras;
+}
+
+/**
+ * Berechnet die Gesamtsumme aller Extras
+ * @returns {number} Summe aller Extra-Preise
+ */
+function calculateExtrasTotal() {
+    const extras = getSelectedExtras();
+    return extras.reduce((sum, extra) => sum + extra.price, 0);
+}
+
+// ========================================
+// PREISBERECHNUNG
+// ========================================
+
+/**
+ * Berechnet den Gesamtpreis inkl. Extras und zeigt ihn an
+ * Wird aufgerufen bei Datumsänderung oder Extra-Auswahl
+ */
 function calculatePrice() {
     const startInput = document.getElementById('bookStart');
     const endInput = document.getElementById('bookEnd');
@@ -36,23 +91,43 @@ function calculatePrice() {
     // Preisberechnung
     const pricePerNight = currentVehicle.price;
     const totalBase = nights * pricePerNight;
+    
+    // Zusatzangebote berechnen
+    const extrasTotal = calculateExtrasTotal();
+    const selectedExtras = getSelectedExtras();
+    
     const serviceFee = 15;
-    const totalPrice = totalBase + serviceFee;
+    const totalPrice = totalBase + extrasTotal + serviceFee;
 
     // Prüfe ob Anzeigeelemente existieren
     const calcDaysEl = document.getElementById('calcDays');
     const calcPriceEl = document.getElementById('calcPrice');
     const calcTotalBaseEl = document.getElementById('calcTotalBase');
     const calcTotalEl = document.getElementById('calcTotal');
+    const extrasInPriceEl = document.getElementById('extrasInPrice');
 
     if (!calcDaysEl || !calcPriceEl || !calcTotalBaseEl || !calcTotalEl) {
         return; // Anzeigeelemente existieren nicht
     }
 
-    // Anzeigen
+    // Basispreis anzeigen
     calcDaysEl.textContent = nights;
     calcPriceEl.textContent = pricePerNight;
     calcTotalBaseEl.textContent = totalBase;
+    
+    // Extras in der Rechnung anzeigen
+    if (extrasInPriceEl && selectedExtras.length > 0) {
+        extrasInPriceEl.innerHTML = selectedExtras.map(extra => `
+            <div class="d-flex justify-content-between mb-1 text-muted">
+                <span>${extra.name}</span>
+                <span>+${extra.price} €</span>
+            </div>
+        `).join('');
+    } else if (extrasInPriceEl) {
+        extrasInPriceEl.innerHTML = '';
+    }
+    
+    // Gesamtpreis anzeigen
     calcTotalEl.textContent = totalPrice;
     priceCalcElement.classList.remove('hidden');
 }
@@ -130,13 +205,18 @@ async function handleBooking(event) {
             return false;
         }
 
-        // Berechne Gesamtpreis
+        // Berechne Gesamtpreis inkl. Extras
         const start = new Date(startDate);
         const end = new Date(endDate);
         const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-        const totalPrice = (nights * currentVehicle.price) + 15;
+        const basePrice = nights * currentVehicle.price;
+        const extrasTotal = calculateExtrasTotal();
+        const totalPrice = basePrice + extrasTotal + 15;
+        
+        // Sammle ausgewählte Extras
+        const selectedExtras = getSelectedExtras();
 
-        // Buchung erstellen
+        // Buchung erstellen mit Extras
         const booking = {
             vehicle_id: currentVehicle.id,
             user_id: currentUser.id,
@@ -144,6 +224,7 @@ async function handleBooking(event) {
             end: endDate,
             nights: nights,
             totalPrice: totalPrice,
+            extras: selectedExtras, // Extras in Buchung speichern
             createdAt: new Date().toISOString()
         };
 
@@ -161,12 +242,21 @@ async function handleBooking(event) {
 
 // Buchungs-Erfolg anzeigen
 function showBookingSuccess(booking) {
+    // Extras formatieren für Anzeige
+    let extrasText = '';
+    if (booking.extras && booking.extras.length > 0) {
+        extrasText = '<p class="small"><strong>Gebuchte Extras:</strong><br>' + 
+            booking.extras.map(e => `• ${e.name} (+${e.price}€)`).join('<br>') + 
+            '</p>';
+    }
+    
     const message = `
         <div class="alert alert-success alert-custom">
             <h4 class="alert-heading"><i class="fa-solid fa-check-circle me-2"></i>Buchung erfolgreich!</h4>
             <p><strong>${currentVehicle.name}</strong></p>
             <p>Zeitraum: ${formatDateDisplay(booking.start)} - ${formatDateDisplay(booking.end)}</p>
-            <p>Gesamtpreis: ${booking.totalPrice}€</p>
+            ${extrasText}
+            <p class="fw-bold">Gesamtpreis: ${booking.totalPrice}€</p>
             <hr>
             <p class="mb-0">Sie finden Ihre Buchung in Ihrem <a href="profil.html" class="alert-link">Profil</a>.</p>
         </div>

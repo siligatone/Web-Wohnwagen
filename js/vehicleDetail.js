@@ -47,7 +47,11 @@ function displayVehicleInfo() {
 
     // Preis
     document.getElementById('vehiclePrice').textContent = currentVehicle.price;
-    document.getElementById('pricePerNight').textContent = currentVehicle.price;
+    // Preis-Element in Preisberechnung (falls vorhanden)
+    const calcPriceEl = document.getElementById('calcPrice');
+    if (calcPriceEl) {
+        calcPriceEl.textContent = currentVehicle.price;
+    }
 
     // Features
     const featuresContainer = document.getElementById('vehicleFeatures');

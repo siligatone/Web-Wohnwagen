@@ -39,36 +39,126 @@
                 <p class="lead text-muted">Wählen Sie aus unserer Flotte das perfekte Wohnmobil für Ihr Abenteuer</p>
             </div>
 
+            <!-- ========================================
+                 FILTER-BEREICH FÜR FAHRZEUGE
+                 ======================================== 
+                 Filtert Fahrzeuge nach:
+                 - Freitext-Suche (searchText) - Name & Beschreibung
+                 - Kraftstoffart (fuel)
+                 - Anzahl Betten (beds)
+                 - Preis pro Nacht (price)
+                 ======================================== -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fa-solid fa-filter me-2"></i>Fahrzeuge filtern
+                    </h5>
+                    
+                    <!-- Filter: Freitext-Suche -->
+                    <div class="mb-3">
+                        <label for="filterSearch" class="form-label small fw-bold">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i>Suche
+                        </label>
+                        <input type="text" class="form-control" id="filterSearch" 
+                               placeholder="Suchen Sie nach Name oder Beschreibung..." 
+                               oninput="applyFilters()">
+                    </div>
+                    
+                    <div class="row g-3">
+                        <!-- Filter: Kraftstoff -->
+                        <div class="col-md-3">
+                            <label for="filterFuel" class="form-label small fw-bold">Kraftstoff</label>
+                            <select id="filterFuel" class="form-select" onchange="applyFilters()">
+                                <option value="">Alle</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Benzin">Benzin</option>
+                                <option value="Elektro">Elektro</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filter: Betten -->
+                        <div class="col-md-3">
+                            <label for="filterBeds" class="form-label small fw-bold">Anzahl Betten</label>
+                            <select id="filterBeds" class="form-select" onchange="applyFilters()">
+                                <option value="">Alle</option>
+                                <option value="2">2 Betten</option>
+                                <option value="4">4 Betten</option>
+                                <option value="6">6 Betten</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filter: Max. Preis -->
+                        <div class="col-md-4">
+                            <label for="filterPrice" class="form-label small fw-bold">
+                                Max. Preis: <span id="priceValue">200</span>€/Nacht
+                            </label>
+                            <input type="range" class="form-range" id="filterPrice" 
+                                   min="50" max="200" value="200" step="10"
+                                   oninput="updatePriceLabel(); applyFilters()">
+                        </div>
+                        
+                        <!-- Reset Button -->
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                                <i class="fa-solid fa-rotate-right me-1"></i>Zurücksetzen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Ende Filter-Bereich -->
+
             <div id="vehicleList" class="row g-4">
                 <!-- Fahrzeuge werden von vehicles.js geladen -->
             </div>
         </section>
 
         <!-- Vorteile Section -->
-        <section class="bg-light py-5">
+        <section class="advantages-section py-5 mt-5">
             <div class="container">
-                <h3 class="text-center mb-5">Warum CamperRent?</h3>
+                <div class="text-center mb-5">
+                    <h2 class="display-4 fw-bold mb-3">Warum CamperRent?</h2>
+                    <p class="lead" style="color: #1976d2; font-weight: 500;">Ihre Vorteile auf einen Blick</p>
+                </div>
                 <div class="row g-4">
-                    <div class="col-md-4 text-center">
-                        <div class="mb-3">
-                            <i class="fa-solid fa-shield-halved fa-3x text-primary"></i>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-4">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                        <i class="fa-solid fa-shield-halved fa-2x text-primary"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3">Geprüfte Qualität</h5>
+                                <p class="card-text text-muted">Alle Fahrzeuge werden regelmäßig gewartet und vor jeder Vermietung überprüft.</p>
+                            </div>
                         </div>
-                        <h5>Geprüfte Qualität</h5>
-                        <p class="text-muted">Alle Fahrzeuge werden regelmäßig gewartet und vor jeder Vermietung überprüft.</p>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="mb-3">
-                            <i class="fa-solid fa-headset fa-3x text-primary"></i>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-4">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                        <i class="fa-solid fa-headset fa-2x text-primary"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3">24/7 Support</h5>
+                                <p class="card-text text-muted">Unser Kundenservice steht Ihnen rund um die Uhr zur Verfügung.</p>
+                            </div>
                         </div>
-                        <h5>24/7 Support</h5>
-                        <p class="text-muted">Unser Kundenservice steht Ihnen rund um die Uhr zur Verfügung.</p>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="mb-3">
-                            <i class="fa-solid fa-euro-sign fa-3x text-primary"></i>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-4">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                        <i class="fa-solid fa-euro-sign fa-2x text-primary"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3">Faire Preise</h5>
+                                <p class="card-text text-muted">Transparente Preisgestaltung ohne versteckte Kosten.</p>
+                            </div>
                         </div>
-                        <h5>Faire Preise</h5>
-                        <p class="text-muted">Transparente Preisgestaltung ohne versteckte Kosten.</p>
                     </div>
                 </div>
             </div>

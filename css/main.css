@@ -62,8 +62,9 @@ footer a:hover {
 }
 
 /* Hero Header */
+/* Hintergrundbild: https://images.unsplash.com/photo-1464219789935-c2d9d9aba644 */
 .hero-header {
-    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1600&q=80');
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1464219789935-c2d9d9aba644?auto=format&fit=crop&w=1600&q=80');
     background-size: cover;
     background-position: center;
     color: white;
@@ -76,4 +77,16 @@ footer a:hover {
 .auth-container {
     max-width: 500px;
     margin: 50px auto;
+}
+
+/* Vorteile Section - Pastellblau */
+.advantages-section {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-top: 3px solid #90caf9;
+    border-bottom: 3px solid #90caf9;
+}
+
+.advantages-section h2 {
+    color: #1565c0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }

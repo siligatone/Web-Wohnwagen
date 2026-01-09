@@ -26,101 +26,145 @@
     {
       "id": "v1",
       "provider_id": "p1",
-      "name": "Ocean Cruiser",
-      "price": 89,
+      "name": "Elite Liner",
+      "price": 199,
       "beds": 4,
       "fuel": "Diesel",
-      "desc": "Kompakter Kastenwagen-Ausbau mit cleverer Raumnutzung. Basierend auf modernem Transporter-Chassis, ideal für 2-4 Personen und spontane Wochenendausflüge.",
+      "desc": "Premium-Vollintegriertes mit exklusiver Ausstattung und Rundum-Panoramaverglasung. Höchster Komfort für anspruchsvolle Reisende - Luxus auf Rädern.",
       "details": {
         "tech": {
           "seats": "4",
           "fuel": "Diesel",
-          "consumption": "8.2 L/100km",
-          "power": "140 PS",
-          "license": "Klasse B",
+          "consumption": "12.5 L/100km",
+          "power": "210 PS",
+          "license": "Klasse C1",
           "emission": "Euro 6d",
-          "drive": "Frontantrieb"
+          "drive": "Heckantrieb"
         },
         "dims": {
-          "len": "540 cm",
-          "width": "205 cm",
-          "height": "255 cm",
-          "empty_weight": "2.850 kg",
-          "total_weight": "3.500 kg",
-          "towing": "2000 kg"
+          "len": "780 cm",
+          "width": "235 cm",
+          "height": "320 cm",
+          "empty_weight": "4.200 kg",
+          "total_weight": "5.200 kg",
+          "towing": "-"
         }
       },
       "features": [
-        "Klimaanlage",
-        "Aufstelldach",
-        "Kompaktküche",
-        "Rückfahrkamera",
-        "LED-Innenbeleuchtung",
-        "USB-Ladestationen"
+        "Queensbett höhenverstellbar",
+        "Echtleder-Lounge",
+        "Standheizung Diesel",
+        "TV/SAT 32 Zoll",
+        "Klimaanlage Dach + Kabine",
+        "Alarmanlage Premium",
+        "Navigationssystem",
+        "Solaranlage 300W",
+        "Espressomaschine"
       ],
       "img": "https://images.unsplash.com/photo-1527786356703-4b100091cd2c?auto=format&fit=crop&w=1200&q=80"
     },
     {
       "id": "v2",
       "provider_id": "p1",
-      "name": "Skyline Comfort",
-      "price": 125,
-      "beds": 5,
-      "fuel": "Diesel",
-      "desc": "Teilintegriertes Wohnmobil mit geräumigem Alkoven für die ganze Familie. Perfekte Mischung aus Komfort, Platz und Fahrdynamik für längere Urlaubsreisen.",
+      "name": "Volt Mobil",
+      "price": 139,
+      "beds": 4,
+      "fuel": "Elektro",
+      "desc": "Innovatives Elektro-Wohnmobil mit 400km Reichweite. Emissionsfrei reisen mit modernster Ladetechnologie und nachhaltiger Energieversorgung durch Solarpanels.",
       "details": {
         "tech": {
-          "seats": "5",
-          "fuel": "Diesel",
-          "consumption": "10.5 L/100km",
-          "power": "177 PS",
+          "seats": "4",
+          "fuel": "Elektro",
+          "consumption": "42 kWh/100km",
+          "power": "180 PS (elektrisch)",
           "license": "Klasse B",
-          "emission": "Euro 6d-TEMP",
-          "drive": "Frontantrieb"
+          "emission": "0g CO₂/km",
+          "drive": "Elektroantrieb"
         },
         "dims": {
-          "len": "695 cm",
-          "width": "233 cm",
-          "height": "305 cm",
-          "empty_weight": "3.200 kg",
-          "total_weight": "3.850 kg",
-          "towing": "1500 kg"
+          "len": "620 cm",
+          "width": "215 cm",
+          "height": "280 cm",
+          "empty_weight": "3.100 kg",
+          "total_weight": "3.800 kg",
+          "towing": "750 kg"
         }
       },
       "features": [
-        "Bad/WC separat",
-        "Hubbett",
-        "Großer Kühlschrank",
-        "Markise elektrisch",
-        "Tempomat",
-        "Zentralverriegelung"
+        "Elektromotor 180 PS",
+        "Reichweite 400 km",
+        "Schnellladung DC",
+        "Solaranlage 500W",
+        "Lithium-Batterie 95 kWh",
+        "Wärmepumpe",
+        "Rekuperation",
+        "E-Markise",
+        "Ladekabel Typ 2"
       ],
-      "img": "https://images.unsplash.com/photo-1464219789935-c2d9d9aba644?auto=format&fit=crop&w=1200&q=80"
+      "img": "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1200&q=80"
     },
     {
       "id": "v3",
       "provider_id": "p1",
-      "name": "Retro Van",
-      "price": 69,
+      "name": "Pure Van",
+      "price": 59,
+      "beds": 2,
+      "fuel": "Diesel",
+      "desc": "Minimalistischer Campingbus mit dem Nötigsten. Einfach, praktisch und günstig - perfekt für spontane Trips und unkomplizierte Abenteuer.",
+      "details": {
+        "tech": {
+          "seats": "2",
+          "fuel": "Diesel",
+          "consumption": "7.2 L/100km",
+          "power": "110 PS",
+          "license": "Klasse B",
+          "emission": "Euro 6d",
+          "drive": "Frontantrieb"
+        },
+        "dims": {
+          "len": "505 cm",
+          "width": "190 cm",
+          "height": "245 cm",
+          "empty_weight": "2.300 kg",
+          "total_weight": "2.900 kg",
+          "towing": "1000 kg"
+        }
+      },
+      "features": [
+        "Klappbett",
+        "Miniküche",
+        "Kühlbox",
+        "Chemietoilette",
+        "Wassertank 60L",
+        "USB-Anschlüsse",
+        "Verdunklungsvorhänge"
+      ],
+      "img": "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      "id": "v4",
+      "provider_id": "p1",
+      "name": "Vintage Van",
+      "price": 75,
       "beds": 2,
       "fuel": "Benzin",
-      "desc": "Kultiger Oldtimer-Campervan im Stil der 70er Jahre. Liebevoll restauriert mit modernen Sicherheitsfeatures - für unvergessliche Retro-Roadtrips.",
+      "desc": "Kultiger Oldtimer-Campervan im Stil der 70er Jahre. Liebevoll restauriert mit modernen Sicherheitsfeatures - für unvergessliche Retro-Roadtrips voller Nostalgie.",
       "details": {
         "tech": {
           "seats": "4",
           "fuel": "Benzin",
-          "consumption": "11.5 L/100km",
-          "power": "68 PS",
+          "consumption": "11.8 L/100km",
+          "power": "70 PS",
           "license": "Klasse B",
           "emission": "H-Kennzeichen",
-          "drive": "Heckmotor"
+          "drive": "Heckmotor Boxer"
         },
         "dims": {
-          "len": "445 cm",
-          "width": "179 cm",
-          "height": "207 cm",
-          "empty_weight": "1.350 kg",
-          "total_weight": "2.100 kg",
+          "len": "450 cm",
+          "width": "180 cm",
+          "height": "210 cm",
+          "empty_weight": "1.400 kg",
+          "total_weight": "2.200 kg",
           "towing": "-"
         }
       },
@@ -128,128 +172,94 @@
         "Oldtimer-Feeling",
         "Pop-up Dach",
         "Vintage Interieur",
-        "Gaskocher",
+        "Gaskocher 2-flammig",
         "Kühlbox 12V",
-        "Originalradio"
+        "Retro-Radio",
+        "Karo-Vorhänge",
+        "Holzvertäfelung"
       ],
       "img": "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&q=80"
     },
     {
-      "id": "v4",
-      "provider_id": "p1",
-      "name": "Luxus Liner",
-      "price": 189,
-      "beds": 4,
-      "fuel": "Diesel",
-      "desc": "Premium-Vollintegriertes mit Einzelbetten und Rundum-Panoramaverglasung. Luxuriöse Ausstattung auf höchstem Niveau für anspruchsvolle Weltenbummler.",
-      "details": {
-        "tech": {
-          "seats": "4",
-          "fuel": "Diesel",
-          "consumption": "12.8 L/100km",
-          "power": "205 PS",
-          "license": "Klasse C1",
-          "emission": "Euro 6d",
-          "drive": "Heckantrieb"
-        },
-        "dims": {
-          "len": "760 cm",
-          "width": "235 cm",
-          "height": "315 cm",
-          "empty_weight": "4.100 kg",
-          "total_weight": "5.000 kg",
-          "towing": "-"
-        }
-      },
-      "features": [
-        "Queensbett höhenverstellbar",
-        "Echtleder-Sitzgruppe",
-        "Standheizung Diesel",
-        "TV/SAT 24 Zoll",
-        "Klimaanlage Dach",
-        "Alarmanlage",
-        "Navigationssystem",
-        "Solaranlage 200W"
-      ],
-      "img": "https://images.unsplash.com/photo-1533591380348-14193f2b6b5f?auto=format&fit=crop&w=1200&q=80"
-    },
-    {
       "id": "v5",
       "provider_id": "p1",
-      "name": "Compact City",
-      "price": 65,
-      "beds": 2,
+      "name": "Grand Liner",
+      "price": 145,
+      "beds": 6,
       "fuel": "Diesel",
-      "desc": "Wendiger Mini-Camper auf Hochdach-Basis. Perfekt für Paare und Städtetrips - kompakte Maße bei cleverer Innenraumgestaltung.",
+      "desc": "Großräumiges Familien-Wohnmobil mit Alkoven und bis zu 6 Schlafplätzen. Viel Stauraum, separate Bereiche und kindergerechte Ausstattung für den perfekten Familienurlaub.",
       "details": {
         "tech": {
-          "seats": "2",
+          "seats": "6",
           "fuel": "Diesel",
-          "consumption": "6.8 L/100km",
-          "power": "102 PS",
-          "license": "Klasse B",
+          "consumption": "11.2 L/100km",
+          "power": "180 PS",
+          "license": "Klasse B (bis 3.5t)",
           "emission": "Euro 6d-TEMP",
           "drive": "Frontantrieb"
         },
         "dims": {
-          "len": "495 cm",
-          "width": "188 cm",
-          "height": "240 cm",
-          "empty_weight": "2.200 kg",
-          "total_weight": "2.800 kg",
-          "towing": "1200 kg"
+          "len": "720 cm",
+          "width": "235 cm",
+          "height": "315 cm",
+          "empty_weight": "3.300 kg",
+          "total_weight": "3.900 kg",
+          "towing": "1800 kg"
         }
       },
       "features": [
-        "Kompakte Bauweise",
-        "Klappbett",
-        "Miniküche",
-        "Chemietoilette",
-        "Standheizung",
-        "Bluetooth Radio",
-        "Fahrradträger"
+        "Alkoven-Doppelbett",
+        "Etagenbett Kinder",
+        "Bad/WC separat",
+        "Großer Kühlschrank 180L",
+        "Markise elektrisch",
+        "Kindersicherungen",
+        "TV-Halterung",
+        "Fahrradträger 4 Räder",
+        "Tempomat"
       ],
-      "img": "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80"
+      "img": "https://images.unsplash.com/photo-1464219789935-c2d9d9aba644?auto=format&fit=crop&w=1200&q=80"
     },
     {
       "id": "v6",
       "provider_id": "p1",
-      "name": "Adventure Pro",
-      "price": 149,
+      "name": "Terra Mobil",
+      "price": 159,
       "beds": 4,
       "fuel": "Diesel",
-      "desc": "Robustes Offroad-Wohnmobil mit Allradantrieb. Für Abenteurer, die abseits befestigter Straßen unterwegs sein möchten - mit verstärktem Fahrwerk.",
+      "desc": "Robustes Offroad-Wohnmobil mit Allradantrieb und verstärktem Fahrwerk. Für Abenteurer, die abseits befestigter Straßen die Wildnis erkunden möchten.",
       "details": {
         "tech": {
           "seats": "4",
           "fuel": "Diesel",
-          "consumption": "13.2 L/100km",
-          "power": "190 PS",
+          "consumption": "13.5 L/100km",
+          "power": "200 PS",
           "license": "Klasse C1",
           "emission": "Euro 6d",
           "drive": "Allradantrieb 4x4"
         },
         "dims": {
-          "len": "680 cm",
-          "width": "220 cm",
-          "height": "295 cm",
-          "empty_weight": "3.800 kg",
-          "total_weight": "4.500 kg",
-          "towing": "2500 kg"
+          "len": "690 cm",
+          "width": "225 cm",
+          "height": "300 cm",
+          "empty_weight": "3.900 kg",
+          "total_weight": "4.800 kg",
+          "towing": "2800 kg"
         }
       },
       "features": [
-        "Allrad 4x4",
-        "Geländereifen",
-        "Bodenfreiheit 24cm",
-        "Wassertank 180L",
-        "Solaranlage",
-        "Außendusche",
-        "Dachträger",
+        "Allrad 4x4 zuschaltbar",
+        "Geländereifen M+S",
+        "Bodenfreiheit 26cm",
+        "Wassertank 200L",
+        "Solaranlage 250W",
+        "Außendusche warm/kalt",
+        "Dachträger verstärkt",
         "Bergabfahrhilfe",
-        "Differentialsperre"
+        "Differentialsperre",
+        "Unterfahrschutz"
       ],
-      "img": "https://images.unsplash.com/photo-1631195863936-c1bad2492def?auto=format&fit=crop&w=1200&q=80"
+      "img": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80"
     }
   ],
   "bookings": [
