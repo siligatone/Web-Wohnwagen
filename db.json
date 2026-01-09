@@ -13,117 +13,243 @@
       "password": "123",
       "role": "customer",
       "name": "Lisa Schmidt"
+    },
+    {
+      "id": "u_1767968929388_7zpphdhpc",
+      "email": "david@test.de",
+      "password": "123",
+      "name": "David Reis",
+      "role": "customer"
     }
   ],
   "vehicles": [
     {
       "id": "v1",
       "provider_id": "p1",
-      "name": "Sunny Explorer",
-      "price": 90,
+      "name": "Ocean Cruiser",
+      "price": 89,
       "beds": 4,
       "fuel": "Diesel",
-      "desc": "Ein kompakter, aber vollausgestatteter Campervan für Paare und kleine Familien. Perfekt für Wochenendtrips und längere Touren durch Europa.",
+      "desc": "Kompakter Kastenwagen-Ausbau mit cleverer Raumnutzung. Basierend auf modernem Transporter-Chassis, ideal für 2-4 Personen und spontane Wochenendausflüge.",
       "details": {
         "tech": {
           "seats": "4",
           "fuel": "Diesel",
-          "consumption": "9.50 L/100km",
-          "power": "170 PS",
+          "consumption": "8.2 L/100km",
+          "power": "140 PS",
           "license": "Klasse B",
-          "emission": "Euro 6d-TEMP",
+          "emission": "Euro 6d",
           "drive": "Frontantrieb"
         },
         "dims": {
-          "len": "699 cm",
-          "width": "233 cm",
-          "height": "314 cm",
-          "empty_weight": "3.200 kg",
-          "total_weight": "3.850 kg",
+          "len": "540 cm",
+          "width": "205 cm",
+          "height": "255 cm",
+          "empty_weight": "2.850 kg",
+          "total_weight": "3.500 kg",
           "towing": "2000 kg"
         }
       },
       "features": [
         "Klimaanlage",
-        "Markise",
-        "Küche",
-        "Bluetooth Audio",
-        "Solaranlage",
-        "Fahrradträger"
+        "Aufstelldach",
+        "Kompaktküche",
+        "Rückfahrkamera",
+        "LED-Innenbeleuchtung",
+        "USB-Ladestationen"
       ],
-      "img": "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80"
+      "img": "https://images.unsplash.com/photo-1527786356703-4b100091cd2c?auto=format&fit=crop&w=1200&q=80"
     },
     {
       "id": "v2",
       "provider_id": "p1",
-      "name": "Family Grand XL",
-      "price": 140,
+      "name": "Skyline Comfort",
+      "price": 125,
+      "beds": 5,
+      "fuel": "Diesel",
+      "desc": "Teilintegriertes Wohnmobil mit geräumigem Alkoven für die ganze Familie. Perfekte Mischung aus Komfort, Platz und Fahrdynamik für längere Urlaubsreisen.",
+      "details": {
+        "tech": {
+          "seats": "5",
+          "fuel": "Diesel",
+          "consumption": "10.5 L/100km",
+          "power": "177 PS",
+          "license": "Klasse B",
+          "emission": "Euro 6d-TEMP",
+          "drive": "Frontantrieb"
+        },
+        "dims": {
+          "len": "695 cm",
+          "width": "233 cm",
+          "height": "305 cm",
+          "empty_weight": "3.200 kg",
+          "total_weight": "3.850 kg",
+          "towing": "1500 kg"
+        }
+      },
+      "features": [
+        "Bad/WC separat",
+        "Hubbett",
+        "Großer Kühlschrank",
+        "Markise elektrisch",
+        "Tempomat",
+        "Zentralverriegelung"
+      ],
+      "img": "https://images.unsplash.com/photo-1464219789935-c2d9d9aba644?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      "id": "v3",
+      "provider_id": "p1",
+      "name": "Retro Van",
+      "price": 69,
+      "beds": 2,
+      "fuel": "Benzin",
+      "desc": "Kultiger Oldtimer-Campervan im Stil der 70er Jahre. Liebevoll restauriert mit modernen Sicherheitsfeatures - für unvergessliche Retro-Roadtrips.",
+      "details": {
+        "tech": {
+          "seats": "4",
+          "fuel": "Benzin",
+          "consumption": "11.5 L/100km",
+          "power": "68 PS",
+          "license": "Klasse B",
+          "emission": "H-Kennzeichen",
+          "drive": "Heckmotor"
+        },
+        "dims": {
+          "len": "445 cm",
+          "width": "179 cm",
+          "height": "207 cm",
+          "empty_weight": "1.350 kg",
+          "total_weight": "2.100 kg",
+          "towing": "-"
+        }
+      },
+      "features": [
+        "Oldtimer-Feeling",
+        "Pop-up Dach",
+        "Vintage Interieur",
+        "Gaskocher",
+        "Kühlbox 12V",
+        "Originalradio"
+      ],
+      "img": "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      "id": "v4",
+      "provider_id": "p1",
+      "name": "Luxus Liner",
+      "price": 189,
       "beds": 4,
       "fuel": "Diesel",
-      "desc": "Luxus pur für die ganze Familie. Dieses Wohnmobil bietet großzügigen Platz, Top-Ausstattung und jede Menge Komfort für unvergessliche Reisen.",
+      "desc": "Premium-Vollintegriertes mit Einzelbetten und Rundum-Panoramaverglasung. Luxuriöse Ausstattung auf höchstem Niveau für anspruchsvolle Weltenbummler.",
       "details": {
         "tech": {
           "seats": "4",
           "fuel": "Diesel",
-          "consumption": "11.0 L/100km",
-          "power": "160 PS",
+          "consumption": "12.8 L/100km",
+          "power": "205 PS",
           "license": "Klasse C1",
           "emission": "Euro 6d",
           "drive": "Heckantrieb"
         },
         "dims": {
-          "len": "740 cm",
+          "len": "760 cm",
           "width": "235 cm",
-          "height": "310 cm",
-          "empty_weight": "3.500 kg",
-          "total_weight": "4.200 kg",
+          "height": "315 cm",
+          "empty_weight": "4.100 kg",
+          "total_weight": "5.000 kg",
           "towing": "-"
         }
       },
       "features": [
-        "Bad/WC",
-        "TV/Sat",
-        "XXL Kühlschrank",
-        "Winterfest",
-        "Standheizung"
+        "Queensbett höhenverstellbar",
+        "Echtleder-Sitzgruppe",
+        "Standheizung Diesel",
+        "TV/SAT 24 Zoll",
+        "Klimaanlage Dach",
+        "Alarmanlage",
+        "Navigationssystem",
+        "Solaranlage 200W"
       ],
-      "img": "https://images.unsplash.com/photo-1626325997424-405dc1188d36?auto=format&fit=crop&w=1200&q=80"
+      "img": "https://images.unsplash.com/photo-1533591380348-14193f2b6b5f?auto=format&fit=crop&w=1200&q=80"
     },
     {
-      "id": "v3",
+      "id": "v5",
       "provider_id": "p1",
-      "name": "Vintage Bulli",
-      "price": 75,
+      "name": "Compact City",
+      "price": 65,
       "beds": 2,
-      "fuel": "Benzin",
-      "desc": "Erleben Sie das echte 70er Jahre Feeling mit diesem restaurierten VW-Bus. Ideal für Nostalgie-Fans und unvergessliche Roadtrips.",
+      "fuel": "Diesel",
+      "desc": "Wendiger Mini-Camper auf Hochdach-Basis. Perfekt für Paare und Städtetrips - kompakte Maße bei cleverer Innenraumgestaltung.",
       "details": {
         "tech": {
-          "seats": "5",
-          "fuel": "Benzin",
-          "consumption": "12.0 L/100km",
-          "power": "70 PS",
+          "seats": "2",
+          "fuel": "Diesel",
+          "consumption": "6.8 L/100km",
+          "power": "102 PS",
           "license": "Klasse B",
-          "emission": "H-Kennzeichen",
-          "drive": "Heckantrieb"
+          "emission": "Euro 6d-TEMP",
+          "drive": "Frontantrieb"
         },
         "dims": {
-          "len": "450 cm",
-          "width": "175 cm",
-          "height": "200 cm",
-          "empty_weight": "1.200 kg",
-          "total_weight": "2.300 kg",
-          "towing": "-"
+          "len": "495 cm",
+          "width": "188 cm",
+          "height": "240 cm",
+          "empty_weight": "2.200 kg",
+          "total_weight": "2.800 kg",
+          "towing": "1200 kg"
         }
       },
       "features": [
-        "Oldtimer",
-        "Aufstelldach",
-        "Gaskocher",
-        "Kühltruhe",
-        "Retro Radio"
+        "Kompakte Bauweise",
+        "Klappbett",
+        "Miniküche",
+        "Chemietoilette",
+        "Standheizung",
+        "Bluetooth Radio",
+        "Fahrradträger"
       ],
-      "img": "https://images.unsplash.com/photo-1517154596051-c636f31b402e?auto=format&fit=crop&w=1200&q=80"
+      "img": "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      "id": "v6",
+      "provider_id": "p1",
+      "name": "Adventure Pro",
+      "price": 149,
+      "beds": 4,
+      "fuel": "Diesel",
+      "desc": "Robustes Offroad-Wohnmobil mit Allradantrieb. Für Abenteurer, die abseits befestigter Straßen unterwegs sein möchten - mit verstärktem Fahrwerk.",
+      "details": {
+        "tech": {
+          "seats": "4",
+          "fuel": "Diesel",
+          "consumption": "13.2 L/100km",
+          "power": "190 PS",
+          "license": "Klasse C1",
+          "emission": "Euro 6d",
+          "drive": "Allradantrieb 4x4"
+        },
+        "dims": {
+          "len": "680 cm",
+          "width": "220 cm",
+          "height": "295 cm",
+          "empty_weight": "3.800 kg",
+          "total_weight": "4.500 kg",
+          "towing": "2500 kg"
+        }
+      },
+      "features": [
+        "Allrad 4x4",
+        "Geländereifen",
+        "Bodenfreiheit 24cm",
+        "Wassertank 180L",
+        "Solaranlage",
+        "Außendusche",
+        "Dachträger",
+        "Bergabfahrhilfe",
+        "Differentialsperre"
+      ],
+      "img": "https://images.unsplash.com/photo-1631195863936-c1bad2492def?auto=format&fit=crop&w=1200&q=80"
     }
   ],
   "bookings": [

@@ -165,9 +165,9 @@ async function displayBookingHistory(userId, append = false) {
                             <button class="btn btn-sm btn-outline-primary mt-2" onclick="viewVehicle('${vehicle.id}')">
                                 Details ansehen
                             </button>
-                            ${isUpcoming ? `
+                            ${(isUpcoming || isActive) ? `
                                 <button class="btn btn-sm btn-outline-danger mt-2" onclick="cancelBooking('${booking.id}')">
-                                    Stornieren
+                                    <i class="fa-solid fa-xmark me-1"></i>Stornieren
                                 </button>
                             ` : ''}
                         </div>
@@ -208,19 +208,19 @@ function viewVehicle(vehicleId) {
 
 // Buchung stornieren
 async function cancelBooking(bookingId) {
-    if (!confirm('Möchten Sie diese Buchung wirklich stornieren?')) {
+    if (!confirm('Möchten Sie diese Buchung wirklich stornieren?\n\nDie Stornierung kann nicht rückgängig gemacht werden.')) {
         return;
     }
 
     try {
         await deleteBooking(bookingId);
-        alert('Buchung wurde erfolgreich storniert.');
+        alert('✓ Buchung wurde erfolgreich storniert.');
 
         // Seite neu laden
         location.reload();
     } catch (error) {
         console.error('Fehler beim Stornieren:', error);
-        alert('Fehler beim Stornieren der Buchung. Bitte versuchen Sie es erneut.');
+        alert('✗ Fehler beim Stornieren der Buchung. Bitte versuchen Sie es erneut.');
     }
 }
 

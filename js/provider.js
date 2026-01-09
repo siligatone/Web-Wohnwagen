@@ -144,30 +144,142 @@ async function viewVehicleBookings(vehicleId) {
             return;
         }
 
-        let message = `Buchungen für "${vehicle.name}":\n\n`;
-
-        // Lade alle User-Daten parallel
-        const userPromises = bookings.map(booking => getUserById(booking.user_id));
-        const users = await Promise.all(userPromises);
-
-        // Erstelle Map für schnellen Zugriff
-        const userMap = new Map();
-        bookings.forEach((booking, index) => {
-            userMap.set(booking.user_id, users[index]);
-        });
-
-        for (const booking of bookings) {
-            const user = userMap.get(booking.user_id);
-            message += `• ${formatDateDisplay(booking.start)} - ${formatDateDisplay(booking.end)}\n`;
-            message += `  Kunde: ${user ? user.name : 'Unbekannt'}\n`;
-            message += `  Preis: ${booking.totalPrice || 'N/A'}€\n\n`;
-        }
-
-        alert(message);
+        // Modal mit Buchungen anzeigen
+        await showBookingsModal(vehicle, bookings);
     } catch (error) {
         console.error('Fehler beim Laden der Buchungen:', error);
         alert('Fehler beim Laden der Buchungen. Ist der Server gestartet?');
     }
+}
+
+// Buchungen-Modal anzeigen
+async function showBookingsModal(vehicle, bookings) {
+    // Lade alle User-Daten parallel
+    const userPromises = bookings.map(booking => getUserById(booking.user_id));
+    const users = await Promise.all(userPromises);
+
+    // Erstelle Map für schnellen Zugriff
+    const userMap = new Map();
+    bookings.forEach((booking, index) => {
+        userMap.set(booking.user_id, users[index]);
+    });
+
+    // Sortiere nach Startdatum
+    bookings.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+    const bookingsHTML = bookings.map(booking => {
+        const user = userMap.get(booking.user_id);
+        const start = new Date(booking.start);
+        const end = new Date(booking.end);
+        const today = new Date();
+        const isUpcoming = start > today;
+        const isActive = start <= today && end >= today;
+        const isPast = end < today;
+
+        let statusBadge = '';
+        let canCancel = false;
+
+        if (isActive) {
+            statusBadge = '<span class="badge bg-success">Aktiv</span>';
+            canCancel = true;
+        } else if (isUpcoming) {
+            statusBadge = '<span class="badge bg-primary">Bevorstehend</span>';
+            canCancel = true;
+        } else {
+            statusBadge = '<span class="badge bg-secondary">Abgeschlossen</span>';
+        }
+
+        return `
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-7">
+                            <h6 class="mb-2">${statusBadge}</h6>
+                            <p class="mb-1"><i class="fa-solid fa-calendar me-2"></i>${formatDateDisplay(booking.start)} - ${formatDateDisplay(booking.end)}</p>
+                            <p class="mb-1"><i class="fa-solid fa-user me-2"></i>Kunde: ${user ? user.name : 'Unbekannt'}</p>
+                            <p class="mb-0"><i class="fa-solid fa-moon me-2"></i>${booking.nights || calculateNights(booking.start, booking.end)} Nächte</p>
+                        </div>
+                        <div class="col-md-5 text-md-end">
+                            <div class="fs-5 fw-bold text-primary mb-2">${booking.totalPrice || 'N/A'}€</div>
+                            <small class="text-muted d-block mb-2">ID: ${booking.id}</small>
+                            ${canCancel ? `
+                                <button class="btn btn-sm btn-outline-danger" onclick="cancelProviderBooking('${booking.id}', '${vehicle.name}')">
+                                    <i class="fa-solid fa-xmark me-1"></i>Stornieren
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Erstelle Modal-HTML
+    const modalHTML = `
+        <div class="modal fade" id="bookingsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fa-solid fa-calendar-check me-2"></i>Buchungen für ${vehicle.name}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${bookingsHTML}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Entferne altes Modal falls vorhanden
+    const oldModal = document.getElementById('bookingsModal');
+    if (oldModal) {
+        oldModal.remove();
+    }
+
+    // Füge neues Modal hinzu
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Zeige Modal
+    const modal = new bootstrap.Modal(document.getElementById('bookingsModal'));
+    modal.show();
+}
+
+// Buchung als Anbieter stornieren
+async function cancelProviderBooking(bookingId, vehicleName) {
+    if (!confirm(`Möchten Sie diese Buchung für "${vehicleName}" wirklich stornieren?\n\nDie Stornierung kann nicht rückgängig gemacht werden.`)) {
+        return;
+    }
+
+    try {
+        await deleteBooking(bookingId);
+        alert('✓ Buchung wurde erfolgreich storniert.');
+
+        // Schließe Modal und aktualisiere Dashboard
+        const modal = bootstrap.Modal.getInstance(document.getElementById('bookingsModal'));
+        if (modal) {
+            modal.hide();
+        }
+
+        // Aktualisiere Dashboard
+        const currentUser = getCurrentUser();
+        await displayProviderStats(currentUser.id);
+        await displayProviderVehicles(currentUser.id);
+    } catch (error) {
+        console.error('Fehler beim Stornieren:', error);
+        alert('✗ Fehler beim Stornieren der Buchung. Bitte versuchen Sie es erneut.');
+    }
+}
+
+// Berechne Anzahl der Nächte (Hilfsfunktion für Provider)
+function calculateNights(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = end - start;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
 // Fahrzeug bearbeiten
