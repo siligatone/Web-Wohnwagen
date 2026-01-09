@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CamperRent - Mieten Sie Freiheit</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+
+    <!-- Header wird dynamisch von shared.js geladen -->
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-header">
+            <div class="container">
+                <h1 class="display-3 fw-bold mb-3">Mieten Sie Freiheit</h1>
+                <p class="lead mb-4">Entdecken Sie die Welt mit unseren geprüften Wohnmobilen</p>
+                <a href="#fahrzeuge" class="btn btn-light btn-lg px-5" onclick="scrollToFleet()">
+                    Fahrzeuge entdecken <i class="fa-solid fa-arrow-down ms-2"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- Fahrzeug-Liste -->
+        <section id="fahrzeuge" class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Unsere Fahrzeuge</h2>
+                <p class="lead text-muted">Wählen Sie aus unserer Flotte das perfekte Wohnmobil für Ihr Abenteuer</p>
+            </div>
+
+            <div id="vehicleList" class="row g-4">
+                <!-- Fahrzeuge werden von vehicles.js geladen -->
+            </div>
+        </section>
+
+        <!-- Vorteile Section -->
+        <section class="bg-light py-5">
+            <div class="container">
+                <h3 class="text-center mb-5">Warum CamperRent?</h3>
+                <div class="row g-4">
+                    <div class="col-md-4 text-center">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-shield-halved fa-3x text-primary"></i>
+                        </div>
+                        <h5>Geprüfte Qualität</h5>
+                        <p class="text-muted">Alle Fahrzeuge werden regelmäßig gewartet und vor jeder Vermietung überprüft.</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-headset fa-3x text-primary"></i>
+                        </div>
+                        <h5>24/7 Support</h5>
+                        <p class="text-muted">Unser Kundenservice steht Ihnen rund um die Uhr zur Verfügung.</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-euro-sign fa-3x text-primary"></i>
+                        </div>
+                        <h5>Faire Preise</h5>
+                        <p class="text-muted">Transparente Preisgestaltung ohne versteckte Kosten.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer wird dynamisch von shared.js geladen -->
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/api.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/vehicles.js"></script>
+</body>
+</html>

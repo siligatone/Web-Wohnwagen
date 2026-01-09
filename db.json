@@ -1,0 +1,161 @@
+{
+  "users": [
+    {
+      "id": "p1",
+      "email": "anbieter@test.de",
+      "password": "123",
+      "role": "provider",
+      "name": "Hans Müller"
+    },
+    {
+      "id": "c1",
+      "email": "kunde@test.de",
+      "password": "123",
+      "role": "customer",
+      "name": "Lisa Schmidt"
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1",
+      "provider_id": "p1",
+      "name": "Sunny Explorer",
+      "price": 90,
+      "beds": 4,
+      "fuel": "Diesel",
+      "desc": "Ein kompakter, aber vollausgestatteter Campervan für Paare und kleine Familien. Perfekt für Wochenendtrips und längere Touren durch Europa.",
+      "details": {
+        "tech": {
+          "seats": "4",
+          "fuel": "Diesel",
+          "consumption": "9.50 L/100km",
+          "power": "170 PS",
+          "license": "Klasse B",
+          "emission": "Euro 6d-TEMP",
+          "drive": "Frontantrieb"
+        },
+        "dims": {
+          "len": "699 cm",
+          "width": "233 cm",
+          "height": "314 cm",
+          "empty_weight": "3.200 kg",
+          "total_weight": "3.850 kg",
+          "towing": "2000 kg"
+        }
+      },
+      "features": [
+        "Klimaanlage",
+        "Markise",
+        "Küche",
+        "Bluetooth Audio",
+        "Solaranlage",
+        "Fahrradträger"
+      ],
+      "img": "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      "id": "v2",
+      "provider_id": "p1",
+      "name": "Family Grand XL",
+      "price": 140,
+      "beds": 4,
+      "fuel": "Diesel",
+      "desc": "Luxus pur für die ganze Familie. Dieses Wohnmobil bietet großzügigen Platz, Top-Ausstattung und jede Menge Komfort für unvergessliche Reisen.",
+      "details": {
+        "tech": {
+          "seats": "4",
+          "fuel": "Diesel",
+          "consumption": "11.0 L/100km",
+          "power": "160 PS",
+          "license": "Klasse C1",
+          "emission": "Euro 6d",
+          "drive": "Heckantrieb"
+        },
+        "dims": {
+          "len": "740 cm",
+          "width": "235 cm",
+          "height": "310 cm",
+          "empty_weight": "3.500 kg",
+          "total_weight": "4.200 kg",
+          "towing": "-"
+        }
+      },
+      "features": [
+        "Bad/WC",
+        "TV/Sat",
+        "XXL Kühlschrank",
+        "Winterfest",
+        "Standheizung"
+      ],
+      "img": "https://images.unsplash.com/photo-1626325997424-405dc1188d36?auto=format&fit=crop&w=1200&q=80"
+    },
+    {
+      "id": "v3",
+      "provider_id": "p1",
+      "name": "Vintage Bulli",
+      "price": 75,
+      "beds": 2,
+      "fuel": "Benzin",
+      "desc": "Erleben Sie das echte 70er Jahre Feeling mit diesem restaurierten VW-Bus. Ideal für Nostalgie-Fans und unvergessliche Roadtrips.",
+      "details": {
+        "tech": {
+          "seats": "5",
+          "fuel": "Benzin",
+          "consumption": "12.0 L/100km",
+          "power": "70 PS",
+          "license": "Klasse B",
+          "emission": "H-Kennzeichen",
+          "drive": "Heckantrieb"
+        },
+        "dims": {
+          "len": "450 cm",
+          "width": "175 cm",
+          "height": "200 cm",
+          "empty_weight": "1.200 kg",
+          "total_weight": "2.300 kg",
+          "towing": "-"
+        }
+      },
+      "features": [
+        "Oldtimer",
+        "Aufstelldach",
+        "Gaskocher",
+        "Kühltruhe",
+        "Retro Radio"
+      ],
+      "img": "https://images.unsplash.com/photo-1517154596051-c636f31b402e?auto=format&fit=crop&w=1200&q=80"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "b1",
+      "vehicle_id": "v1",
+      "user_id": "c1",
+      "start": "2023-12-01",
+      "end": "2023-12-05",
+      "nights": 4,
+      "totalPrice": 375,
+      "createdAt": "2023-11-15T10:30:00.000Z"
+    },
+    {
+      "vehicle_id": "v1",
+      "user_id": "c1",
+      "start": "2026-01-21",
+      "end": "2026-01-30",
+      "nights": 9,
+      "totalPrice": 825,
+      "createdAt": "2026-01-09T08:15:28.510Z",
+      "id": "b_1767946528510_yxzvq99bh"
+    },
+    {
+      "vehicle_id": "v2",
+      "user_id": "p1",
+      "start": "2026-01-16",
+      "end": "2026-01-23",
+      "nights": 7,
+      "totalPrice": 995,
+      "createdAt": "2026-01-09T08:46:12.506Z",
+      "id": "b_1767948372506_5w7bvlhk7"
+    }
+  ]
+}
