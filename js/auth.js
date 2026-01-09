@@ -107,17 +107,6 @@ async function handleRegister(event) {
     return false;
 }
 
-// Demo-Login ausfüllen
-function fillDemoLogin(type) {
-    if (type === 'kunde') {
-        document.getElementById('loginEmail').value = 'kunde@test.de';
-        document.getElementById('loginPass').value = '123';
-    } else if (type === 'anbieter') {
-        document.getElementById('loginEmail').value = 'anbieter@test.de';
-        document.getElementById('loginPass').value = '123';
-    }
-}
-
 // Logout
 function logout() {
     if (confirm('Möchten Sie sich wirklich abmelden?')) {
