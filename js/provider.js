@@ -307,7 +307,11 @@ async function editVehicle(vehicleId) {
         document.getElementById('editVehiclePrice').value = vehicle.price;
         document.getElementById('editVehicleBeds').value = vehicle.beds;
         document.getElementById('editVehicleFuel').value = vehicle.fuel;
-        document.getElementById('editVehicleImage').value = vehicle.img || '';
+
+        // Bilder: Zeige images Array als komma-getrennte Liste
+        const images = vehicle.images || (vehicle.img ? [vehicle.img] : []);
+        document.getElementById('editVehicleImages').value = images.join(', ');
+
         document.getElementById('editVehicleDesc').value = vehicle.desc;
 
         // Technische Daten
@@ -367,6 +371,10 @@ async function handleEditVehicle(event) {
         const featuresValue = document.getElementById('editFeatures').value.trim();
         const features = featuresValue ? featuresValue.split(',').map(f => f.trim()).filter(f => f) : [];
 
+        // Parse Images (komma-getrennt)
+        const imagesValue = document.getElementById('editVehicleImages').value.trim();
+        const images = imagesValue ? imagesValue.split(',').map(url => url.trim()).filter(url => url) : [];
+
         // Update alle bearbeitbaren Felder
         const updatedVehicle = {
             ...currentVehicle,
@@ -374,7 +382,8 @@ async function handleEditVehicle(event) {
             price: parseInt(document.getElementById('editVehiclePrice').value),
             beds: parseInt(document.getElementById('editVehicleBeds').value),
             fuel: document.getElementById('editVehicleFuel').value,
-            img: document.getElementById('editVehicleImage').value || currentVehicle.img,
+            img: images.length > 0 ? images[0] : (currentVehicle.img || ''),
+            images: images.length > 0 ? images : (currentVehicle.images || [currentVehicle.img]),
             desc: document.getElementById('editVehicleDesc').value,
             features: features,
             details: {
@@ -470,6 +479,14 @@ async function handleCreateVehicle(event) {
     const featuresValue = document.getElementById('features').value.trim();
     const features = featuresValue ? featuresValue.split(',').map(f => f.trim()).filter(f => f) : [];
 
+    // Parse Images (komma-getrennt)
+    const imagesValue = document.getElementById('vehicleImages').value.trim();
+    const images = imagesValue ? imagesValue.split(',').map(url => url.trim()).filter(url => url) : [];
+
+    // Fallback Bild wenn keine Bilder angegeben
+    const defaultImage = 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80';
+    const finalImages = images.length > 0 ? images : [defaultImage];
+
     // Formular-Daten sammeln
     const newVehicle = {
         id: generateId('v'),
@@ -479,7 +496,8 @@ async function handleCreateVehicle(event) {
         beds: parseInt(document.getElementById('vehicleBeds').value),
         fuel: document.getElementById('vehicleFuel').value,
         desc: document.getElementById('vehicleDesc').value,
-        img: document.getElementById('vehicleImage').value || 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80',
+        img: finalImages[0],
+        images: finalImages,
         features: features,
         details: {
             tech: {

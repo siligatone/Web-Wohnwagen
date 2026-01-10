@@ -39,8 +39,9 @@ async function loadVehicleDetails() {
 function displayVehicleInfo() {
     // Header
     document.getElementById('vehicleName').textContent = currentVehicle.name;
-    document.getElementById('vehicleImage').src = currentVehicle.img;
-    document.getElementById('vehicleImage').alt = currentVehicle.name;
+
+    // Bildergalerie anzeigen
+    displayVehicleImages();
 
     // Beschreibung
     document.getElementById('vehicleDesc').textContent = currentVehicle.desc;
@@ -89,6 +90,116 @@ function displayVehicleInfo() {
         };
         return `<tr><th>${labels[key] || key}</th><td>${value}</td></tr>`;
     }).join('');
+}
+
+// Bildergalerie anzeigen (einzelnes Bild oder Karussell)
+function displayVehicleImages() {
+    const container = document.getElementById('vehicleImageContainer');
+
+    // Hole images Array (Fallback auf img Feld für Rückwärtskompatibilität)
+    let images = currentVehicle.images || [];
+
+    // Fallback: Wenn kein images Array, nutze img Feld
+    if (!images || images.length === 0) {
+        if (currentVehicle.img) {
+            images = [currentVehicle.img];
+        } else {
+            container.innerHTML = '<p class="text-muted">Keine Bilder verfügbar</p>';
+            return;
+        }
+    }
+
+    // Wenn nur 1 Bild: Zeige einfaches Bild
+    if (images.length === 1) {
+        container.innerHTML = `
+            <img src="${images[0]}"
+                 class="vehicle-single-image"
+                 alt="${currentVehicle.name}">
+        `;
+        return;
+    }
+
+    // Mehrere Bilder: Bootstrap Karussell erstellen
+    const carouselId = 'vehicleCarousel';
+
+    // Carousel Items
+    const carouselItems = images.map((imgUrl, index) => `
+        <div class="carousel-item ${index === 0 ? 'active' : ''}">
+            <img src="${imgUrl}" alt="${currentVehicle.name} - Bild ${index + 1}">
+        </div>
+    `).join('');
+
+    // Thumbnails
+    const thumbnails = images.map((imgUrl, index) => `
+        <div class="carousel-thumbnail ${index === 0 ? 'active' : ''}"
+             onclick="goToSlide(${index})"
+             data-index="${index}">
+            <img src="${imgUrl}" alt="Vorschau ${index + 1}">
+        </div>
+    `).join('');
+
+    // Vollständiges Karussell HTML
+    container.innerHTML = `
+        <div id="${carouselId}" class="carousel slide vehicle-carousel" data-bs-ride="false">
+            <!-- Bild-Zähler -->
+            <div class="carousel-image-counter">
+                <span id="currentImageIndex">1</span> / ${images.length}
+            </div>
+
+            <!-- Carousel Inner -->
+            <div class="carousel-inner">
+                ${carouselItems}
+            </div>
+
+            <!-- Navigation Controls -->
+            ${images.length > 1 ? `
+                <button class="carousel-control-prev" type="button" data-bs-target="#${carouselId}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Vorheriges</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#${carouselId}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Nächstes</span>
+                </button>
+            ` : ''}
+        </div>
+
+        <!-- Thumbnail Preview -->
+        ${images.length > 1 ? `
+            <div class="carousel-thumbnails">
+                ${thumbnails}
+            </div>
+        ` : ''}
+    `;
+
+    // Event Listener für Slide-Wechsel
+    if (images.length > 1) {
+        const carouselElement = document.getElementById(carouselId);
+        const bsCarousel = new bootstrap.Carousel(carouselElement, {
+            interval: false // Kein automatisches Wechseln
+        });
+
+        // Update Zähler und aktive Thumbnail bei Slide-Wechsel
+        carouselElement.addEventListener('slid.bs.carousel', function(event) {
+            const currentIndex = event.to;
+            document.getElementById('currentImageIndex').textContent = currentIndex + 1;
+
+            // Update aktive Thumbnail
+            document.querySelectorAll('.carousel-thumbnail').forEach((thumb, idx) => {
+                thumb.classList.toggle('active', idx === currentIndex);
+            });
+        });
+
+        // Speichere Carousel-Instanz global für goToSlide()
+        window.vehicleCarouselInstance = bsCarousel;
+    }
+}
+
+// Zu bestimmtem Slide springen (von Thumbnail)
+function goToSlide(index) {
+    if (window.vehicleCarouselInstance) {
+        window.vehicleCarouselInstance.to(index);
+    }
 }
 
 // Bei DOM-Ready

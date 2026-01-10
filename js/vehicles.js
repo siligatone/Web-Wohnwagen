@@ -120,10 +120,14 @@ function renderVehicles(vehicles) {
     }
 
     // Fahrzeug-Karten generieren
-    container.innerHTML = vehicles.map(vehicle => `
+    container.innerHTML = vehicles.map(vehicle => {
+        // Hole erstes Bild (Fallback auf img Feld)
+        const imageUrl = (vehicle.images && vehicle.images.length > 0) ? vehicle.images[0] : vehicle.img;
+
+        return `
         <div class="col-md-6 col-lg-4">
             <div class="card vehicle-card h-100" onclick="goToVehicle('${vehicle.id}')">
-                <img src="${vehicle.img}" class="card-img-top" alt="${vehicle.name}">
+                <img src="${imageUrl}" class="card-img-top" alt="${vehicle.name}">
                 <div class="card-body">
                     <h5 class="card-title fw-bold">${vehicle.name}</h5>
                     <p class="card-text text-muted small">${vehicle.desc.substring(0, 100)}...</p>
@@ -141,7 +145,8 @@ function renderVehicles(vehicles) {
                 </div>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 /**
