@@ -242,32 +242,12 @@ async function handleBooking(event) {
 
 // Buchungs-Erfolg anzeigen
 function showBookingSuccess(booking) {
-    // Extras formatieren für Anzeige
     let extrasText = '';
     if (booking.extras && booking.extras.length > 0) {
-        extrasText = '<p class="small"><strong>Gebuchte Extras:</strong><br>' + 
-            booking.extras.map(e => `• ${e.name} (+${e.price}€)`).join('<br>') + 
-            '</p>';
+        extrasText = '\n\nGebuchte Extras:\n' + booking.extras.map(e => `• ${e.name} (+${e.price}€)`).join('\n');
     }
     
-    const message = `
-        <div class="alert alert-success alert-custom">
-            <h4 class="alert-heading"><i class="fa-solid fa-check-circle me-2"></i>Buchung erfolgreich!</h4>
-            <p><strong>${currentVehicle.name}</strong></p>
-            <p>Zeitraum: ${formatDateDisplay(booking.start)} - ${formatDateDisplay(booking.end)}</p>
-            ${extrasText}
-            <p class="fw-bold">Gesamtpreis: ${booking.totalPrice}€</p>
-            <hr>
-            <p class="mb-0">Sie finden Ihre Buchung in Ihrem <a href="profil.html" class="alert-link">Profil</a>.</p>
-        </div>
-    `;
-
-    // Zeige Modal oder ersetze Formular
-    const bookingForm = document.querySelector('form');
-    if (bookingForm) {
-        bookingForm.innerHTML = message;
-    }
-
-    // Scroll nach oben
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    alert(`✓ Buchung erfolgreich!\n\nFahrzeug: ${currentVehicle.name}\nZeitraum: ${formatDateDisplay(booking.start)} - ${formatDateDisplay(booking.end)}\nNächte: ${booking.nights}${extrasText}\n\nGesamtpreis: ${booking.totalPrice}€\n\nSie finden Ihre Buchung in Ihrem Profil.`);
+    
+    location.reload();
 }

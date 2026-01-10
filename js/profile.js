@@ -208,13 +208,57 @@ function viewVehicle(vehicleId) {
 
 // Buchung stornieren
 async function cancelBooking(bookingId) {
-    if (!confirm('Möchten Sie diese Buchung wirklich stornieren?\n\nDie Stornierung kann nicht rückgängig gemacht werden.')) {
-        return;
-    }
-
+    const currentUser = getCurrentUser();
+    
     try {
+        // Lade Buchungsdetails
+        const booking = await getBookingById(bookingId);
+        if (!booking) {
+            alert('Buchung konnte nicht gefunden werden.');
+            return;
+        }
+
+        // Prüfe ob Nutzer Anbieter ist
+        const isProvider = currentUser.role === 'provider';
+        
+        let cancellationFee = 0;
+        let confirmMessage = '';
+        
+        if (isProvider) {
+            // Anbieter storniert kostenlos
+            confirmMessage = 'Möchten Sie diese Buchung wirklich stornieren?\n\nDie Stornierung kann nicht rückgängig gemacht werden.';
+        } else {
+            // Kunde zahlt Stornierungsgebühr
+            // Berechne Stornierungskosten: 20% des Basispreises (ohne Extras und Verwaltungskosten)
+            const serviceFee = 15; // Verwaltungskosten
+            
+            // Berechne Extra-Kosten
+            let extrasTotal = 0;
+            if (booking.extras && booking.extras.length > 0) {
+                extrasTotal = booking.extras.reduce((sum, extra) => sum + (extra.price || 0), 0);
+            }
+            
+            // Basispreis = Gesamtpreis - Extras - Verwaltungskosten
+            const basePrice = booking.totalPrice - extrasTotal - serviceFee;
+            
+            // Stornierungsgebühr: 20% des Basispreises
+            cancellationFee = Math.round(basePrice * 0.20);
+            
+            confirmMessage = `STORNIERUNGSKOSTEN\n\nBitte beachten Sie: Bei der Stornierung dieser Buchung fallen folgende Kosten an:\n\nStornierungsgebühr: ${cancellationFee}€ \n\nMöchten Sie die Buchung trotzdem stornieren?`;
+        }
+        
+        if (!confirm(confirmMessage)) {
+            return;
+        }
+
+        // Buchung löschen
         await deleteBooking(bookingId);
-        alert('✓ Buchung wurde erfolgreich storniert.');
+        
+        if (isProvider) {
+            alert('✓ Buchung wurde erfolgreich storniert.');
+        } else {
+            alert(`✓ Buchung wurde storniert.\n\nEs wurden Stornierungskosten in Höhe von ${cancellationFee}€ berechnet.`);
+        }
 
         // Seite neu laden
         location.reload();
