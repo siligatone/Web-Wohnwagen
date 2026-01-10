@@ -80,13 +80,18 @@ async function handleRegister(event) {
             return false;
         }
 
+        // Rolle aus Formular auslesen
+        const roleCustomer = document.getElementById('roleCustomer');
+        const roleProvider = document.getElementById('roleProvider');
+        const selectedRole = roleProvider && roleProvider.checked ? 'provider' : 'customer';
+
         // Neuen User erstellen
         const newUser = {
             id: generateId('u'),
             email: email,
             password: password,
             name: `${firstName} ${lastName}`,
-            role: 'customer'
+            role: selectedRole
         };
 
         await addUser(newUser);

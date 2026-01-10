@@ -24,242 +24,265 @@
   ],
   "vehicles": [
     {
-      "id": "v1",
-      "provider_id": "p1",
-      "name": "Elite Liner",
-      "price": 199,
       "beds": 4,
-      "fuel": "Diesel",
-      "desc": "Premium-Vollintegriertes mit exklusiver Ausstattung und Rundum-Panoramaverglasung. Höchster Komfort für anspruchsvolle Reisende - Luxus auf Rädern.",
+      "desc": "Neuer VW California Ocean/Coast mit innovativem 3-Raum-Konzept, zwei Schiebetüren und smartem Campingsystem via App-Steuerung. Kompakter Campervan mit großzügigem Komfort und moderner Technologie für Abenteuer zu zweit oder zu viert.",
       "details": {
         "tech": {
           "seats": "4",
           "fuel": "Diesel",
-          "consumption": "12.5 L/100km",
-          "power": "210 PS",
-          "license": "Klasse C1",
-          "emission": "Euro 6d",
-          "drive": "Heckantrieb"
-        },
-        "dims": {
-          "len": "780 cm",
-          "width": "235 cm",
-          "height": "320 cm",
-          "empty_weight": "4.200 kg",
-          "total_weight": "5.200 kg",
-          "towing": "-"
-        }
-      },
-      "features": [
-        "Queensbett höhenverstellbar",
-        "Echtleder-Lounge",
-        "Standheizung Diesel",
-        "TV/SAT 32 Zoll",
-        "Klimaanlage Dach + Kabine",
-        "Alarmanlage Premium",
-        "Navigationssystem",
-        "Solaranlage 300W",
-        "Espressomaschine"
-      ],
-      "img": "https://images.unsplash.com/photo-1565049186696-93c9418576a6?auto=format&fit=crop&w=1200&q=80"
-    },
-    {
-      "id": "v2",
-      "provider_id": "p1",
-      "name": "Volt Mobil",
-      "price": 139,
-      "beds": 4,
-      "fuel": "Elektro",
-      "desc": "Innovatives Elektro-Wohnmobil mit 400km Reichweite. Emissionsfrei reisen mit modernster Ladetechnologie und nachhaltiger Energieversorgung durch Solarpanels.",
-      "details": {
-        "tech": {
-          "seats": "4",
-          "fuel": "Elektro",
-          "consumption": "42 kWh/100km",
-          "power": "180 PS (elektrisch)",
-          "license": "Klasse B",
-          "emission": "0g CO₂/km",
-          "drive": "Elektroantrieb"
-        },
-        "dims": {
-          "len": "620 cm",
-          "width": "215 cm",
-          "height": "280 cm",
-          "empty_weight": "3.100 kg",
-          "total_weight": "3.800 kg",
-          "towing": "750 kg"
-        }
-      },
-      "features": [
-        "Elektromotor 180 PS",
-        "Reichweite 400 km",
-        "Schnellladung DC",
-        "Solaranlage 500W",
-        "Lithium-Batterie 95 kWh",
-        "Wärmepumpe",
-        "Rekuperation",
-        "E-Markise",
-        "Ladekabel Typ 2"
-      ],
-      "img": "https://images.unsplash.com/photo-1527786356703-4b100091cd2c?auto=format&fit=crop&w=1200&q=80"
-    },
-    {
-      "id": "v3",
-      "provider_id": "p1",
-      "name": "Pure Van",
-      "price": 59,
-      "beds": 2,
-      "fuel": "Diesel",
-      "desc": "Minimalistischer Campingbus mit dem Nötigsten. Einfach, praktisch und günstig - perfekt für spontane Trips und unkomplizierte Abenteuer.",
-      "details": {
-        "tech": {
-          "seats": "2",
-          "fuel": "Diesel",
-          "consumption": "7.2 L/100km",
-          "power": "110 PS",
+          "consumption": "7.8 L/100km",
+          "power": "150 PS",
           "license": "Klasse B",
           "emission": "Euro 6d",
           "drive": "Frontantrieb"
         },
         "dims": {
-          "len": "505 cm",
-          "width": "190 cm",
-          "height": "245 cm",
-          "empty_weight": "2.300 kg",
-          "total_weight": "2.900 kg",
-          "towing": "1000 kg"
-        }
-      },
-      "features": [
-        "Klappbett",
-        "Miniküche",
-        "Kühlbox",
-        "Chemietoilette",
-        "Wassertank 60L",
-        "USB-Anschlüsse",
-        "Verdunklungsvorhänge"
-      ],
-      "img": "https://images.unsplash.com/photo-1539632527982-e0780d6ce61c?auto=format&fit=crop&w=1200&q=80"
-    },
-    {
-      "id": "v4",
-      "provider_id": "p1",
-      "name": "Vintage Van",
-      "price": 75,
-      "beds": 2,
-      "fuel": "Benzin",
-      "desc": "Kultiger Oldtimer-Campervan im Stil der 70er Jahre. Liebevoll restauriert mit modernen Sicherheitsfeatures - für unvergessliche Retro-Roadtrips voller Nostalgie.",
-      "details": {
-        "tech": {
-          "seats": "4",
-          "fuel": "Benzin",
-          "consumption": "11.8 L/100km",
-          "power": "70 PS",
-          "license": "Klasse B",
-          "emission": "H-Kennzeichen",
-          "drive": "Heckmotor Boxer"
-        },
-        "dims": {
-          "len": "450 cm",
-          "width": "180 cm",
-          "height": "210 cm",
-          "empty_weight": "1.400 kg",
-          "total_weight": "2.200 kg",
-          "towing": "-"
-        }
-      },
-      "features": [
-        "Oldtimer-Feeling",
-        "Pop-up Dach",
-        "Vintage Interieur",
-        "Gaskocher 2-flammig",
-        "Kühlbox 12V",
-        "Retro-Radio",
-        "Karo-Vorhänge",
-        "Holzvertäfelung"
-      ],
-      "img": "https://images.unsplash.com/photo-1639156814151-334b5327665b?auto=format&fit=crop&w=1200&q=80"
-    },
-    {
-      "id": "v5",
-      "provider_id": "p1",
-      "name": "Grand Liner",
-      "price": 145,
-      "beds": 6,
-      "fuel": "Diesel",
-      "desc": "Großräumiges Familien-Wohnmobil mit Alkoven und bis zu 6 Schlafplätzen. Viel Stauraum, separate Bereiche und kindergerechte Ausstattung für den perfekten Familienurlaub.",
-      "details": {
-        "tech": {
-          "seats": "6",
-          "fuel": "Diesel",
-          "consumption": "11.2 L/100km",
-          "power": "180 PS",
-          "license": "Klasse B (bis 3.5t)",
-          "emission": "Euro 6d-TEMP",
-          "drive": "Frontantrieb"
-        },
-        "dims": {
-          "len": "720 cm",
-          "width": "235 cm",
-          "height": "315 cm",
-          "empty_weight": "3.300 kg",
-          "total_weight": "3.900 kg",
+          "len": "518 cm",
+          "width": "225 cm",
+          "height": "198 cm",
+          "empty_weight": "2850 kg",
+          "total_weight": "3500 kg",
           "towing": "1800 kg"
         }
       },
       "features": [
-        "Alkoven-Doppelbett",
-        "Etagenbett Kinder",
-        "Bad/WC separat",
-        "Großer Kühlschrank 180L",
-        "Markise elektrisch",
-        "Kindersicherungen",
-        "TV-Halterung",
-        "Fahrradträger 4 Räder",
-        "Tempomat"
+        "Aufstelldach manuell/automatisch",
+        "Integrierte Küchenzeile mit 1 Gasplatte",
+        "Kühlschrank 42L",
+        "Sitzheizung Fahrer & Beifahrer",
+        "Luftstandheizung (dieselbetrieben)",
+        "Navigationssystem mit ChatGPT",
+        "Rückfahrkamera",
+        "230V Anschluss",
+        "Markise"
       ],
-      "img": "https://images.unsplash.com/photo-1626680114529-3f6ffa002b80?auto=format&fit=crop&w=1200&q=80"
+      "fuel": "Diesel",
+      "id": "v1",
+      "img": "https://media.discordapp.net/attachments/1317158991171944478/1459541869456392324/Sunrise_Suite.png?ex=6963a7ca&is=6962564a&hm=922e9b01ddb66fb5734ba7780bbd960691950baccdb95a8baa0fd5645e28903a&=&format=webp&quality=lossless",
+      "images": [
+        "https://media.discordapp.net/attachments/1317158991171944478/1459541869456392324/Sunrise_Suite.png?ex=6963a7ca&is=6962564a&hm=922e9b01ddb66fb5734ba7780bbd960691950baccdb95a8baa0fd5645e28903a&=&format=webp&quality=lossless"
+      ],
+      "name": "Sunrise Suite",
+      "price": 109,
+      "provider_id": "p1"
     },
     {
-      "id": "v6",
-      "provider_id": "p1",
-      "name": "Terra Mobil",
-      "price": 159,
       "beds": 4,
-      "fuel": "Diesel",
-      "desc": "Robustes Offroad-Wohnmobil mit Allradantrieb und verstärktem Fahrwerk. Für Abenteurer, die abseits befestigter Straßen die Wildnis erkunden möchten.",
+      "desc": "Kastenwagen-Wohnmobil für Nordamerika mit Platz für bis zu 4 Personen. Durchdachte Ausstattung mit vollständiger Küche, eigenem Badezimmer, Solarpanel und flexiblem Raumkonzept für unabhängiges Reisen durch USA und Kanada.",
+      "details": {
+        "tech": {
+          "seats": "4",
+          "fuel": "Benzin",
+          "consumption": "11.2 L/100km",
+          "power": "280 PS",
+          "license": "Klasse C",
+          "emission": "Euro 6",
+          "drive": "Heckantrieb"
+        },
+        "dims": {
+          "len": "642 cm",
+          "width": "270 cm",
+          "height": "287 cm",
+          "empty_weight": "4200 kg",
+          "total_weight": "5500 kg",
+          "towing": "2000 kg"
+        }
+      },
+      "features": [
+        "Aufstelldach manuell",
+        "Großer Küchenbereich mit 2 Gas-/Elektrokochplatten",
+        "Kühlschrank 121",
+        "76L mit Gefrierfach",
+        "Luftstandheizung (gasbetrieben)",
+        "Stand-/Klimaanlage (beim Fahren und Parken)",
+        "Innendusche mit Warmwasser",
+        "Außendusche mit Warmwasser",
+        "Solarpanel",
+        "Wechselrichter/Generator"
+      ],
+      "fuel": "Benzin",
+      "id": "v2",
+      "img": "https://cdn.discordapp.com/attachments/1317158991171944478/1459541869858914416/Liberty_Lodge.png?ex=6963a7ca&is=6962564a&hm=e7d96944de90e51c65c5dac2819e6b51468415f54397e7f939715c1db584331f&",
+      "images": [
+        "https://cdn.discordapp.com/attachments/1317158991171944478/1459541869858914416/Liberty_Lodge.png?ex=6963a7ca&is=6962564a&hm=e7d96944de90e51c65c5dac2819e6b51468415f54397e7f939715c1db584331f&"
+      ],
+      "name": "Liberty Lodge",
+      "price": 129,
+      "provider_id": "p1"
+    },
+    {
+      "beds": 5,
+      "desc": "Großes Class-C Wohnmobil für Nordamerika mit Platz für 5 Personen. Vollständig ausgestattete Küche, Badezimmer mit Warmwasserdusche, Alkoven-Dach und Solarpanel. Ideal für Familien und Freundesgruppen in USA und Kanada.",
+      "details": {
+        "tech": {
+          "seats": "5",
+          "fuel": "Benzin",
+          "consumption": "12.5 L/100km",
+          "power": "325 PS",
+          "license": "Klasse C",
+          "emission": "Euro 6d",
+          "drive": "Allrad"
+        },
+        "dims": {
+          "len": "730 cm",
+          "width": "317 cm",
+          "height": "336 cm",
+          "empty_weight": "5100 kg",
+          "total_weight": "6500 kg",
+          "towing": "2500 kg"
+        }
+      },
+      "features": [
+        "Alkoven-Dach mit Bett",
+        "Geräumige Wohnküche mit 2 Gasplatten",
+        "Kühlschrank mit Gefrierfach",
+        "Mikrowelle/Mikrowellen-Ofen-Kombination",
+        "Luftstandheizung (gasbetrieben)",
+        "Stand-/Klimaanlage (beim Fahren und Parken)",
+        "Innendusche mit Warmwasser",
+        "Außendusche mit Warmwasser",
+        "Solarpanel"
+      ],
+      "fuel": "Benzin",
+      "id": "v3",
+      "img": "https://media.discordapp.net/attachments/1317158991171944478/1459541870236663980/Family_Freedom.png?ex=6963a7ca&is=6962564a&hm=25bdbe8d3eea309f583296bd5df2021d41f45813adce0e0147995f374f58aef4&=&format=webp&quality=lossless",
+      "images": [
+        "https://media.discordapp.net/attachments/1317158991171944478/1459541870236663980/Family_Freedom.png?ex=6963a7ca&is=6962564a&hm=25bdbe8d3eea309f583296bd5df2021d41f45813adce0e0147995f374f58aef4&=&format=webp&quality=lossless"
+      ],
+      "name": "Family Freedom",
+      "price": 149,
+      "provider_id": "p1"
+    },
+    {
+      "beds": 4,
+      "desc": "Teilintegriertes Wohnmobil für bis zu 4 Personen mit vollständiger Ausstattung. Festes Hochdach mit Stehhöhe, große Nasszelle mit WC und Dusche, geräumige Heckgarage und Stand-Klimaanlage für ganzjähriges Reisen.",
       "details": {
         "tech": {
           "seats": "4",
           "fuel": "Diesel",
-          "consumption": "13.5 L/100km",
-          "power": "200 PS",
+          "consumption": "9.5 L/100km",
+          "power": "140 PS",
           "license": "Klasse C1",
           "emission": "Euro 6d",
-          "drive": "Allradantrieb 4x4"
+          "drive": "Frontantrieb"
         },
         "dims": {
-          "len": "690 cm",
-          "width": "225 cm",
-          "height": "300 cm",
-          "empty_weight": "3.900 kg",
-          "total_weight": "4.800 kg",
-          "towing": "2800 kg"
+          "len": "698 cm",
+          "width": "232 cm",
+          "height": "310 cm",
+          "empty_weight": "3600 kg",
+          "total_weight": "4500 kg",
+          "towing": "1500 kg"
         }
       },
       "features": [
-        "Allrad 4x4 zuschaltbar",
-        "Geländereifen M+S",
-        "Bodenfreiheit 26cm",
-        "Wassertank 200L",
-        "Solaranlage 250W",
-        "Außendusche warm/kalt",
-        "Dachträger verstärkt",
-        "Bergabfahrhilfe",
-        "Differentialsperre",
-        "Unterfahrschutz"
+        "Festes Hochdach mit Stehhöhe",
+        "Geräumige Wohnküche mit 2 Gasplatten",
+        "Kühlschrank 133L",
+        "Sitzheizung Fahrer & Beifahrer",
+        "Luftstandheizung (gasbetrieben)",
+        "Stand-/Klimaanlage (beim Fahren und Parken)",
+        "Warmwasser-Innendusche",
+        "Navigationssystem",
+        "Heckgarage mit großem Stauraum"
       ],
-      "img": "https://images.unsplash.com/photo-1627666259372-54f2bf2622b8?auto=format&fit=crop&w=1200&q=80"
+      "fuel": "Diesel",
+      "id": "v4",
+      "images": [
+        "https://cdn.discordapp.com/attachments/1317158991171944478/1459541870714683554/Camper_Castle.png?ex=6963a7ca&is=6962564a&hm=0474ba5820b04d8667ad5eec17284766b60ef74ec618cea05d75eee3bfc5ce87&",
+        "https://roadsurfer.com/wp-content/uploads/camper-castle-interior.jpg",
+        "https://roadsurfer.com/wp-content/uploads/camper-castle-seating-area.jpg"
+      ],
+      "img": "https://cdn.discordapp.com/attachments/1317158991171944478/1459541870714683554/Camper_Castle.png?ex=6963a7ca&is=6962564a&hm=0474ba5820b04d8667ad5eec17284766b60ef74ec618cea05d75eee3bfc5ce87&",
+      "name": "Camper Castle",
+      "price": 119,
+      "provider_id": "p1"
+    },
+    {
+      "beds": 2,
+      "desc": "Kompakter Kastenwagen für Paare mit fesem Hochdach und Stehhöhe. Durchdachte 2-Personen-Ausstattung mit vollständiger Küche, Badezimmer und Heizung. Flexibel und wendig für Reisen durch Europa in jeder Jahreszeit.",
+      "details": {
+        "tech": {
+          "seats": "4",
+          "fuel": "Diesel",
+          "consumption": "7.2 L/100km",
+          "power": "130 PS",
+          "license": "Klasse B",
+          "emission": "Euro 6d",
+          "drive": "Frontantrieb"
+        },
+        "dims": {
+          "len": "599 cm",
+          "width": "270 cm",
+          "height": "284 cm",
+          "empty_weight": "2950 kg",
+          "total_weight": "3600 kg",
+          "towing": "1200 kg"
+        }
+      },
+      "features": [
+        "Festes Hochdach mit Stehhöhe",
+        "Großer Küchenbereich mit 2 Gasplatten",
+        "Kühlschrank 69L",
+        "Sitzheizung Fahrer & Beifahrer",
+        "Luftstandheizung (dieselbetrieben)",
+        "Warmwasser-Innendusche",
+        "Warmwasser-Außendusche",
+        "Navigationssystem",
+        "230V Anschluss"
+      ],
+      "fuel": "Diesel",
+      "id": "v5",
+      "img": "https://cdn.discordapp.com/attachments/1317158991171944478/1459541871125594203/Couple_Cottage.png?ex=6963a7cb&is=6962564b&hm=272bbab8799ad21208ebf00c2b0e8081df629553eec61a4fd7c8c499564d9d61&",
+      "images": [
+        "https://cdn.discordapp.com/attachments/1317158991171944478/1459541871125594203/Couple_Cottage.png?ex=6963a7cb&is=6962564b&hm=272bbab8799ad21208ebf00c2b0e8081df629553eec61a4fd7c8c499564d9d61&"
+      ],
+      "name": "Couple Cottage",
+      "price": 89,
+      "provider_id": "p1"
+    },
+    {
+      "beds": 4,
+      "desc": "Kompakter VW T6.1 California Beach Campervan mit 5 Sitzplätzen und praktischen Wohnelementen. Flexibles und wendiges Raumwunder mit ausziehbarer Küchenzeile und Dachzelt, ideal für Wochenendtrips und Alltagsflexibilität.",
+      "details": {
+        "tech": {
+          "seats": "5",
+          "fuel": "Diesel",
+          "consumption": "8.1 L/100km",
+          "power": "150 PS",
+          "license": "Klasse B",
+          "emission": "Euro 6d",
+          "drive": "Frontantrieb"
+        },
+        "dims": {
+          "len": "490 cm",
+          "width": "230 cm",
+          "height": "199 cm",
+          "empty_weight": "2700 kg",
+          "total_weight": "3300 kg",
+          "towing": "1500 kg"
+        }
+      },
+      "features": [
+        "Aufstelldach manuell",
+        "Ausziehbare Kochstelle mit 1 Gasplatte",
+        "Kühlbox 31L",
+        "Sitzheizung Fahrer & Beifahrer",
+        "Luftstandheizung (dieselbetrieben)",
+        "Automatische Klimaanlage",
+        "Rückfahrkamera",
+        "Navigationssystem",
+        "Markise"
+      ],
+      "fuel": "Diesel",
+      "id": "v6",
+      "img": "https://cdn.discordapp.com/attachments/1317158991171944478/1459541871532703785/Beach_Hostel.png?ex=6963a7cb&is=6962564b&hm=114c5bd7048d499782e106b63050d98d703611d50fbc47be28112e98370544a1&",
+      "images": [
+        "https://cdn.discordapp.com/attachments/1317158991171944478/1459541871532703785/Beach_Hostel.png?ex=6963a7cb&is=6962564b&hm=114c5bd7048d499782e106b63050d98d703611d50fbc47be28112e98370544a1&"
+      ],
+      "name": "Beach Hostel",
+      "price": 74,
+      "provider_id": "p1"
     }
   ],
   "bookings": [

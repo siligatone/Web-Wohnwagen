@@ -2,14 +2,121 @@
    PAGES.CSS - Seiten-spezifische Styles
    =================================== */
 
-/* Vehicle Detail Page */
-.detail-header-img {
-    width: 100%;
-    height: 400px;
-    object-fit: cover;
+/* Vehicle Detail Page - Image Gallery */
+.vehicle-image-container {
     border-radius: 12px;
-    margin-bottom: 30px;
+    overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    width: 100%;
+    position: relative;
+}
+
+/* Use aspect-ratio with explicit height calculation */
+.vehicle-image-container::before {
+    content: '';
+    display: block;
+    padding-top: calc(768 / 1344 * 100%); /* 57.14% for 16:9 ratio */
+}
+
+.vehicle-image-container > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Single Image (fallback wenn nur 1 Bild) */
+.vehicle-single-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* Carousel Styling */
+.vehicle-carousel {
+    width: 100%;
+    height: 100%;
+}
+
+.vehicle-carousel .carousel-inner {
+    height: 100%;
+}
+
+.vehicle-carousel .carousel-item {
+    height: 100%;
+}
+
+.vehicle-carousel .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Carousel Controls */
+.vehicle-carousel .carousel-control-prev,
+.vehicle-carousel .carousel-control-next {
+    width: 60px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.vehicle-carousel .carousel-control-prev:hover,
+.vehicle-carousel .carousel-control-next:hover {
+    opacity: 1;
+}
+
+/* Image Counter Badge */
+.carousel-image-counter {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    z-index: 10;
+}
+
+/* Thumbnail Preview */
+.carousel-thumbnails {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    overflow-x: auto;
+    padding: 5px 0;
+}
+
+.carousel-thumbnail {
+    flex: 0 0 80px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.3s;
+    background: #f8f9fa;
+}
+
+.carousel-thumbnail:hover {
+    border-color: var(--primary);
+    opacity: 0.8;
+}
+
+.carousel-thumbnail.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 8px rgba(25, 118, 210, 0.5);
+}
+
+.carousel-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .vehicle-detail-section {
@@ -170,8 +277,9 @@
         padding: 80px 0;
     }
 
-    .detail-header-img {
-        height: 250px;
+    .carousel-thumbnail {
+        flex: 0 0 60px;
+        height: 45px;
     }
 
     .provider-stats {

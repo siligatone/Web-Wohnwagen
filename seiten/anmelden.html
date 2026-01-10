@@ -69,9 +69,24 @@
                             <label class="form-label">E-Mail Adresse</label>
                             <input type="email" id="regEmail" class="form-control" required>
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label">Passwort wählen</label>
                             <input type="password" id="regPass" class="form-control" required minlength="3">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label d-block">Ich möchte...</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="roleChoice" id="roleCustomer" value="customer" checked>
+                                <label class="form-check-label" for="roleCustomer">
+                                    <i class="fa-solid fa-user me-2"></i>Fahrzeuge mieten (Kunde)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="roleChoice" id="roleProvider" value="provider">
+                                <label class="form-check-label" for="roleProvider">
+                                    <i class="fa-solid fa-car me-2"></i>Fahrzeuge vermieten (Anbieter)
+                                </label>
+                            </div>
                         </div>
                         <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" required id="agbCheck">
