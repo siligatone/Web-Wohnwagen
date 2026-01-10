@@ -7,7 +7,7 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    background: #000;
+    background: #fff;
 }
 
 /* Single Image (fallback wenn nur 1 Bild) */
@@ -15,18 +15,18 @@
     width: 100%;
     height: 400px;
     object-fit: contain;
-    background: #000;
+    background: #fff;
     display: block;
 }
 
 /* Carousel Styling */
 .vehicle-carousel .carousel-inner {
-    background: #000;
+    background: #fff;
 }
 
 .vehicle-carousel .carousel-item {
     height: 400px;
-    background: #000;
+    background: #fff;
 }
 
 .vehicle-carousel .carousel-item img {
