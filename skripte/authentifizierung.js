@@ -33,9 +33,9 @@ async function handleLogin(event) {
         if (redirectTo) {
             window.location.href = redirectTo;
         } else {
-            // Prüfe, ob wir bereits im /pages/ Ordner sind
-            const isInPages = window.location.pathname.includes('/pages/');
-            const prefix = isInPages ? '' : 'pages/';
+            // Prüfe, ob wir bereits im /seiten/ Ordner sind
+            const isInPages = window.location.pathname.includes('/seiten/');
+            const prefix = isInPages ? '' : 'seiten/';
 
             if (user.role === 'provider') {
                 window.location.href = `${prefix}anbieter.html`;
@@ -111,9 +111,9 @@ async function handleRegister(event) {
 function logout() {
     if (confirm('Möchten Sie sich wirklich abmelden?')) {
         setCurrentUser(null);
-        // Prüfe, ob wir im /pages/ Ordner sind
-        const isInPages = window.location.pathname.includes('/pages/');
-        window.location.href = isInPages ? '../index.html' : 'index.html';
+        // Prüfe, ob wir im /seiten/ Ordner sind
+        const isInPages = window.location.pathname.includes('/seiten/');
+        window.location.href = isInPages ? '../startseite.html' : 'startseite.html';
     }
 }
 

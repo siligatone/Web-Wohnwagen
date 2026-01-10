@@ -170,7 +170,7 @@ async function displayVehicles() {
 
 // Zu Fahrzeug-Detailseite navigieren
 function goToVehicle(vehicleId) {
-    window.location.href = `pages/fahrzeug.html?id=${vehicleId}`;
+    window.location.href = `seiten/fahrzeug.html?id=${vehicleId}`;
 }
 
 // Smooth Scroll zu Fahrzeug-Liste

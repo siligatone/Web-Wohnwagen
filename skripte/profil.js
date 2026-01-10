@@ -60,7 +60,7 @@ async function displayProviderProfile(providerId) {
                         <i class="fa-solid fa-calendar-xmark"></i>
                         <h3>Keine Buchungen vorhanden</h3>
                         <p>Sie haben noch keine Wohnmobile gebucht.</p>
-                        <a href="../index.html" class="btn btn-primary mt-3">Fahrzeuge entdecken</a>
+                        <a href="../startseite.html" class="btn btn-primary mt-3">Fahrzeuge entdecken</a>
                     </div>
                 `;
             }
@@ -93,7 +93,7 @@ async function displayBookingHistory(userId, append = false) {
                         <i class="fa-solid fa-calendar-xmark"></i>
                         <h3>Keine Buchungen vorhanden</h3>
                         <p>Sie haben noch keine Wohnmobile gebucht.</p>
-                        <a href="../index.html" class="btn btn-primary mt-3">Fahrzeuge entdecken</a>
+                        <a href="../startseite.html" class="btn btn-primary mt-3">Fahrzeuge entdecken</a>
                     </div>
                 `;
             }

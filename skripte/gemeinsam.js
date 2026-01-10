@@ -15,15 +15,15 @@ function renderHeader() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     const isProvider = currentUser && currentUser.role === 'provider';
 
-    // Prüfe, ob wir im /pages/ Ordner sind
-    const isInPages = window.location.pathname.includes('/pages/');
+    // Prüfe, ob wir im /seiten/ Ordner sind
+    const isInPages = window.location.pathname.includes('/seiten/');
     const pathPrefix = isInPages ? '../' : '';
-    const pagesPrefix = isInPages ? '' : 'pages/';
+    const pagesPrefix = isInPages ? '' : 'seiten/';
 
     const headerHTML = `
         <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="${pathPrefix}index.html">
+                <a class="navbar-brand fw-bold" href="${pathPrefix}startseite.html">
                     <i class="fa-solid fa-route me-2"></i>CamperRent
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
@@ -32,10 +32,10 @@ function renderHeader() {
                 <div class="collapse navbar-collapse" id="navContent">
                     <ul class="navbar-nav ms-auto align-items-center">
                         <li class="nav-item">
-                            <a class="nav-link" href="${pathPrefix}index.html">Home</a>
+                            <a class="nav-link" href="${pathPrefix}startseite.html">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="${pathPrefix}index.html#fahrzeuge">Fahrzeuge</a>
+                            <a class="nav-link" href="${pathPrefix}startseite.html#fahrzeuge">Fahrzeuge</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="${pagesPrefix}impressum.html">Impressum</a>
@@ -78,10 +78,10 @@ function renderHeader() {
 
 // Footer rendern
 function renderFooter() {
-    // Prüfe, ob wir im /pages/ Ordner sind
-    const isInPages = window.location.pathname.includes('/pages/');
+    // Prüfe, ob wir im /seiten/ Ordner sind
+    const isInPages = window.location.pathname.includes('/seiten/');
     const pathPrefix = isInPages ? '../' : '';
-    const pagesPrefix = isInPages ? '' : 'pages/';
+    const pagesPrefix = isInPages ? '' : 'seiten/';
 
     const footerHTML = `
         <footer class="py-5">
@@ -96,7 +96,7 @@ function renderFooter() {
                         <ul class="list-unstyled">
                             <li><a href="${pagesPrefix}impressum.html">Impressum</a></li>
                             <li><a href="${pagesPrefix}datenschutz.html">Datenschutz</a></li>
-                            <li><a href="${pathPrefix}index.html">Startseite</a></li>
+                            <li><a href="${pathPrefix}startseite.html">Startseite</a></li>
                         </ul>
                     </div>
                     <div class="col-md-4">
@@ -169,7 +169,7 @@ function acceptCookies() {
 function logout() {
     if (confirm('Möchten Sie sich wirklich abmelden?')) {
         localStorage.removeItem('currentUser');
-        window.location.href = 'index.html';
+        window.location.href = 'startseite.html';
     }
 }
 

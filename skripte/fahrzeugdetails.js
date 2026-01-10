@@ -11,7 +11,7 @@ async function loadVehicleDetails() {
     const vehicleId = urlParams.get('id');
 
     if (!vehicleId) {
-        window.location.href = '../index.html';
+        window.location.href = '../startseite.html';
         return;
     }
 
@@ -21,7 +21,7 @@ async function loadVehicleDetails() {
 
         if (!currentVehicle) {
             alert('Fahrzeug nicht gefunden');
-            window.location.href = '../index.html';
+            window.location.href = '../startseite.html';
             return;
         }
 
@@ -31,7 +31,7 @@ async function loadVehicleDetails() {
     } catch (error) {
         console.error('Fehler beim Laden des Fahrzeugs:', error);
         alert('Fehler beim Laden der Fahrzeugdaten. Ist der Server gestartet?');
-        window.location.href = '../index.html';
+        window.location.href = '../startseite.html';
     }
 }
 
