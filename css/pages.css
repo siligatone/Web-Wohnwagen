@@ -18,7 +18,8 @@
     padding-top: calc(768 / 1344 * 100%); /* 57.14% for 16:9 ratio */
 }
 
-.vehicle-image-container > * {
+.vehicle-image-container > .vehicle-single-image,
+.vehicle-image-container > .vehicle-carousel {
     position: absolute;
     top: 0;
     left: 0;
