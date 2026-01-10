@@ -18,6 +18,13 @@ async function initProviderDashboard() {
 
 // Statistiken anzeigen
 async function displayProviderStats(providerId) {
+    // SICHERHEIT: Provider darf nur eigene Statistiken sehen
+    const currentUser = getCurrentUser();
+    if (currentUser.id !== providerId || currentUser.role !== 'provider') {
+        console.error('Keine Berechtigung für diese Statistiken');
+        return;
+    }
+
     try {
         const vehicles = await getVehiclesByProvider(providerId);
         const allBookings = await getAllBookings();
@@ -62,6 +69,19 @@ async function displayProviderVehicles(providerId) {
     const tableBody = document.getElementById('providerVehicleTable');
 
     if (!tableBody) return;
+
+    // SICHERHEIT: Provider darf nur eigene Fahrzeuge sehen
+    const currentUser = getCurrentUser();
+    if (currentUser.id !== providerId || currentUser.role !== 'provider') {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-danger py-4">
+                    Keine Berechtigung zum Anzeigen dieser Fahrzeuge.
+                </td>
+            </tr>
+        `;
+        return;
+    }
 
     try {
         const vehicles = await getVehiclesByProvider(providerId);
@@ -135,8 +155,16 @@ async function displayProviderVehicles(providerId) {
 
 // Fahrzeug-Buchungen anzeigen
 async function viewVehicleBookings(vehicleId) {
+    const currentUser = getCurrentUser();
+    
     try {
         const vehicle = await getVehicleById(vehicleId);
+        
+        // SICHERHEIT: Prüfe ob das Fahrzeug dem Provider gehört
+        if (vehicle.provider_id !== currentUser.id) {
+            alert('Sie haben keine Berechtigung, die Buchungen dieses Fahrzeugs zu sehen.');
+            return;
+        }
         const bookings = await getBookingsByVehicle(vehicleId);
 
         if (bookings.length === 0) {
@@ -254,7 +282,18 @@ async function cancelProviderBooking(bookingId, vehicleName) {
         return;
     }
 
+    const currentUser = getCurrentUser();
+
     try {
+        // SICHERHEIT: Prüfe ob die Buchung zu einem eigenen Fahrzeug gehört
+        const booking = await getBookingById(bookingId);
+        const vehicle = await getVehicleById(booking.vehicle_id);
+        
+        if (vehicle.provider_id !== currentUser.id) {
+            alert('Sie haben keine Berechtigung, diese Buchung zu stornieren.');
+            return;
+        }
+
         await deleteBooking(bookingId);
         alert('✓ Buchung wurde erfolgreich storniert.');
 

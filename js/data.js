@@ -5,7 +5,7 @@
 // Session-Management (bleibt in localStorage)
 const STORAGE_KEYS = {
     currentUser: 'currentUser',
-    cookieConsent: 'camperRent_cookie_consent'
+    cookieConsent: 'interCamp_cookie_consent'
 };
 
 // === USER FUNCTIONS (API-basiert) ===
@@ -51,6 +51,15 @@ async function getVehiclesByProvider(providerId) {
 }
 
 async function addVehicle(vehicle) {
+    // SICHERHEIT: Nur Provider dürfen Fahrzeuge hinzufügen
+    const currentUser = getCurrentUser();
+    if (!currentUser || currentUser.role !== 'provider') {
+        throw new Error('Nur Anbieter können Fahrzeuge hinzufügen');
+    }
+
+    // SICHERHEIT: Stelle sicher, dass das Fahrzeug dem aktuellen Provider zugewiesen wird
+    vehicle.provider_id = currentUser.id;
+
     if (!vehicle.id) {
         vehicle.id = generateUniqueId('v');
     }
@@ -58,12 +67,43 @@ async function addVehicle(vehicle) {
 }
 
 async function updateVehicleData(vehicleId, updates) {
+    // SICHERHEIT: Nur Provider dürfen Fahrzeuge bearbeiten
+    const currentUser = getCurrentUser();
+    if (!currentUser || currentUser.role !== 'provider') {
+        throw new Error('Keine Berechtigung zum Bearbeiten von Fahrzeugen');
+    }
+
     const vehicle = await getVehicleById(vehicleId);
+    if (!vehicle) {
+        throw new Error('Fahrzeug nicht gefunden');
+    }
+
+    // Prüfe ob das Fahrzeug dem Provider gehört
+    if (vehicle.provider_id !== currentUser.id) {
+        throw new Error('Sie können nur Ihre eigenen Fahrzeuge bearbeiten');
+    }
+
     const updatedVehicle = { ...vehicle, ...updates };
     return await updateVehicle(vehicleId, updatedVehicle);
 }
 
 async function deleteVehicleData(vehicleId) {
+    // SICHERHEIT: Nur Provider dürfen Fahrzeuge löschen
+    const currentUser = getCurrentUser();
+    if (!currentUser || currentUser.role !== 'provider') {
+        throw new Error('Keine Berechtigung zum Löschen von Fahrzeugen');
+    }
+
+    const vehicle = await getVehicleById(vehicleId);
+    if (!vehicle) {
+        throw new Error('Fahrzeug nicht gefunden');
+    }
+
+    // Prüfe ob das Fahrzeug dem Provider gehört
+    if (vehicle.provider_id !== currentUser.id) {
+        throw new Error('Sie können nur Ihre eigenen Fahrzeuge löschen');
+    }
+
     return await deleteVehicle(vehicleId);
 }
 
@@ -86,6 +126,17 @@ async function getBookingsByVehicle(vehicleId) {
 }
 
 async function addBooking(booking) {
+    // SICHERHEIT: Prüfe dass Nutzer eingeloggt ist
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        throw new Error('Sie müssen eingeloggt sein, um eine Buchung zu erstellen');
+    }
+
+    // SICHERHEIT: Stelle sicher, dass die Buchung für den aktuellen Nutzer erstellt wird
+    if (booking.user_id !== currentUser.id) {
+        throw new Error('Sie können nur Buchungen für sich selbst erstellen');
+    }
+
     if (!booking.id) {
         booking.id = generateUniqueId('b');
     }
@@ -93,6 +144,29 @@ async function addBooking(booking) {
 }
 
 async function deleteBookingData(bookingId) {
+    // SICHERHEIT: Prüfe Berechtigung vor dem Löschen
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        throw new Error('Nicht eingeloggt');
+    }
+
+    const booking = await getBookingById(bookingId);
+    if (!booking) {
+        throw new Error('Buchung nicht gefunden');
+    }
+
+    // Prüfe ob Nutzer die Buchung erstellt hat ODER ob es ein Provider ist, der das Fahrzeug besitzt
+    if (currentUser.role === 'provider') {
+        const vehicle = await getVehicleById(booking.vehicle_id);
+        if (vehicle.provider_id !== currentUser.id) {
+            throw new Error('Keine Berechtigung zum Löschen dieser Buchung');
+        }
+    } else {
+        if (booking.user_id !== currentUser.id) {
+            throw new Error('Keine Berechtigung zum Löschen dieser Buchung');
+        }
+    }
+
     return await deleteBooking(bookingId);
 }
 

@@ -13,10 +13,10 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-DB_FILE = 'db.json'
+DB_FILE = 'datenbank.json'
 
 def read_db():
-    """Read database from db.json file"""
+    """Read database from datenbank.json file"""
     if not os.path.exists(DB_FILE):
         return {"users": [], "vehicles": [], "bookings": []}
 
@@ -24,7 +24,7 @@ def read_db():
         return json.load(f)
 
 def write_db(data):
-    """Write database to db.json file"""
+    """Write database to datenbank.json file"""
     with open(DB_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 

@@ -83,6 +83,17 @@ async function displayBookingHistory(userId, append = false) {
 
     if (!container) return;
 
+    // SICHERHEIT: Nutzer darf nur eigene Buchungen sehen
+    const currentUser = getCurrentUser();
+    if (currentUser.id !== userId) {
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Keine Berechtigung zum Anzeigen dieser Buchungen.
+            </div>
+        `;
+        return;
+    }
+
     try {
         const bookings = await getBookingsByUser(userId);
 
@@ -140,6 +151,17 @@ async function displayBookingHistory(userId, append = false) {
                 statusClass = 'border-secondary';
             }
 
+            // Extras formatieren (falls vorhanden)
+            let extrasHTML = '';
+            if (booking.extras && booking.extras.length > 0) {
+                extrasHTML = `
+                    <p class="mb-1">
+                        <i class="fa-solid fa-plus-circle me-2"></i>
+                        <strong>Extras:</strong> ${booking.extras.map(e => e.name).join(', ')}
+                    </p>
+                `;
+            }
+
             return `
                 <div class="booking-history-card ${statusClass}">
                     <div class="row align-items-center">
@@ -156,14 +178,15 @@ async function displayBookingHistory(userId, append = false) {
                                 <i class="fa-solid fa-moon me-2"></i>
                                 <strong>Nächte:</strong> ${booking.nights || calculateNights(booking.start, booking.end)}
                             </p>
+                            ${extrasHTML}
                             <p class="mb-0 text-muted small">
                                 Buchung-ID: ${booking.id}
                             </p>
                         </div>
                         <div class="col-md-3 text-md-end">
                             <div class="fs-4 fw-bold text-primary">${booking.totalPrice || 'N/A'}€</div>
-                            <button class="btn btn-sm btn-outline-primary mt-2" onclick="viewVehicle('${vehicle.id}')">
-                                Details ansehen
+                            <button class="btn btn-sm btn-outline-primary mt-2" onclick="viewBookingDetails('${booking.id}', '${vehicle.id}')">
+                                <i class="fa-solid fa-info-circle me-1"></i>Details ansehen
                             </button>
                             ${(isUpcoming || isActive) ? `
                                 <button class="btn btn-sm btn-outline-danger mt-2" onclick="cancelBooking('${booking.id}')">
@@ -201,7 +224,112 @@ function calculateNights(startDate, endDate) {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// Zu Fahrzeug-Seite navigieren
+// Buchungsdetails in Modal anzeigen
+async function viewBookingDetails(bookingId, vehicleId) {
+    try {
+        const booking = await getBookingById(bookingId);
+        const vehicle = await getVehicleById(vehicleId);
+        if (!booking || !vehicle) {
+            alert('Fehler beim Laden der Details');
+            return;
+        }
+
+        const start = new Date(booking.start);
+        const end = new Date(booking.end);
+        const today = new Date();
+        const isUpcoming = start > today;
+        const isActive = start <= today && end >= today;
+        const canCancel = isUpcoming || isActive;
+
+        let statusBadge = '';
+        if (isActive) {
+            statusBadge = '<span class="badge bg-success">Aktiv</span>';
+        } else if (isUpcoming) {
+            statusBadge = '<span class="badge bg-primary">Bevorstehend</span>';
+        } else {
+            statusBadge = '<span class="badge bg-secondary">Abgeschlossen</span>';
+        }
+
+        let extrasHTML = '';
+        let extrasTotal = 0;
+        if (booking.extras && booking.extras.length > 0) {
+            extrasTotal = booking.extras.reduce((sum, extra) => sum + (extra.price || 0), 0);
+            extrasHTML = `<h6 class="mt-3 mb-2">Gebuchte Extras:</h6><ul class="list-unstyled">${booking.extras.map(e => `<li class="mb-1"><i class="fa-solid fa-check text-success me-2"></i>${e.name} - ${e.price}€</li>`).join('')}</ul>`;
+        }
+
+        const nights = booking.nights || calculateNights(booking.start, booking.end);
+        const basePrice = nights * vehicle.price;
+        const serviceFee = 15;
+        const totalPrice = booking.totalPrice || (basePrice + extrasTotal + serviceFee);
+
+        const modalHTML = `
+            <div class="modal fade" id="bookingDetailsModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fa-solid fa-file-invoice me-2"></i>${vehicle.name} ${statusBadge}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h6 class="mb-3">Buchungsinformationen:</h6>
+                            <div class="row mb-2">
+                                <div class="col-6"><i class="fa-solid fa-calendar-day me-2 text-primary"></i><strong>Check-in:</strong></div>
+                                <div class="col-6">${formatDateDisplay(booking.start)}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6"><i class="fa-solid fa-calendar-check me-2 text-primary"></i><strong>Check-out:</strong></div>
+                                <div class="col-6">${formatDateDisplay(booking.end)}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6"><i class="fa-solid fa-moon me-2 text-primary"></i><strong>Anzahl Nächte:</strong></div>
+                                <div class="col-6">${nights}</div>
+                            </div>
+                            ${extrasHTML}
+                            <hr>
+                            <h6 class="mb-3">Preisübersicht:</h6>
+                            <div class="row mb-2">
+                                <div class="col-8">Grundpreis (${nights} × ${vehicle.price}€)</div>
+                                <div class="col-4 text-end">${basePrice}€</div>
+                            </div>
+                            ${extrasTotal > 0 ? `<div class="row mb-2"><div class="col-8">Extras</div><div class="col-4 text-end">${extrasTotal}€</div></div>` : ''}
+                            <div class="row mb-2">
+                                <div class="col-8">Verwaltungsgebühr</div>
+                                <div class="col-4 text-end">${serviceFee}€</div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-8"><strong>Gesamtpreis:</strong></div>
+                                <div class="col-4 text-end"><strong class="fs-5 text-primary">${totalPrice}€</strong></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            ${canCancel ? `<button type="button" class="btn btn-danger" onclick="cancelBookingFromModal('${booking.id}')"><i class="fa-solid fa-xmark me-1"></i>Buchung stornieren</button>` : ''}
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const oldModal = document.getElementById('bookingDetailsModal');
+        if (oldModal) oldModal.remove();
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        new bootstrap.Modal(document.getElementById('bookingDetailsModal')).show();
+    } catch (error) {
+        console.error('Fehler beim Laden der Buchungsdetails:', error);
+        alert('Fehler beim Laden der Details. Bitte versuchen Sie es erneut.');
+    }
+}
+
+// Buchung aus Modal stornieren
+async function cancelBookingFromModal(bookingId) {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('bookingDetailsModal'));
+    if (modal) modal.hide();
+    await cancelBooking(bookingId);
+}
+
+// Zu Fahrzeug-Seite navigieren (wird nicht mehr verwendet, behalten für Kompatibilität)
 function viewVehicle(vehicleId) {
     window.location.href = `fahrzeug.html?id=${vehicleId}`;
 }
@@ -215,6 +343,12 @@ async function cancelBooking(bookingId) {
         const booking = await getBookingById(bookingId);
         if (!booking) {
             alert('Buchung konnte nicht gefunden werden.');
+            return;
+        }
+
+        // SICHERHEIT: Prüfe ob die Buchung dem aktuellen Nutzer gehört
+        if (booking.user_id !== currentUser.id) {
+            alert('Sie haben keine Berechtigung, diese Buchung zu stornieren.');
             return;
         }
 

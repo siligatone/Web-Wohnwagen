@@ -36,4 +36,4 @@ Thumbs.db
 *-backup.*
 
 # Optional: Datenbank-Backups
-# db.json.backup
+# datenbank.json.backup

@@ -2,24 +2,31 @@
   "users": [
     {
       "id": "p1",
-      "email": "anbieter@test.de",
+      "email": "andrea@test.de",
       "password": "123",
       "role": "provider",
-      "name": "Hans Müller"
+      "name": "Andrea Reis"
+    },
+    {
+      "id": "p2",
+      "email": "anbieter2@test.de",
+      "password": "123",
+      "role": "provider",
+      "name": "Max Schneider"
     },
     {
       "id": "c1",
-      "email": "kunde@test.de",
-      "password": "123",
-      "role": "customer",
-      "name": "Lisa Schmidt"
-    },
-    {
-      "id": "u_1767968929388_7zpphdhpc",
       "email": "david@test.de",
       "password": "123",
-      "name": "David Reis",
-      "role": "customer"
+      "role": "customer",
+      "name": "David Siligato"
+    },
+    {
+      "id": "c2",
+      "email": "kunde2@test.de",
+      "password": "123",
+      "role": "customer",
+      "name": "Sophie Bauer"
     }
   ],
   "vehicles": [
@@ -239,7 +246,7 @@
       ],
       "name": "Couple Cottage",
       "price": 89,
-      "provider_id": "p1"
+      "provider_id": "p2"
     },
     {
       "beds": 4,
@@ -282,7 +289,7 @@
       ],
       "name": "Beach Hostel",
       "price": 74,
-      "provider_id": "p1"
+      "provider_id": "p2"
     }
   ],
   "bookings": [
@@ -290,31 +297,29 @@
       "id": "b1",
       "vehicle_id": "v1",
       "user_id": "c1",
-      "start": "2023-12-01",
-      "end": "2023-12-05",
-      "nights": 4,
-      "totalPrice": 375,
-      "createdAt": "2023-11-15T10:30:00.000Z"
+      "start": "2026-02-15",
+      "end": "2026-02-20",
+      "nights": 5,
+      "totalPrice": 560,
+      "extras": [
+        {
+          "id": "extraBikeRack",
+          "name": "Fahrradhalter",
+          "price": 25
+        }
+      ],
+      "createdAt": "2026-01-10T10:30:00.000Z"
     },
     {
-      "vehicle_id": "v1",
-      "user_id": "c1",
-      "start": "2026-01-21",
-      "end": "2026-01-30",
-      "nights": 9,
-      "totalPrice": 825,
-      "createdAt": "2026-01-09T08:15:28.510Z",
-      "id": "b_1767946528510_yxzvq99bh"
-    },
-    {
-      "vehicle_id": "v2",
-      "user_id": "p1",
-      "start": "2026-01-16",
-      "end": "2026-01-23",
+      "vehicle_id": "v3",
+      "user_id": "c2",
+      "start": "2026-03-10",
+      "end": "2026-03-17",
       "nights": 7,
-      "totalPrice": 995,
-      "createdAt": "2026-01-09T08:46:12.506Z",
-      "id": "b_1767948372506_5w7bvlhk7"
+      "totalPrice": 1058,
+      "extras": [],
+      "createdAt": "2026-01-10T11:15:28.510Z",
+      "id": "b2"
     }
   ]
 }

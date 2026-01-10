@@ -24,7 +24,7 @@ function renderHeader() {
         <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
             <div class="container">
                 <a class="navbar-brand fw-bold" href="${pathPrefix}index.html">
-                    <i class="fa-solid fa-route me-2"></i>CamperRent
+                    <i class="fa-solid fa-route me-2"></i>InterCamp
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
                     <span class="navbar-toggler-icon"></span>
@@ -88,7 +88,7 @@ function renderFooter() {
             <div class="container">
                 <div class="row gy-4">
                     <div class="col-md-4">
-                        <h5 class="fw-bold text-white mb-3">CamperRent</h5>
+                        <h5 class="fw-bold text-white mb-3">InterCamp</h5>
                         <p class="small">Wir machen Camping einfach. Entdecken Sie die Welt mit unseren geprüften Wohnmobilen.</p>
                     </div>
                     <div class="col-md-4">
@@ -102,13 +102,13 @@ function renderFooter() {
                     <div class="col-md-4">
                         <h5 class="fw-bold text-white mb-3">Kontakt</h5>
                         <ul class="list-unstyled text-light small">
-                            <li><i class="fa-solid fa-envelope me-2"></i>info@camperrent.de</li>
+                            <li><i class="fa-solid fa-envelope me-2"></i>info@intercamp.de</li>
                             <li><i class="fa-solid fa-phone me-2"></i>+49 123 456789</li>
                         </ul>
                     </div>
                 </div>
                 <div class="border-top border-secondary mt-4 pt-3 text-center small text-white-50">
-                    &copy; 2026 CamperRent Demo.
+                    &copy; 2026 InterCamp Demo.
                 </div>
             </div>
         </footer>
@@ -149,7 +149,7 @@ function checkCookieConsent() {
     }
 
     // Zeige Banner, wenn noch nicht akzeptiert
-    if (!localStorage.getItem('camperRent_cookie_consent')) {
+    if (!localStorage.getItem('interCamp_cookie_consent')) {
         setTimeout(() => {
             cookieBanner.classList.add('show');
         }, 1000);
@@ -158,7 +158,7 @@ function checkCookieConsent() {
 
 // Cookie akzeptieren
 function acceptCookies() {
-    localStorage.setItem('camperRent_cookie_consent', 'true');
+    localStorage.setItem('interCamp_cookie_consent', 'true');
     const banner = document.getElementById('cookie-banner');
     if (banner) {
         banner.classList.remove('show');
