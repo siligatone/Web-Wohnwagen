@@ -174,36 +174,33 @@ function displayVehicleImages() {
 
     // Event Listener für Slide-Wechsel
     if (images.length > 1) {
-        // Warte bis DOM vollständig geladen ist
-        setTimeout(() => {
-            const carouselElement = document.getElementById(carouselId);
-            if (!carouselElement) {
-                console.error('Carousel element not found');
-                return;
+        const carouselElement = document.getElementById(carouselId);
+        if (!carouselElement) {
+            console.error('Carousel element not found');
+            return;
+        }
+
+        const bsCarousel = new bootstrap.Carousel(carouselElement, {
+            interval: false, // Kein automatisches Wechseln
+            wrap: true
+        });
+
+        // Update Zähler und aktive Thumbnail bei Slide-Wechsel
+        carouselElement.addEventListener('slid.bs.carousel', function(event) {
+            const currentIndex = event.to;
+            const counterElement = document.getElementById('currentImageIndex');
+            if (counterElement) {
+                counterElement.textContent = currentIndex + 1;
             }
 
-            const bsCarousel = new bootstrap.Carousel(carouselElement, {
-                interval: false, // Kein automatisches Wechseln
-                wrap: true
+            // Update aktive Thumbnail
+            document.querySelectorAll('.carousel-thumbnail').forEach((thumb, idx) => {
+                thumb.classList.toggle('active', idx === currentIndex);
             });
+        });
 
-            // Update Zähler und aktive Thumbnail bei Slide-Wechsel
-            carouselElement.addEventListener('slid.bs.carousel', function(event) {
-                const currentIndex = event.to;
-                const counterElement = document.getElementById('currentImageIndex');
-                if (counterElement) {
-                    counterElement.textContent = currentIndex + 1;
-                }
-
-                // Update aktive Thumbnail
-                document.querySelectorAll('.carousel-thumbnail').forEach((thumb, idx) => {
-                    thumb.classList.toggle('active', idx === currentIndex);
-                });
-            });
-
-            // Speichere Carousel-Instanz global für goToSlide()
-            window.vehicleCarouselInstance = bsCarousel;
-        }, 100);
+        // Speichere Carousel-Instanz global für goToSlide()
+        window.vehicleCarouselInstance = bsCarousel;
     }
 }
 
