@@ -188,10 +188,12 @@
       ],
       "fuel": "Diesel",
       "id": "v4",
-      "img": "https://cdn.discordapp.com/attachments/1317158991171944478/1459541870714683554/Camper_Castle.png?ex=6963a7ca&is=6962564a&hm=0474ba5820b04d8667ad5eec17284766b60ef74ec618cea05d75eee3bfc5ce87&",
       "images": [
-        "https://cdn.discordapp.com/attachments/1317158991171944478/1459541870714683554/Camper_Castle.png?ex=6963a7ca&is=6962564a&hm=0474ba5820b04d8667ad5eec17284766b60ef74ec618cea05d75eee3bfc5ce87&"
+        "https://cdn.discordapp.com/attachments/1317158991171944478/1459541870714683554/Camper_Castle.png?ex=6963a7ca&is=6962564a&hm=0474ba5820b04d8667ad5eec17284766b60ef74ec618cea05d75eee3bfc5ce87&",
+        "https://roadsurfer.com/wp-content/uploads/camper-castle-interior.jpg",
+        "https://roadsurfer.com/wp-content/uploads/camper-castle-seating-area.jpg"
       ],
+      "img": "https://cdn.discordapp.com/attachments/1317158991171944478/1459541870714683554/Camper_Castle.png?ex=6963a7ca&is=6962564a&hm=0474ba5820b04d8667ad5eec17284766b60ef74ec618cea05d75eee3bfc5ce87&",
       "name": "Camper Castle",
       "price": 119,
       "provider_id": "p1"
