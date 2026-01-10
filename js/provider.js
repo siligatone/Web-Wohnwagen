@@ -284,12 +284,20 @@ function calculateNights(startDate, endDate) {
 
 // Fahrzeug bearbeiten
 async function editVehicle(vehicleId) {
+    const currentUser = getCurrentUser();
+
     try {
         // Lade Fahrzeugdaten
         const vehicle = await getVehicleById(vehicleId);
 
         if (!vehicle) {
             alert('Fahrzeug nicht gefunden.');
+            return;
+        }
+
+        // Sicherheitsprüfung: Nur eigene Fahrzeuge bearbeiten
+        if (vehicle.provider_id !== currentUser.id) {
+            alert('Sie haben keine Berechtigung, dieses Fahrzeug zu bearbeiten.');
             return;
         }
 
@@ -343,10 +351,17 @@ async function handleEditVehicle(event) {
     event.preventDefault();
 
     const vehicleId = document.getElementById('editVehicleId').value;
+    const currentUser = getCurrentUser();
 
     try {
         // Lade aktuelles Fahrzeug
         const currentVehicle = await getVehicleById(vehicleId);
+
+        // Sicherheitsprüfung: Nur eigene Fahrzeuge bearbeiten
+        if (currentVehicle.provider_id !== currentUser.id) {
+            alert('Sie haben keine Berechtigung, dieses Fahrzeug zu bearbeiten.');
+            return false;
+        }
 
         // Parse Features (komma-getrennt)
         const featuresValue = document.getElementById('editFeatures').value.trim();
@@ -404,8 +419,17 @@ async function handleEditVehicle(event) {
 
 // Fahrzeug löschen
 async function deleteVehicleConfirm(vehicleId) {
+    const currentUser = getCurrentUser();
+
     try {
         const vehicle = await getVehicleById(vehicleId);
+
+        // Sicherheitsprüfung: Nur eigene Fahrzeuge löschen
+        if (vehicle.provider_id !== currentUser.id) {
+            alert('Sie haben keine Berechtigung, dieses Fahrzeug zu löschen.');
+            return;
+        }
+
         const bookings = await getBookingsByVehicle(vehicleId);
 
         if (bookings.length > 0) {
