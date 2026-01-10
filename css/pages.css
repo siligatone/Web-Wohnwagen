@@ -13,7 +13,9 @@
 .vehicle-single-image {
     width: 100%;
     height: auto;
+    max-height: 450px;
     display: block;
+    object-fit: contain;
 }
 
 /* Carousel Styling */
@@ -22,11 +24,16 @@
 }
 
 .vehicle-carousel .carousel-item {
-    height: auto;
+    height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .vehicle-carousel .carousel-item img {
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
     height: auto;
     display: block;
 }
@@ -251,6 +258,14 @@
 @media (max-width: 768px) {
     .hero-header {
         padding: 80px 0;
+    }
+
+    .vehicle-single-image {
+        max-height: 300px;
+    }
+
+    .vehicle-carousel .carousel-item {
+        height: 300px;
     }
 
     .carousel-thumbnail {
