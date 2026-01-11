@@ -1,29 +1,24 @@
 <!DOCTYPE html>
 <html lang="de">
+<!--
+    InterCamp - Provider Dashboard
+    Zeigt Statistiken, Buchungsübersicht und Fahrzeugverwaltung für Anbieter
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anbieter Dashboard - InterCamp</title>
 
-    <!-- Bootstrap 5 CSS Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom Stylesheets -->
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/pages.css">
 </head>
 <body>
-
     <!-- Header wird dynamisch von shared.js geladen -->
     <header></header>
 
-    <!-- ===================================
-         MAIN CONTENT
-         =================================== -->
     <main>
         <div class="container py-5">
             <!-- Dashboard Header mit Zurück-Button -->
@@ -34,15 +29,9 @@
                 </a>
             </div>
 
-            <!-- ===================================
-                 STATISTIK-KARTEN
-                 ===================================
-                 4 Stat-Cards zeigen Kennzahlen
-                 Wird von provider.js befüllt:
-                 - Anzahl Fahrzeuge
-                 - Gesamt-Buchungen
-                 - Umsatz (€)
-                 - Aktive Buchungen -->
+            <!-- Statistik-Karten
+                 Zeigt Kennzahlen: Fahrzeuge, Buchungen, Umsatz, Aktive Buchungen
+                 Wird von provider.js befüllt -->
             <div class="provider-stats">
                 <div class="stat-card">
                     <div class="stat-number" id="statVehicles">0</div>
@@ -62,12 +51,9 @@
                 </div>
             </div>
 
-            <!-- ===================================
-                 BUCHUNGSÜBERSICHT DIAGRAMM
-                 ===================================
+            <!-- Buchungsübersicht Diagramm
                  Canvas-Balkendiagramm zeigt Buchungen pro Fahrzeug
-                 Wird von providerStats.js gerendert
-                 Hover zeigt Fahrzeugdetails im canvasLegend -->
+                 Wird von providerStats.js gerendert -->
             <div class="card mb-5">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0"><i class="fa-solid fa-chart-bar me-2"></i>Buchungsübersicht nach Fahrzeug</h5>
@@ -83,9 +69,8 @@
                 </div>
             </div>
 
-            <!-- ===================================
-                 FAHRZEUG-VERWALTUNG
-                 =================================== -->
+            <!-- Fahrzeug-Verwaltung
+                 CRUD-Operationen für Fahrzeuge -->
             <div class="provider-vehicle-table">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3><i class="fa-solid fa-van-shuttle me-2"></i>Meine Fahrzeuge</h3>
@@ -95,12 +80,9 @@
                     </button>
                 </div>
 
-                <!-- ===================================
-                     FAHRZEUG HINZUFÜGEN FORMULAR
-                     ===================================
-                     Standardmäßig hidden (class="hidden")
-                     toggleAddVehicleForm() blendet ein/aus
-                     onsubmit ruft handleCreateVehicle() aus provider.js auf -->
+                <!-- Fahrzeug hinzufügen Formular
+                     Standardmäßig versteckt, toggle mit toggleAddVehicleForm()
+                     Submit ruft handleCreateVehicle() aus provider.js auf -->
                 <div id="addVehicleForm" class="card mb-4 hidden">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Neues Fahrzeug hinzufügen</h5>
@@ -216,9 +198,7 @@
                     </div>
                 </div>
 
-                <!-- ===================================
-                     FAHRZEUG-TABELLE
-                     ===================================
+                <!-- Fahrzeugliste Tabelle
                      Zeigt alle Fahrzeuge des Providers
                      Wird von provider.js befüllt
                      Jede Zeile hat Aktions-Buttons: Bearbeiten/Löschen/Buchungen -->
@@ -243,9 +223,7 @@
         </div>
     </main>
 
-    <!-- ===================================
-         FAHRZEUG BEARBEITEN MODAL
-         ===================================
+    <!-- Fahrzeuhg Bearbeiten Modal
          Bootstrap Modal für Fahrzeug-Bearbeitung
          Identische Felder wie Hinzufügen-Formular
          Wird von showEditModal() in provider.js geöffnet
@@ -378,20 +356,10 @@
     <!-- Footer wird dynamisch von shared.js geladen -->
     <footer></footer>
 
-    <!-- ===================================
-         JAVASCRIPT DEPENDENCIES
-         =================================== -->
-
-    <!-- Bootstrap JavaScript -->
+    <!-- JavaScript Dependencies
+         Bootstrap für UI-Komponenten
+         Custom Scripts für Provider Dashboard, Statistiken und CRUD -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Custom JavaScript Files
-         - api.js: API-Kommunikation
-         - data.js: Datenverwaltung
-         - shared.js: Header/Footer
-         - auth.js: Auth-Check (requireAuth für Provider)
-         - providerStats.js: Canvas-Diagramm-Rendering
-         - provider.js: Dashboard-Logik und CRUD-Operationen -->
     <script src="../js/api.js"></script>
     <script src="../js/data.js"></script>
     <script src="../js/shared.js"></script>

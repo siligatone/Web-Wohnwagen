@@ -1,81 +1,59 @@
 <!DOCTYPE html>
 <html lang="de">
+<!--
+    InterCamp - Fahrzeugdetails
+    Zeigt vollständige Fahrzeuginformationen, Verfügbarkeitskalender und Buchungsformular
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fahrzeug Details - InterCamp</title>
 
-    <!-- Bootstrap 5 CSS Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom Stylesheets -->
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/pages.css">
 </head>
 <body>
-
     <!-- Header wird dynamisch von shared.js geladen -->
     <header></header>
 
-    <!-- ===================================
-         MAIN CONTENT
-         =================================== -->
     <main>
         <div class="container py-4">
-            <!-- Zurück-Button zur Fahrzeugübersicht -->
             <a href="../index.html" class="btn btn-link text-decoration-none text-muted mb-3 ps-0">
                 <i class="fa-solid fa-arrow-left me-2"></i>Zurück zur Übersicht
             </a>
 
             <div class="row">
-                <!-- ===================================
-                     LINKE SPALTE - FAHRZEUG-DETAILS
-                     ===================================
-                     Zeigt alle Informationen zum Fahrzeug
+                <!-- Linke Spalte - Fahrzeugdetails
+                     Zeigt Name, Bilder, Beschreibung, Ausstattung und technische Daten
                      Wird von vehicleDetail.js befüllt -->
                 <div class="col-lg-8">
-                    <!-- Fahrzeugname (wird von vehicleDetail.js gesetzt) -->
                     <h1 id="vehicleName" class="display-5 fw-bold mb-2">Fahrzeug-Name</h1>
-
-                    <!-- Standort (statisch) -->
                     <p class="text-muted mb-4">
                         <i class="fa-solid fa-location-dot me-1"></i> Standort: Frankfurt am Main
                     </p>
 
-                    <!-- ===================================
-                         BILDERGALERIE
-                         ===================================
-                         Wird von vehicleDetail.js dynamisch generiert
-                         Zeigt entweder einzelnes Bild oder Multi-Image-Karussell
-                         Bei mehreren Bildern: Bootstrap Carousel mit Thumbnails -->
-                    <div id="vehicleImageContainer" class="vehicle-image-container mb-4">
-                        <!-- Bildergalerie wird von vehicleDetail.js hier eingefügt -->
-                    </div>
+                    <!-- Bildergalerie
+                         Dynamisch generiert: Einzelbild oder Multi-Image-Karussell
+                         Bei mehreren Bildern mit Bootstrap Carousel und Thumbnails -->
+                    <div id="vehicleImageContainer" class="vehicle-image-container mb-4"></div>
 
-                    <!-- Fahrzeugbeschreibung -->
                     <div class="vehicle-detail-section">
                         <h3>Über dieses Fahrzeug</h3>
                         <p id="vehicleDesc" class="lead">Beschreibung...</p>
                     </div>
 
-                    <!-- Ausstattungs-Highlights -->
                     <div class="vehicle-detail-section">
                         <h3>Ausstattung Highlights</h3>
-                        <!-- Features als Badge-Liste (von vehicleDetail.js befüllt) -->
                         <div id="vehicleFeatures" class="d-flex flex-wrap gap-2"></div>
                     </div>
 
-                    <!-- ===================================
-                         TECHNISCHE DATEN & ABMESSUNGEN
-                         ===================================
+                    <!-- Technische Daten und Abmessungen
                          2-Spalten-Layout mit Tabellen
                          Daten werden von vehicleDetail.js befüllt -->
                     <div class="row g-4">
-                        <!-- Technische Daten: Sitzplätze, Kraftstoff, etc. -->
                         <div class="col-md-6">
                             <div class="tech-card">
                                 <h5 class="fw-bold mb-3 text-primary">
@@ -87,7 +65,6 @@
                             </div>
                         </div>
 
-                        <!-- Abmessungen & Gewicht: Länge, Höhe, Gewicht, etc. -->
                         <div class="col-md-6">
                             <div class="tech-card">
                                 <h5 class="fw-bold mb-3 text-primary">
@@ -101,15 +78,11 @@
                     </div>
                 </div>
 
-                <!-- ===================================
-                     RECHTE SPALTE - BUCHUNGSBEREICH
-                     ===================================
+                <!-- Rechte Spalte - Buchungsbereich
                      Sticky Card mit Preis, Kalender und Buchungsformular -->
                 <div class="col-lg-4">
-                    <!-- Sticky Booking Card (bleibt beim Scrollen sichtbar) -->
                     <div class="card shadow border-0 sticky-top" style="top: 100px; z-index: 10;">
                         <div class="card-body p-4">
-                            <!-- Preis pro Nacht (von vehicleDetail.js gesetzt) -->
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h3 class="text-primary fw-bold mb-0">
                                     <span id="vehiclePrice">0</span> €
@@ -118,18 +91,14 @@
                             </div>
                             <hr>
 
-                            <!-- ===================================
-                                 VERFÜGBARKEITS-KALENDER
-                                 ===================================
-                                 Interaktiver Kalender zeigt verfügbare/gebuchte Tage
-                                 Wird von calendar.js gesteuert
-                                 Benutzer kann durch Klicken Start/End-Datum wählen -->
+                            <!-- Verfügbarkeitskalender
+                                 Interaktiver Kalender zeigt verfügbare und gebuchte Tage
+                                 Wird von calendar.js gesteuert -->
                             <h6 class="fw-bold mb-3">
                                 <i class="fa-regular fa-calendar me-2"></i>Verfügbarkeit & Buchung
                             </h6>
 
                             <div id="calendarWidget" class="mb-3">
-                                <!-- Kalender Header mit Monat/Jahr und Navigation -->
                                 <div class="calendar-header">
                                     <button id="calPrevBtn" class="calendar-btn" onclick="changeMonth(-1)">
                                         <i class="fa-solid fa-chevron-left"></i>
@@ -140,7 +109,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Kalender Grid mit Wochentag-Headern -->
                                 <div class="calendar-grid">
                                     <div class="calendar-day-header">Mo</div>
                                     <div class="calendar-day-header">Di</div>
@@ -149,11 +117,9 @@
                                     <div class="calendar-day-header">Fr</div>
                                     <div class="calendar-day-header">Sa</div>
                                     <div class="calendar-day-header">So</div>
-                                    <!-- Kalendertage werden von calendar.js hier eingefügt -->
                                     <div id="calDays" style="display:contents"></div>
                                 </div>
 
-                                <!-- Kalender-Legende -->
                                 <div class="mt-2 small d-flex gap-3 justify-content-center">
                                     <span class="d-flex align-items-center">
                                         <div style="width:10px;height:10px;background:#ffcccc;margin-right:5px;"></div> Belegt
@@ -164,14 +130,10 @@
                                 </div>
                             </div>
 
-                            <!-- ===================================
-                                 BUCHUNGSFORMULAR
-                                 ===================================
-                                 Formular für Buchung mit Datums-Auswahl und Extras
-                                 onsubmit ruft handleBooking() aus booking.js auf -->
+                            <!-- Buchungsformular
+                                 Datums-Auswahl, Extras und Preisberechnung
+                                 Submit ruft handleBooking() aus booking.js auf -->
                             <form onsubmit="return handleBooking(event)">
-                                <!-- Anreise/Abreise Datum-Inputs
-                                     validateDates() aus booking.js prüft bei Änderung -->
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="small fw-bold form-label">Anreise</label>
@@ -183,18 +145,14 @@
                                     </div>
                                 </div>
 
-                                <!-- ===================================
-                                     ZUSATZANGEBOTE (EXTRAS)
-                                     ===================================
-                                     Buchbare Zusatzleistungen mit Preisen
-                                     Jede Checkbox hat data-price Attribut
-                                     onchange triggert calculatePrice() aus booking.js -->
+                                <!-- Zusatzangebote
+                                     Checkboxen mit data-price Attribut
+                                     Änderungen triggern calculatePrice() aus booking.js -->
                                 <div class="mb-3">
                                     <label class="small fw-bold form-label mb-2">
                                         <i class="fa-solid fa-plus-circle me-1"></i>Zusatzangebote hinzubuchen
                                     </label>
                                     <div class="extras-list">
-                                        <!-- Extra: Fahrradhalter (+25€) -->
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" id="extraBikeRack"
                                                    data-price="25" onchange="calculatePrice()">
@@ -204,7 +162,6 @@
                                             </label>
                                         </div>
 
-                                        <!-- Extra: Camping-Möbel (+35€) -->
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" id="extraFurniture"
                                                    data-price="35" onchange="calculatePrice()">
@@ -214,7 +171,6 @@
                                             </label>
                                         </div>
 
-                                        <!-- Extra: Erweiterungszelt (+45€) -->
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" id="extraTent"
                                                    data-price="45" onchange="calculatePrice()">
@@ -224,7 +180,6 @@
                                             </label>
                                         </div>
 
-                                        <!-- Extra: Sonnendach (+30€) -->
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" id="extraAwning"
                                                    data-price="30" onchange="calculatePrice()">
@@ -234,7 +189,6 @@
                                             </label>
                                         </div>
 
-                                        <!-- Extra: Bettwäsche-Set (+20€) -->
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" id="extraBedding"
                                                    data-price="20" onchange="calculatePrice()">
@@ -244,7 +198,6 @@
                                             </label>
                                         </div>
 
-                                        <!-- Extra: Handtücher-Set (+15€) -->
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" id="extraTowels"
                                                    data-price="15" onchange="calculatePrice()">
@@ -255,25 +208,18 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Ende Zusatzangebote -->
 
-                                <!-- ===================================
-                                     PREISBERECHNUNG
-                                     ===================================
+                                <!-- Preisberechnung
                                      Zeigt aufgeschlüsselte Kosten
-                                     Wird von calculatePrice() in booking.js befüllt
-                                     Standardmäßig hidden, wird bei Datums-Auswahl sichtbar -->
+                                     Wird von calculatePrice() in booking.js befüllt -->
                                 <div id="priceCalculation" class="bg-light p-3 rounded mb-3 hidden">
-                                    <!-- Basis-Preis (Nächte × Preis pro Nacht) -->
                                     <div class="d-flex justify-content-between mb-1">
                                         <span><span id="calcDays">0</span> Nächte x <span id="calcPrice">0</span> €</span>
                                         <span><span id="calcTotalBase">0</span> €</span>
                                     </div>
 
-                                    <!-- Extras in Rechnung (dynamisch befüllt) -->
                                     <div id="extrasInPrice" class="small"></div>
 
-                                    <!-- Servicegebühr (fest 15€) -->
                                     <div class="d-flex justify-content-between mb-1 text-muted small">
                                         <span>Servicegebühr</span>
                                         <span>15 €</span>
@@ -281,14 +227,12 @@
 
                                     <hr class="my-2">
 
-                                    <!-- Gesamtpreis -->
                                     <div class="d-flex justify-content-between fw-bold">
                                         <span>Gesamt</span>
                                         <span><span id="calcTotal">0</span> €</span>
                                     </div>
                                 </div>
 
-                                <!-- Submit-Button -->
                                 <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
                                     Jetzt buchen
                                 </button>
@@ -304,15 +248,12 @@
     <!-- Footer wird dynamisch von shared.js geladen -->
     <footer></footer>
 
-    <!-- ===================================
-         BUCHUNGSBESTÄTIGUNGS-MODAL
-         ===================================
+    <!-- Buchungsbestätigungs-Modal
          Bootstrap Modal zeigt Erfolgs-Meldung nach Buchung
          Wird von booking.js geöffnet und befüllt -->
     <div class="modal fade" id="bookingSuccessModal" tabindex="-1" aria-labelledby="bookingSuccessModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <!-- Modal Header mit Erfolgs-Icon -->
                 <div class="modal-header bg-success text-white">
                     <h5 class="modal-title" id="bookingSuccessModalLabel">
                         <i class="fa-solid fa-check-circle me-2"></i>Buchung erfolgreich!
@@ -320,12 +261,8 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Schließen"></button>
                 </div>
 
-                <!-- Modal Body mit Buchungsdetails (dynamisch befüllt) -->
-                <div class="modal-body" id="bookingSuccessModalBody">
-                    <!-- Wird von booking.js befüllt -->
-                </div>
+                <div class="modal-body" id="bookingSuccessModalBody"></div>
 
-                <!-- Modal Footer mit Buttons -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
                     <a href="profil.html" class="btn btn-primary">Zu meinen Buchungen</a>
@@ -334,21 +271,10 @@
         </div>
     </div>
 
-    <!-- ===================================
-         JAVASCRIPT DEPENDENCIES
-         =================================== -->
-
-    <!-- Bootstrap JavaScript -->
+    <!-- JavaScript Dependencies
+         Bootstrap für UI-Komponenten
+         Custom Scripts für Kalender, Fahrzeugdetails und Buchungslogik -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Custom JavaScript Files
-         Reihenfolge wichtig:
-         - api.js: API-Kommunikation
-         - data.js: Datenverwaltung
-         - shared.js: Header/Footer
-         - calendar.js: Verfügbarkeits-Kalender
-         - vehicleDetail.js: Fahrzeugdaten laden und anzeigen
-         - booking.js: Buchungs-Logik und Preis-Berechnung -->
     <script src="../js/api.js"></script>
     <script src="../js/data.js"></script>
     <script src="../js/shared.js"></script>

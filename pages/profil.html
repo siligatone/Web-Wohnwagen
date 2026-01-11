@@ -1,34 +1,27 @@
 <!DOCTYPE html>
 <html lang="de">
+<!--
+    InterCamp - Benutzerprofil
+    Zeigt persönliche Daten und Buchungshistorie
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mein Profil - InterCamp</title>
 
-    <!-- Bootstrap 5 CSS Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom Stylesheets -->
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/pages.css">
 </head>
 <body>
-
     <!-- Header wird dynamisch von shared.js geladen -->
     <header></header>
 
-    <!-- ===================================
-         MAIN CONTENT
-         =================================== -->
     <main>
         <div class="container py-5">
-            <!-- ===================================
-                 PROFIL-HEADER
-                 ===================================
+            <!-- Profil-Header
                  Zeigt Seitentitel und Zurück-Button -->
             <div class="profile-header">
                 <div class="row align-items-center">
@@ -44,29 +37,24 @@
                 </div>
             </div>
 
-            <!-- ===================================
-                 PERSÖNLICHE DATEN
-                 ===================================
+            <!-- Persönliche Daten
                  Zeigt Name, Email und Account-Typ
-                 Wird von profile.js mit Benutzerdaten befüllt -->
+                 Wird von profile.js befüllt -->
             <div class="row g-4 mb-4">
                 <div class="col-md-12">
                     <div class="profile-info">
                         <h4 class="mb-3">Persönliche Daten</h4>
                         <div class="row">
-                            <!-- Name -->
                             <div class="col-md-4 mb-3">
                                 <strong class="text-muted d-block mb-1">Name</strong>
                                 <span id="profileName" class="fs-5">-</span>
                             </div>
 
-                            <!-- Email -->
                             <div class="col-md-4 mb-3">
                                 <strong class="text-muted d-block mb-1">E-Mail</strong>
                                 <span id="profileEmail" class="fs-5">-</span>
                             </div>
 
-                            <!-- Account-Typ (Customer oder Provider) -->
                             <div class="col-md-4 mb-3">
                                 <strong class="text-muted d-block mb-1">Account-Typ</strong>
                                 <span id="profileRole" class="fs-5">-</span>
@@ -76,32 +64,19 @@
                 </div>
             </div>
 
-            <!-- ===================================
-                 PROVIDER DASHBOARD BUTTON
-                 ===================================
-                 Wird nur für Provider angezeigt
-                 Link zu anbieter.html (Provider-Dashboard)
-                 Wird von profile.js dynamisch eingefügt -->
-            <div id="providerDashboardButton" class="mb-4">
-                <!-- Button wird von profile.js für Provider hier eingefügt -->
-            </div>
+            <!-- Provider Dashboard Button
+                 Nur für Provider sichtbar, wird dynamisch von profile.js eingefügt -->
+            <div id="providerDashboardButton" class="mb-4"></div>
 
-            <!-- ===================================
-                 BUCHUNGSHISTORIE
-                 ===================================
+            <!-- Buchungshistorie
                  Zeigt alle Buchungen des Benutzers
-                 Für Customers: Ihre gebuchten Fahrzeuge
-                 Für Providers: Buchungen ihrer Fahrzeuge
                  Wird von profile.js dynamisch generiert -->
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3><i class="fa-solid fa-calendar-check me-2"></i>Meine Buchungen</h3>
                 </div>
 
-                <!-- Buchungsliste Container (dynamisch befüllt) -->
-                <div id="bookingHistoryContainer">
-                    <!-- Buchungskarten werden von profile.js hier eingefügt -->
-                </div>
+                <div id="bookingHistoryContainer"></div>
             </div>
         </div>
     </main>
@@ -109,19 +84,10 @@
     <!-- Footer wird dynamisch von shared.js geladen -->
     <footer></footer>
 
-    <!-- ===================================
-         JAVASCRIPT DEPENDENCIES
-         =================================== -->
-
-    <!-- Bootstrap JavaScript -->
+    <!-- JavaScript Dependencies
+         Bootstrap für UI-Komponenten
+         Custom Scripts für Profildaten und Buchungshistorie -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Custom JavaScript Files
-         - api.js: API-Kommunikation
-         - data.js: Datenverwaltung
-         - shared.js: Header/Footer
-         - auth.js: Auth-Check (requireAuth)
-         - profile.js: Profildaten und Buchungshistorie anzeigen -->
     <script src="../js/api.js"></script>
     <script src="../js/data.js"></script>
     <script src="../js/shared.js"></script>

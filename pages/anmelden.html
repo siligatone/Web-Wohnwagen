@@ -1,95 +1,66 @@
 <!DOCTYPE html>
 <html lang="de">
+<!--
+    InterCamp - Authentifizierung
+    Login und Registrierung mit Toggle zwischen zwei Formularen
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anmelden - InterCamp</title>
 
-    <!-- Bootstrap 5 CSS Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom Stylesheets (../ navigiert aus pages/ zum root) -->
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/pages.css">
 </head>
 <body>
-
     <!-- Header wird dynamisch von shared.js geladen -->
     <header></header>
 
-    <!-- ===================================
-         MAIN CONTENT
-         =================================== -->
     <main>
         <div class="container">
-            <!-- Auth Container - Zentriert Login/Register Forms -->
             <div class="auth-container">
-
-                <!-- ===================================
-                     LOGIN SECTION
-                     ===================================
-                     Login-Formular für bestehende Benutzer
-                     Standardmäßig sichtbar (Register ist hidden)
-                     Formular-Submit ruft handleLogin() aus auth.js auf -->
+                <!-- Login-Formular
+                     Standardmäßig sichtbar, Submit ruft handleLogin() aus auth.js auf -->
                 <div id="loginSection" class="auth-card">
-                    <!-- Form Header -->
                     <div class="auth-header">
                         <h2>Anmelden</h2>
                         <p class="text-muted">Willkommen zurück!</p>
                     </div>
 
-                    <!-- Login-Formular
-                         onsubmit: handleLogin(event) aus auth.js
-                         return false verhindert Standard-Form-Submit -->
                     <form onsubmit="return handleLogin(event)">
-                        <!-- Email-Eingabe (required = Pflichtfeld) -->
                         <div class="mb-3">
                             <label class="form-label">E-Mail Adresse</label>
                             <input type="email" id="loginEmail" class="form-control form-control-lg" required>
                         </div>
 
-                        <!-- Passwort-Eingabe (required = Pflichtfeld) -->
                         <div class="mb-4">
                             <label class="form-label">Passwort</label>
                             <input type="password" id="loginPass" class="form-control form-control-lg" required>
                         </div>
 
-                        <!-- Error-Container (wird von auth.js befüllt bei Fehler) -->
                         <div id="loginError"></div>
 
-                        <!-- Submit-Button -->
                         <button type="submit" class="btn btn-primary w-100 btn-lg mb-3">Einloggen</button>
                     </form>
 
-                    <!-- Link zum Wechsel zur Registrierung
-                         showRegisterForm() blendet Login aus und Register ein -->
                     <div class="form-switch-link">
                         Noch kein Konto? <a href="#" onclick="showRegisterForm(); return false;">Hier registrieren</a>
                     </div>
                 </div>
 
-                <!-- ===================================
-                     REGISTER SECTION
-                     ===================================
-                     Registrierungs-Formular für neue Benutzer
-                     Standardmäßig hidden (display: none)
-                     Formular-Submit ruft handleRegister() aus auth.js auf -->
+                <!-- Registrierungs-Formular
+                     Standardmäßig versteckt, Submit ruft handleRegister() aus auth.js auf
+                     Enthält Rollenauswahl (Customer/Provider) -->
                 <div id="registerSection" class="auth-card" style="display: none;">
-                    <!-- Form Header -->
                     <div class="auth-header">
                         <h2>Registrieren</h2>
                         <p class="text-muted">Erstellen Sie ein kostenloses Konto</p>
                     </div>
 
-                    <!-- Registrierungs-Formular
-                         onsubmit: handleRegister(event) aus auth.js
-                         return false verhindert Standard-Form-Submit -->
                     <form onsubmit="return handleRegister(event)">
-                        <!-- Vor- und Nachname (2-Spalten-Layout) -->
                         <div class="row mb-3">
                             <div class="col">
                                 <label class="form-label">Vorname</label>
@@ -101,26 +72,19 @@
                             </div>
                         </div>
 
-                        <!-- Email-Eingabe (required + type=email für Validierung) -->
                         <div class="mb-3">
                             <label class="form-label">E-Mail Adresse</label>
                             <input type="email" id="regEmail" class="form-control" required>
                         </div>
 
-                        <!-- Passwort-Eingabe (minlength=3 für Mindestlänge) -->
                         <div class="mb-3">
                             <label class="form-label">Passwort wählen</label>
                             <input type="password" id="regPass" class="form-control" required minlength="3">
                         </div>
 
-                        <!-- Rollen-Auswahl: Customer oder Provider
-                             Radio-Buttons mit name="roleChoice" für gegenseitige Exklusivität
-                             Customer ist standardmäßig gewählt (checked)
-                             auth.js liest den value (customer/provider) aus -->
                         <div class="mb-4">
                             <label class="form-label d-block">Ich möchte...</label>
 
-                            <!-- Option 1: Customer (Fahrzeuge mieten) -->
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="roleChoice" id="roleCustomer" value="customer" checked>
                                 <label class="form-check-label" for="roleCustomer">
@@ -128,7 +92,6 @@
                                 </label>
                             </div>
 
-                            <!-- Option 2: Provider (Fahrzeuge vermieten) -->
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="roleChoice" id="roleProvider" value="provider">
                                 <label class="form-check-label" for="roleProvider">
@@ -137,7 +100,6 @@
                             </div>
                         </div>
 
-                        <!-- AGB-Checkbox (required = muss akzeptiert werden) -->
                         <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" required id="agbCheck">
                             <label class="form-check-label small" for="agbCheck">
@@ -145,15 +107,11 @@
                             </label>
                         </div>
 
-                        <!-- Error-Container (wird von auth.js befüllt bei Fehler) -->
                         <div id="registerError"></div>
 
-                        <!-- Submit-Button -->
                         <button type="submit" class="btn btn-success w-100 btn-lg mb-3">Registrieren</button>
                     </form>
 
-                    <!-- Link zum Wechsel zum Login
-                         showLoginForm() blendet Register aus und Login ein -->
                     <div class="form-switch-link">
                         Bereits registriert? <a href="#" onclick="showLoginForm(); return false;">Zum Login</a>
                     </div>
@@ -165,37 +123,23 @@
     <!-- Footer wird dynamisch von shared.js geladen -->
     <footer></footer>
 
-    <!-- ===================================
-         JAVASCRIPT DEPENDENCIES
-         =================================== -->
-
-    <!-- Bootstrap JavaScript -->
+    <!-- JavaScript Dependencies
+         Bootstrap für UI-Komponenten
+         Custom Scripts für Authentifizierung -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Custom JavaScript Files
-         - api.js: API-Kommunikation
-         - data.js: Datenverwaltung
-         - shared.js: Header/Footer
-         - auth.js: Login/Register-Logik (handleLogin, handleRegister) -->
     <script src="../js/api.js"></script>
     <script src="../js/data.js"></script>
     <script src="../js/shared.js"></script>
     <script src="../js/auth.js"></script>
 
-    <!-- ===================================
-         INLINE JAVASCRIPT
-         ===================================
-         Toggle-Funktionen für Formular-Wechsel -->
+    <!-- Inline Toggle-Funktionen
+         Wechseln zwischen Login- und Registrierungs-Formular -->
     <script>
-        // Blendet Login aus und Register ein
-        // Wird von "Hier registrieren" Link aufgerufen
         function showRegisterForm() {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('registerSection').style.display = 'block';
         }
 
-        // Blendet Register aus und Login ein
-        // Wird von "Zum Login" Link aufgerufen
         function showLoginForm() {
             document.getElementById('registerSection').style.display = 'none';
             document.getElementById('loginSection').style.display = 'block';
