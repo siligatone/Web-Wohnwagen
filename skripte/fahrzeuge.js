@@ -245,7 +245,7 @@ async function displayVehicles() {
 // Ziel-URL-Format: pages/fahrzeug.html?id=v1
 // Die Detailseite (vehicleDetail.js) extrahiert dann die ID und lädt Daten
 function goToVehicle(vehicleId) {
-    window.location.href = `pages/fahrzeug.html?id=${vehicleId}`;
+    window.location.href = `seiten/fahrzeug.html?id=${vehicleId}`;
 }
 
 // Scrollt sanft zur Fahrzeugliste

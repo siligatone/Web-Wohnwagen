@@ -50,11 +50,9 @@ async function handleLogin(event) {
         if (redirectTo) {
             window.location.href = redirectTo;
         } else {
-            // Prüfe den aktuellen Pfad um den korrekten Prefix zu setzen
-            // Falls wir bereits in /pages/ sind, brauchen wir kein 'pages/' prefix
-            // Sonst müssen wir 'pages/' voranstellen um in den richtigen Ordner zu kommen
-            const isInPages = window.location.pathname.includes('/pages/');
-            const prefix = isInPages ? '' : 'pages/';
+            // Prüfe, ob wir bereits im /seiten/ Ordner sind
+            const isInPages = window.location.pathname.includes('/seiten/');
+            const prefix = isInPages ? '' : 'seiten/';
 
             if (user.role === 'provider') {
                 window.location.href = `${prefix}anbieter.html`;
@@ -157,11 +155,9 @@ function logout() {
     if (confirm('Möchten Sie sich wirklich abmelden?')) {
         // Lösche User aus localStorage (Session beenden)
         setCurrentUser(null);
-
-        // Leite zur Startseite weiter
-        // Falls wir in /pages/ sind, müssen wir ein Verzeichnis hoch (../)
-        const isInPages = window.location.pathname.includes('/pages/');
-        window.location.href = isInPages ? '../index.html' : 'index.html';
+        // Prüfe, ob wir im /seiten/ Ordner sind
+        const isInPages = window.location.pathname.includes('/seiten/');
+        window.location.href = isInPages ? '../startseite.html' : 'startseite.html';
     }
 }
 

@@ -38,16 +38,10 @@ function renderHeader() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     const isProvider = currentUser && currentUser.role === 'provider';
 
-    // Pfad-Präfix-Logik für korrekte relative Links
-    // Problem: Seiten liegen teils im Root (index.html) teils in /pages/ (profil.html)
-    // Lösung: Prüfe aktuellen Pfad und setze Präfixe entsprechend
-    // Beispiele:
-    // - Von index.html (Root): pathPrefix='' pagesPrefix='pages/'
-    // - Von pages/profil.html: pathPrefix='../' pagesPrefix=''
-    // So funktionieren Links zu index.html und zu Unterseiten von überall
-    const isInPages = window.location.pathname.includes('/pages/');
+    // Prüfe, ob wir im /seiten/ Ordner sind
+    const isInPages = window.location.pathname.includes('/seiten/');
     const pathPrefix = isInPages ? '../' : '';
-    const pagesPrefix = isInPages ? '' : 'pages/';
+    const pagesPrefix = isInPages ? '' : 'seiten/';
 
     // Header-HTML als Template-String generieren
     // Bootstrap 5 Navbar: navbar-dark für dunklen Style, sticky-top für fixierte Position beim Scrollen
@@ -62,25 +56,8 @@ function renderHeader() {
     const headerHTML = `
         <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="${pathPrefix}index.html">
-                    <svg width="30" height="30" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px; vertical-align: middle;">
-                        <!-- Minimalistischer Wohnwagen - nur weiß -->
-
-                        <!-- Wohnwagen Körper -->
-                        <path d="M 30 20 L 95 20 Q 105 20 105 30 L 105 50 L 30 50 L 30 30 Q 30 20 30 20 Z" fill="#ffffff"/>
-
-                        <!-- Kleines Fenster -->
-                        <rect x="45" y="28" width="12" height="10" rx="2" fill="#000000" opacity="0.3"/>
-
-                        <!-- Deichsel (Anhänger-Teil) -->
-                        <line x1="30" y1="35" x2="15" y2="50" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-                        <line x1="30" y1="35" x2="15" y2="20" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-
-                        <!-- Großes Rad -->
-                        <circle cx="75" cy="58" r="12" fill="#ffffff"/>
-                        <circle cx="75" cy="58" r="6" fill="#000000" opacity="0.3"/>
-                    </svg>
-                    InterCamp
+                <a class="navbar-brand fw-bold" href="${pathPrefix}startseite.html">
+                    <i class="fa-solid fa-route me-2"></i>CamperRent
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
                     <span class="navbar-toggler-icon"></span>
@@ -88,10 +65,10 @@ function renderHeader() {
                 <div class="collapse navbar-collapse" id="navContent">
                     <ul class="navbar-nav ms-auto align-items-center">
                         <li class="nav-item">
-                            <a class="nav-link" href="${pathPrefix}index.html">Home</a>
+                            <a class="nav-link" href="${pathPrefix}startseite.html">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="${pathPrefix}index.html#fahrzeuge">Fahrzeuge</a>
+                            <a class="nav-link" href="${pathPrefix}startseite.html#fahrzeuge">Fahrzeuge</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="${pagesPrefix}impressum.html">Impressum</a>
@@ -147,11 +124,10 @@ function renderHeader() {
 // Der Footer passt Pfade automatisch an je nach Verzeichnis-Kontext (Root vs. /pages/)
 // Bootstrap Grid Layout sorgt für responsive Darstellung
 function renderFooter() {
-    // Pfad-Präfix-Logik (identisch zum Header)
-    // Siehe renderHeader() für detaillierte Erklärung
-    const isInPages = window.location.pathname.includes('/pages/');
+    // Prüfe, ob wir im /seiten/ Ordner sind
+    const isInPages = window.location.pathname.includes('/seiten/');
     const pathPrefix = isInPages ? '../' : '';
-    const pagesPrefix = isInPages ? '' : 'pages/';
+    const pagesPrefix = isInPages ? '' : 'seiten/';
 
     // Footer-HTML als Template-String generieren
     // Bootstrap Footer mit dunklem Hintergrund (siehe CSS)
@@ -172,7 +148,7 @@ function renderFooter() {
                         <ul class="list-unstyled">
                             <li><a href="${pagesPrefix}impressum.html">Impressum</a></li>
                             <li><a href="${pagesPrefix}datenschutz.html">Datenschutz</a></li>
-                            <li><a href="${pathPrefix}index.html">Startseite</a></li>
+                            <li><a href="${pathPrefix}startseite.html">Startseite</a></li>
                         </ul>
                     </div>
                     <div class="col-md-4">
@@ -290,11 +266,7 @@ function logout() {
         // Entferne currentUser aus localStorage
         // Dies beendet die Session und der Benutzer ist ausgeloggt
         localStorage.removeItem('currentUser');
-
-        // Leite zur Startseite weiter
-        // Nach Logout sollte Benutzer auf einer öffentlichen Seite landen
-        // index.html ist sicher da sie keinen Login erfordert
-        window.location.href = 'index.html';
+        window.location.href = 'startseite.html';
     }
 }
 

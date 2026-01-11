@@ -26,8 +26,8 @@
          =================================== -->
     <main>
         <div class="container py-4">
-            <!-- Zurück-Button zur Fahrzeugübersicht -->
-            <a href="../index.html" class="btn btn-link text-decoration-none text-muted mb-3 ps-0">
+            <!-- Zurück-Button -->
+            <a href="../startseite.html" class="btn btn-link text-decoration-none text-muted mb-3 ps-0">
                 <i class="fa-solid fa-arrow-left me-2"></i>Zurück zur Übersicht
             </a>
 
@@ -341,19 +341,12 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom JavaScript Files
-         Reihenfolge wichtig:
-         - api.js: API-Kommunikation
-         - data.js: Datenverwaltung
-         - shared.js: Header/Footer
-         - calendar.js: Verfügbarkeits-Kalender
-         - vehicleDetail.js: Fahrzeugdaten laden und anzeigen
-         - booking.js: Buchungs-Logik und Preis-Berechnung -->
-    <script src="../js/api.js"></script>
-    <script src="../js/data.js"></script>
-    <script src="../js/shared.js"></script>
-    <script src="../js/calendar.js"></script>
-    <script src="../js/vehicleDetail.js"></script>
-    <script src="../js/booking.js"></script>
+    <!-- Custom JS -->
+    <script src="../skripte/schnittstelle.js"></script>
+    <script src="../skripte/daten.js"></script>
+    <script src="../skripte/gemeinsam.js"></script>
+    <script src="../skripte/kalender.js"></script>
+    <script src="../skripte/fahrzeugdetails.js"></script>
+    <script src="../skripte/buchung.js"></script>
 </body>
 </html>

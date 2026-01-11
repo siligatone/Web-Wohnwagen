@@ -33,7 +33,7 @@ async function loadVehicleDetails() {
     // Falls keine ID in URL: Benutzer hat direkte URL ohne Parameter aufgerufen
     // Weiterleitung zur Startseite da kein Fahrzeug angezeigt werden kann
     if (!vehicleId) {
-        window.location.href = '../index.html';
+        window.location.href = '../startseite.html';
         return;
     }
 
@@ -49,7 +49,7 @@ async function loadVehicleDetails() {
         // Zeige Fehlermeldung und leite zur Startseite weiter
         if (!currentVehicle) {
             alert('Fahrzeug nicht gefunden');
-            window.location.href = '../index.html';
+            window.location.href = '../startseite.html';
             return;
         }
 
@@ -66,7 +66,7 @@ async function loadVehicleDetails() {
         // Häufigste Ursachen: Server nicht gestartet, falsche URL, CORS-Probleme
         console.error('Fehler beim Laden des Fahrzeugs:', error);
         alert('Fehler beim Laden der Fahrzeugdaten. Ist der Server gestartet?');
-        window.location.href = '../index.html';
+        window.location.href = '../startseite.html';
     }
 }
 
