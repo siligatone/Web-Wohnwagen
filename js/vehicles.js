@@ -169,6 +169,7 @@ function renderVehicles(vehicles) {
         // encodeURIComponent() escapet URL für sichere Query-Parameter-Übergabe
         // Falls Thumbnail-API fehlschlägt zeigt Browser automatisch Original-URL
         const imageUrl = `http://localhost:3000/api/thumbnail?url=${encodeURIComponent(originalImageUrl)}&width=400`;
+        const sanitizedOriginalUrl = originalImageUrl.replace(/"/g, '&quot;');
 
         // Bootstrap Card HTML für ein Fahrzeug
         // card-img-top: Bild oben in Card (Standard-Bootstrap-Layout)
@@ -181,7 +182,7 @@ function renderVehicles(vehicles) {
         return `
         <div class="col-md-6 col-lg-4">
             <div class="card vehicle-card h-100" onclick="goToVehicle('${vehicle.id}')">
-                <img src="${imageUrl}" class="card-img-top" alt="${vehicle.name}" loading="lazy">
+                <img src="${imageUrl}" data-original="${sanitizedOriginalUrl}" class="card-img-top" alt="${vehicle.name}" loading="lazy" onerror="this.onerror=null; if (this.dataset.original) this.src=this.dataset.original;">
                 <div class="card-body">
                     <h5 class="card-title fw-bold">${vehicle.name}</h5>
                     <p class="card-text text-muted small">${vehicle.desc.substring(0, 100)}...</p>
