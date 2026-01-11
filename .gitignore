@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Thumbnail cache (server-generated images)
+thumbnail_cache/
+
 # Python
 __pycache__/
 *.py[cod]

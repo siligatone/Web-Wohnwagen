@@ -11,7 +11,12 @@
       "Bash(git init:*)",
       "Bash(git remote add:*)",
       "Bash(git add:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git restore:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd multi-image gallery with carousel functionality\n\n- Extend database structure: Add images array to all vehicles\n- Vehicle detail page: Replace single image with Bootstrap carousel\n  - Show single image when only one image available\n  - Show carousel with navigation and thumbnails for multiple images\n  - Add image counter badge\n  - Thumbnails clickable to navigate between images\n- CSS updates:\n  - Use object-fit: contain to prevent image cropping\n  - Add carousel styling with black background\n  - Responsive thumbnail gallery\n- Update vehicles.js to use first image from images array\n- Provider dashboard: Support multiple image URLs\n  - Change image input to textarea (comma-separated URLs)\n  - Parse and save multiple images in create/edit functions\n  - Display existing images as comma-separated list in edit form\n- Maintain backward compatibility with img field\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(git revert:*)"
     ],
     "deny": [],
     "ask": []

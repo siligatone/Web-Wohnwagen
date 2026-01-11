@@ -5,23 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InterCamp - Ihr Zuhause auf Rädern</title>
 
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 CSS Framework für responsive Layout -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome Icons -->
+
+    <!-- FontAwesome Icons für UI-Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Custom CSS -->
+    <!-- Custom Stylesheets für Design und Layout -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
 
-    <!-- Header wird dynamisch von shared.js geladen -->
+    <!-- ===================================
+         HEADER / NAVIGATION
+         ===================================
+         Wird dynamisch von shared.js generiert
+         Enthält: Logo, Navigation, Login/Logout Buttons -->
+    <header></header>
 
-    <!-- MAIN CONTENT -->
+    <!-- ===================================
+         MAIN CONTENT
+         =================================== -->
     <main>
-        <!-- Hero Section -->
+        <!-- ===================================
+             HERO SECTION
+             ===================================
+             Große Header-Section mit Hintergrundbild
+             CTA-Button scrollt zur Fahrzeugliste
+             Verwendet scrollToFleet() aus vehicles.js -->
         <section class="hero-header">
             <div class="container">
                 <h1 class="display-3 fw-bold mb-3">Ihr Abenteuer wartet!</h1>
@@ -32,40 +45,53 @@
             </div>
         </section>
 
-        <!-- Fahrzeug-Liste -->
+        <!-- ===================================
+             FAHRZEUG-LISTE MIT FILTER
+             ===================================
+             Hauptbereich der Startseite
+             Zeigt alle verfügbaren Fahrzeuge als Karten
+             Vehicles werden von vehicles.js geladen und gerendert -->
         <section id="fahrzeuge" class="container py-5">
+            <!-- Section Header -->
             <div class="text-center mb-5">
                 <h2 class="display-5 fw-bold">Unsere rollenden Hotels</h2>
                 <p class="lead text-muted">Finden Sie Ihren fahrbaren Urlaubstraum</p>
             </div>
 
-            <!-- ========================================
-                 FILTER-BEREICH FÜR FAHRZEUGE
-                 ======================================== 
-                 Filtert Fahrzeuge nach:
-                 - Freitext-Suche (searchText) - Name & Beschreibung
-                 - Kraftstoffart (fuel)
-                 - Anzahl Betten (beds)
-                 - Preis pro Nacht (price)
-                 ======================================== -->
+            <!-- ===================================
+                 FILTER-BEREICH
+                 ===================================
+                 Filtert Fahrzeuge nach verschiedenen Kriterien
+                 Alle Filter verwenden applyFilters() aus vehicles.js
+
+                 Filter-Optionen:
+                 1. Freitext-Suche: Durchsucht Name und Beschreibung
+                 2. Kraftstoff: Dropdown (Diesel, Benzin, Elektro)
+                 3. Anzahl Betten: Dropdown (2, 4, 6)
+                 4. Max. Preis: Range-Slider (50-200€)
+
+                 Reset-Button setzt alle Filter zurück -->
             <div class="card mb-4 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
                         <i class="fa-solid fa-filter me-2"></i>Fahrzeuge filtern
                     </h5>
-                    
-                    <!-- Filter: Freitext-Suche -->
+
+                    <!-- Filter: Freitext-Suche
+                         oninput triggert sofortige Filterung während Tippen -->
                     <div class="mb-3">
                         <label for="filterSearch" class="form-label small fw-bold">
                             <i class="fa-solid fa-magnifying-glass me-1"></i>Suche
                         </label>
-                        <input type="text" class="form-control" id="filterSearch" 
-                               placeholder="Suchen Sie nach Name oder Beschreibung..." 
+                        <input type="text" class="form-control" id="filterSearch"
+                               placeholder="Suchen Sie nach Name oder Beschreibung..."
                                oninput="applyFilters()">
                     </div>
-                    
+
                     <div class="row g-3">
-                        <!-- Filter: Kraftstoff -->
+                        <!-- Filter: Kraftstoff-Auswahl
+                             value="" = "Alle" zeigt alle Fahrzeuge
+                             onchange triggert Filterung bei Auswahl-Änderung -->
                         <div class="col-md-3">
                             <label for="filterFuel" class="form-label small fw-bold">Kraftstoff</label>
                             <select id="filterFuel" class="form-select" onchange="applyFilters()">
@@ -75,8 +101,9 @@
                                 <option value="Elektro">Elektro</option>
                             </select>
                         </div>
-                        
-                        <!-- Filter: Betten -->
+
+                        <!-- Filter: Anzahl Betten
+                             value="" = "Alle" zeigt alle Fahrzeuge -->
                         <div class="col-md-3">
                             <label for="filterBeds" class="form-label small fw-bold">Anzahl Betten</label>
                             <select id="filterBeds" class="form-select" onchange="applyFilters()">
@@ -86,18 +113,24 @@
                                 <option value="6">6 Betten</option>
                             </select>
                         </div>
-                        
-                        <!-- Filter: Max. Preis -->
+
+                        <!-- Filter: Maximaler Preis pro Nacht
+                             Range-Slider von 50€ bis 200€ in 10€ Schritten
+                             priceValue span zeigt aktuellen Wert
+                             updatePriceLabel() aktualisiert Anzeige
+                             oninput triggert bei jeder Slider-Bewegung -->
                         <div class="col-md-4">
                             <label for="filterPrice" class="form-label small fw-bold">
                                 Max. Preis: <span id="priceValue">200</span>€/Nacht
                             </label>
-                            <input type="range" class="form-range" id="filterPrice" 
+                            <input type="range" class="form-range" id="filterPrice"
                                    min="50" max="200" value="200" step="10"
                                    oninput="updatePriceLabel(); applyFilters()">
                         </div>
-                        
-                        <!-- Reset Button -->
+
+                        <!-- Reset Button
+                             Setzt alle Filter auf Standardwerte zurück
+                             Verwendet resetFilters() aus vehicles.js -->
                         <div class="col-md-2 d-flex align-items-end">
                             <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
                                 <i class="fa-solid fa-rotate-right me-1"></i>Zurücksetzen
@@ -108,19 +141,35 @@
             </div>
             <!-- Ende Filter-Bereich -->
 
+            <!-- ===================================
+                 FAHRZEUG-KARTEN CONTAINER
+                 ===================================
+                 Wird dynamisch von vehicles.js befüllt
+                 displayVehicles() lädt Fahrzeuge und ruft renderVehicles() auf
+                 Bootstrap Grid: 3 Spalten auf Large Screens (col-lg-4)
+                 Jede Karte ist klickbar und führt zu fahrzeug.html?id=xyz -->
             <div id="vehicleList" class="row g-4">
-                <!-- Fahrzeuge werden von vehicles.js geladen -->
+                <!-- Fahrzeug-Karten werden von vehicles.js hier eingefügt -->
             </div>
         </section>
 
-        <!-- Vorteile Section -->
+        <!-- ===================================
+             VORTEILE SECTION
+             ===================================
+             Zeigt 3 Hauptvorteile von InterCamp
+             Statischer Content mit Icon-Karten
+             3-Spalten-Layout (col-md-4) -->
         <section class="advantages-section py-5 mt-5">
             <div class="container">
+                <!-- Section Header -->
                 <div class="text-center mb-5">
                     <h2 class="display-4 fw-bold mb-3">Warum InterCamp?</h2>
                     <p class="lead" style="color: #1976d2; font-weight: 500;">Ihre Vorteile auf einen Blick</p>
                 </div>
+
+                <!-- Vorteile-Karten -->
                 <div class="row g-4">
+                    <!-- Vorteil 1: Geprüfte Qualität -->
                     <div class="col-md-4">
                         <div class="card h-100 border-0 shadow-sm">
                             <div class="card-body text-center p-4">
@@ -134,6 +183,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Vorteil 2: 24/7 Support -->
                     <div class="col-md-4">
                         <div class="card h-100 border-0 shadow-sm">
                             <div class="card-body text-center p-4">
@@ -147,6 +198,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Vorteil 3: Faire Preise -->
                     <div class="col-md-4">
                         <div class="card h-100 border-0 shadow-sm">
                             <div class="card-body text-center p-4">
@@ -165,12 +218,26 @@
         </section>
     </main>
 
-    <!-- Footer wird dynamisch von shared.js geladen -->
+    <!-- ===================================
+         FOOTER
+         ===================================
+         Wird dynamisch von shared.js generiert
+         Enthält: Firmeninfo, Links, Kontaktdaten, Copyright -->
+    <footer></footer>
 
-    <!-- Bootstrap JS -->
+    <!-- ===================================
+         JAVASCRIPT DEPENDENCIES
+         =================================== -->
+
+    <!-- Bootstrap JavaScript für interaktive Komponenten -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom JS -->
+    <!-- Custom JavaScript Files
+         Reihenfolge wichtig: api.js -> data.js -> shared.js -> vehicles.js
+         - api.js: API-Kommunikation mit Backend
+         - data.js: Datenverwaltung und CRUD-Operationen
+         - shared.js: Header/Footer und Cookie-Banner
+         - vehicles.js: Fahrzeugübersicht und Filter-Logik -->
     <script src="js/api.js"></script>
     <script src="js/data.js"></script>
     <script src="js/shared.js"></script>

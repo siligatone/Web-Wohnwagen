@@ -1,24 +1,35 @@
-/* ===================================
-   PROVIDER.JS - Anbieter-Dashboard
-   =================================== */
+// ===================================
+// PROVIDER.JS - Anbieter-Dashboard und Fahrzeugverwaltung
+// ===================================
+// Diese Datei verwaltet das komplette Provider-Dashboard für Wohnmobil-Anbieter.
+// Sie zeigt Statistiken (Fahrzeuge, Buchungen, Umsatz), eine Fahrzeug-Tabelle und ermöglicht CRUD-Operationen.
+// Provider können Fahrzeuge erstellen, bearbeiten, löschen und deren Buchungen einsehen.
+// Umfangreiche Sicherheitsprüfungen stellen sicher dass Provider nur ihre eigenen Daten verwalten können.
 
-// Provider-Dashboard initialisieren
+// Initialisiert das Provider-Dashboard beim Seiten-Load
+// Diese Funktion führt einen Auth-Check durch und lädt dann Statistiken und Fahrzeug-Liste
+// Nur Benutzer mit Rolle 'provider' dürfen zugreifen, andere werden weitergeleitet
 async function initProviderDashboard() {
-    // Auth-Check - nur Provider dürfen zugreifen
+    // Auth-Check mit Rollen-Anforderung
+    // requireAuth('provider') prüft Login UND Rolle, leitet zum Login weiter falls nicht berechtigt
     if (!requireAuth('provider')) return;
 
     const currentUser = getCurrentUser();
 
-    // Statistiken anzeigen
+    // Lade und zeige Statistiken (Anzahl Fahrzeuge, Buchungen, Umsatz, aktive Buchungen)
     await displayProviderStats(currentUser.id);
 
-    // Fahrzeug-Liste anzeigen
+    // Lade und zeige Fahrzeug-Tabelle mit allen Fahrzeugen des Providers
     await displayProviderVehicles(currentUser.id);
 }
 
-// Statistiken anzeigen
+// Berechnet und zeigt Provider-Statistiken an
+// Diese Funktion lädt alle relevanten Daten und berechnet Kennzahlen für das Dashboard
+// Parameter: providerId - Die User-ID des Providers
+// Die Statistiken werden in die stat-Cards und das Canvas-Diagramm geschrieben
 async function displayProviderStats(providerId) {
-    // SICHERHEIT: Provider darf nur eigene Statistiken sehen
+    // SICHERHEIT: Doppelte Prüfung dass nur der aktuelle Provider seine Statistiken sieht
+    // Verhindert URL-Manipulation um Statistiken anderer Provider zu sehen
     const currentUser = getCurrentUser();
     if (currentUser.id !== providerId || currentUser.role !== 'provider') {
         console.error('Keine Berechtigung für diese Statistiken');
@@ -26,23 +37,27 @@ async function displayProviderStats(providerId) {
     }
 
     try {
+        // Lade alle Fahrzeuge des Providers und alle Buchungen
         const vehicles = await getVehiclesByProvider(providerId);
         const allBookings = await getAllBookings();
 
-        // Filtern nach eigenen Fahrzeugen
+        // Filtere Buchungen nach eigenen Fahrzeugen
+        // Nur Buchungen die Fahrzeuge des Providers betreffen sind relevant
         const vehicleIds = vehicles.map(v => v.id);
         const providerBookings = allBookings.filter(b => vehicleIds.includes(b.vehicle_id));
 
-        // Berechne Statistiken
+        // Berechne Kern-Statistiken
         const totalVehicles = vehicles.length;
         const totalBookings = providerBookings.length;
 
-        // Gesamtumsatz
+        // Gesamtumsatz: Summiere alle totalPrice Werte aller Buchungen
+        // reduce() akkumuliert die Preise, startet bei 0
         const totalRevenue = providerBookings.reduce((sum, booking) => {
             return sum + (booking.totalPrice || 0);
         }, 0);
 
-        // Aktive Buchungen
+        // Aktive Buchungen: Zähle Buchungen die heute laufen
+        // Eine Buchung ist aktiv wenn heute zwischen Start und End liegt
         const today = new Date();
         const activeBookings = providerBookings.filter(b => {
             const start = new Date(b.start);
@@ -50,13 +65,20 @@ async function displayProviderStats(providerId) {
             return start <= today && end >= today;
         }).length;
 
-        // Anzeigen
+        // Aktualisiere Statistik-Cards im DOM
         document.getElementById('statVehicles').textContent = totalVehicles;
         document.getElementById('statBookings').textContent = totalBookings;
         document.getElementById('statRevenue').textContent = totalRevenue;
         document.getElementById('statActive').textContent = activeBookings;
+
+        // Rendere Canvas-Balkendiagramm falls providerStats.js geladen ist
+        // Das Diagramm zeigt Buchungen pro Fahrzeug visuell an
+        if (typeof renderBookingStatsCanvas === 'function') {
+            renderBookingStatsCanvas(providerBookings, vehicles);
+        }
     } catch (error) {
         console.error('Fehler beim Laden der Statistiken:', error);
+        // Zeige Fragezeichen bei Fehler statt falscher Zahlen
         document.getElementById('statVehicles').textContent = '?';
         document.getElementById('statBookings').textContent = '?';
         document.getElementById('statRevenue').textContent = '?';
@@ -64,13 +86,16 @@ async function displayProviderStats(providerId) {
     }
 }
 
-// Fahrzeug-Liste anzeigen
+// Zeigt alle Fahrzeuge des Providers in einer Tabelle an
+// Diese Funktion lädt Fahrzeuge und deren Buchungen und rendert eine interaktive Tabelle
+// Parameter: providerId - Die User-ID des Providers
+// Jede Zeile enthält Fahrzeugdaten, Buchungsanzahl, Status und Action-Buttons
 async function displayProviderVehicles(providerId) {
     const tableBody = document.getElementById('providerVehicleTable');
 
     if (!tableBody) return;
 
-    // SICHERHEIT: Provider darf nur eigene Fahrzeuge sehen
+    // SICHERHEIT: Prüfe dass nur der aktuelle Provider seine Fahrzeuge sieht
     const currentUser = getCurrentUser();
     if (currentUser.id !== providerId || currentUser.role !== 'provider') {
         tableBody.innerHTML = `
@@ -84,8 +109,10 @@ async function displayProviderVehicles(providerId) {
     }
 
     try {
+        // Lade alle Fahrzeuge des Providers
         const vehicles = await getVehiclesByProvider(providerId);
 
+        // Falls keine Fahrzeuge: zeige leere Nachricht
         if (vehicles.length === 0) {
             tableBody.innerHTML = `
                 <tr>
@@ -97,20 +124,24 @@ async function displayProviderVehicles(providerId) {
             return;
         }
 
-        // Lade alle Buchungen parallel
+        // Lade Buchungen für alle Fahrzeuge parallel für bessere Performance
+        // Promise.all() wartet bis alle Requests fertig sind
         const bookingsPromises = vehicles.map(vehicle => getBookingsByVehicle(vehicle.id));
         const allBookingsArrays = await Promise.all(bookingsPromises);
 
-        // Erstelle Map für schnellen Zugriff
+        // Erstelle Map für schnellen Zugriff auf Buchungen pro Fahrzeug
         const bookingsMap = new Map();
         vehicles.forEach((vehicle, index) => {
             bookingsMap.set(vehicle.id, allBookingsArrays[index]);
         });
 
+        // Generiere HTML für jede Tabellenzeile
         tableBody.innerHTML = vehicles.map(vehicle => {
-            // Zähle Buchungen für dieses Fahrzeug
+            // Hole Buchungen für dieses Fahrzeug
             const bookings = bookingsMap.get(vehicle.id) || [];
 
+            // Erstelle Tabellenzeile mit Bild, Daten, Status und Action-Buttons
+            // Status: Aktiv (hat Buchungen) oder Inaktiv (keine Buchungen)
             return `
                 <tr>
                     <td>
@@ -153,26 +184,33 @@ async function displayProviderVehicles(providerId) {
     }
 }
 
-// Fahrzeug-Buchungen anzeigen
+// Zeigt alle Buchungen für ein bestimmtes Fahrzeug in einem Modal an
+// Diese Funktion wird vom Kalender-Button in der Fahrzeug-Tabelle aufgerufen
+// Parameter: vehicleId - Die ID des Fahrzeugs dessen Buchungen angezeigt werden sollen
 async function viewVehicleBookings(vehicleId) {
     const currentUser = getCurrentUser();
-    
+
     try {
+        // Lade Fahrzeugdaten
         const vehicle = await getVehicleById(vehicleId);
-        
-        // SICHERHEIT: Prüfe ob das Fahrzeug dem Provider gehört
+
+        // SICHERHEIT: Prüfe dass das Fahrzeug dem aktuellen Provider gehört
+        // Verhindert dass Provider Buchungen fremder Fahrzeuge einsehen
         if (vehicle.provider_id !== currentUser.id) {
             alert('Sie haben keine Berechtigung, die Buchungen dieses Fahrzeugs zu sehen.');
             return;
         }
+
+        // Lade alle Buchungen für das Fahrzeug
         const bookings = await getBookingsByVehicle(vehicleId);
 
+        // Falls keine Buchungen: zeige Info-Meldung
         if (bookings.length === 0) {
             alert(`Für "${vehicle.name}" gibt es noch keine Buchungen.`);
             return;
         }
 
-        // Modal mit Buchungen anzeigen
+        // Zeige Buchungen in Modal
         await showBookingsModal(vehicle, bookings);
     } catch (error) {
         console.error('Fehler beim Laden der Buchungen:', error);
@@ -180,21 +218,24 @@ async function viewVehicleBookings(vehicleId) {
     }
 }
 
-// Buchungen-Modal anzeigen
+// Erstellt und zeigt ein Modal mit allen Buchungen eines Fahrzeugs
+// Das Modal zeigt Buchungsstatus, Kundendaten, Zeitraum und Preis
+// Parameter: vehicle - Das Vehicle-Objekt, bookings - Array aller Buchungen
 async function showBookingsModal(vehicle, bookings) {
-    // Lade alle User-Daten parallel
+    // Lade alle Kundendaten parallel für bessere Performance
     const userPromises = bookings.map(booking => getUserById(booking.user_id));
     const users = await Promise.all(userPromises);
 
-    // Erstelle Map für schnellen Zugriff
+    // Erstelle Map für schnellen Zugriff auf User-Daten
     const userMap = new Map();
     bookings.forEach((booking, index) => {
         userMap.set(booking.user_id, users[index]);
     });
 
-    // Sortiere nach Startdatum
+    // Sortiere Buchungen chronologisch nach Startdatum
     bookings.sort((a, b) => new Date(a.start) - new Date(b.start));
 
+    // Generiere HTML für jede Buchung
     const bookingsHTML = bookings.map(booking => {
         const user = userMap.get(booking.user_id);
         const start = new Date(booking.start);
@@ -204,6 +245,7 @@ async function showBookingsModal(vehicle, bookings) {
         const isActive = start <= today && end >= today;
         const isPast = end < today;
 
+        // Bestimme Status-Badge und Stornierungsmöglichkeit
         let statusBadge = '';
         let canCancel = false;
 
@@ -217,6 +259,8 @@ async function showBookingsModal(vehicle, bookings) {
             statusBadge = '<span class="badge bg-secondary">Abgeschlossen</span>';
         }
 
+        // Erstelle Buchungs-Card mit allen Details
+        // Provider können aktive und zukünftige Buchungen stornieren (z.B. bei Fahrzeugausfall)
         return `
             <div class="card mb-2">
                 <div class="card-body">
@@ -242,7 +286,7 @@ async function showBookingsModal(vehicle, bookings) {
         `;
     }).join('');
 
-    // Erstelle Modal-HTML
+    // Erstelle Modal-HTML mit Buchungsliste
     const modalHTML = `
         <div class="modal fade" id="bookingsModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
@@ -262,22 +306,23 @@ async function showBookingsModal(vehicle, bookings) {
         </div>
     `;
 
-    // Entferne altes Modal falls vorhanden
+    // Entferne altes Modal falls vorhanden (verhindert Duplikate)
     const oldModal = document.getElementById('bookingsModal');
     if (oldModal) {
         oldModal.remove();
     }
 
-    // Füge neues Modal hinzu
+    // Füge neues Modal zum DOM hinzu und zeige es an
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // Zeige Modal
     const modal = new bootstrap.Modal(document.getElementById('bookingsModal'));
     modal.show();
 }
 
-// Buchung als Anbieter stornieren
+// Storniert eine Buchung als Provider (z.B. bei Fahrzeugausfall)
+// Provider-Stornierungen sind kostenlos, im Gegensatz zu Kunden-Stornierungen
+// Parameter: bookingId - ID der zu stornierenden Buchung, vehicleName - Name des Fahrzeugs für Bestätigung
 async function cancelProviderBooking(bookingId, vehicleName) {
+    // Bestätigung einholen
     if (!confirm(`Möchten Sie diese Buchung für "${vehicleName}" wirklich stornieren?\n\nDie Stornierung kann nicht rückgängig gemacht werden.`)) {
         return;
     }
@@ -285,25 +330,27 @@ async function cancelProviderBooking(bookingId, vehicleName) {
     const currentUser = getCurrentUser();
 
     try {
-        // SICHERHEIT: Prüfe ob die Buchung zu einem eigenen Fahrzeug gehört
+        // SICHERHEIT: Prüfe dass die Buchung zu einem eigenen Fahrzeug gehört
+        // Verhindert dass Provider fremde Buchungen stornieren
         const booking = await getBookingById(bookingId);
         const vehicle = await getVehicleById(booking.vehicle_id);
-        
+
         if (vehicle.provider_id !== currentUser.id) {
             alert('Sie haben keine Berechtigung, diese Buchung zu stornieren.');
             return;
         }
 
+        // Buchung löschen
         await deleteBooking(bookingId);
         alert('✓ Buchung wurde erfolgreich storniert.');
 
-        // Schließe Modal und aktualisiere Dashboard
+        // Schließe Modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('bookingsModal'));
         if (modal) {
             modal.hide();
         }
 
-        // Aktualisiere Dashboard
+        // Aktualisiere Dashboard-Daten
         const currentUser = getCurrentUser();
         await displayProviderStats(currentUser.id);
         await displayProviderVehicles(currentUser.id);
@@ -313,7 +360,10 @@ async function cancelProviderBooking(bookingId, vehicleName) {
     }
 }
 
-// Berechne Anzahl der Nächte (Hilfsfunktion für Provider)
+// Berechnet die Anzahl Nächte zwischen zwei Daten
+// Diese Hilfsfunktion wird für die Anzeige verwendet
+// Parameter: startDate/endDate - Datum-Strings im Format YYYY-MM-DD
+// Rückgabe: Anzahl Nächte (aufgerundet)
 function calculateNights(startDate, endDate) {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -321,7 +371,9 @@ function calculateNights(startDate, endDate) {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// Fahrzeug bearbeiten
+// Öffnet das Bearbeiten-Modal und füllt es mit Fahrzeugdaten
+// Diese Funktion lädt ein Fahrzeug und füllt alle Formular-Felder
+// Parameter: vehicleId - ID des zu bearbeitenden Fahrzeugs
 async function editVehicle(vehicleId) {
     const currentUser = getCurrentUser();
 
@@ -334,7 +386,7 @@ async function editVehicle(vehicleId) {
             return;
         }
 
-        // Sicherheitsprüfung: Nur eigene Fahrzeuge bearbeiten
+        // SICHERHEIT: Prüfe dass das Fahrzeug dem Provider gehört
         if (vehicle.provider_id !== currentUser.id) {
             alert('Sie haben keine Berechtigung, dieses Fahrzeug zu bearbeiten.');
             return;
@@ -348,12 +400,13 @@ async function editVehicle(vehicleId) {
         document.getElementById('editVehicleFuel').value = vehicle.fuel;
 
         // Bilder: Zeige images Array als komma-getrennte Liste
+        // Für Rückwärtskompatibilität mit altem img-Feld
         const images = vehicle.images || (vehicle.img ? [vehicle.img] : []);
         document.getElementById('editVehicleImages').value = images.join(', ');
 
         document.getElementById('editVehicleDesc').value = vehicle.desc;
 
-        // Technische Daten
+        // Technische Daten - nur falls vorhanden
         if (vehicle.details && vehicle.details.tech) {
             document.getElementById('editTechSeats').value = vehicle.details.tech.seats || '';
             document.getElementById('editTechConsumption').value = vehicle.details.tech.consumption || '';
@@ -363,7 +416,7 @@ async function editVehicle(vehicleId) {
             document.getElementById('editTechDrive').value = vehicle.details.tech.drive || '';
         }
 
-        // Abmessungen
+        // Abmessungen - nur falls vorhanden
         if (vehicle.details && vehicle.details.dims) {
             document.getElementById('editDimsLen').value = vehicle.details.dims.len || '';
             document.getElementById('editDimsWidth').value = vehicle.details.dims.width || '';
@@ -373,7 +426,7 @@ async function editVehicle(vehicleId) {
             document.getElementById('editDimsTowing').value = vehicle.details.dims.towing || '';
         }
 
-        // Features
+        // Features als komma-getrennte Liste
         if (vehicle.features && Array.isArray(vehicle.features)) {
             document.getElementById('editFeatures').value = vehicle.features.join(', ');
         } else {
@@ -389,7 +442,10 @@ async function editVehicle(vehicleId) {
     }
 }
 
-// Fahrzeug-Änderungen speichern
+// Speichert Änderungen an einem Fahrzeug
+// Diese Funktion wird vom Bearbeiten-Formular aufgerufen
+// Parameter: event - Das Submit-Event des Formulars
+// Rückgabe: false um Standard-Submit zu verhindern
 async function handleEditVehicle(event) {
     event.preventDefault();
 
@@ -397,24 +453,26 @@ async function handleEditVehicle(event) {
     const currentUser = getCurrentUser();
 
     try {
-        // Lade aktuelles Fahrzeug
+        // Lade aktuelles Fahrzeug für Sicherheitsprüfung
         const currentVehicle = await getVehicleById(vehicleId);
 
-        // Sicherheitsprüfung: Nur eigene Fahrzeuge bearbeiten
+        // SICHERHEIT: Prüfe dass das Fahrzeug dem Provider gehört
         if (currentVehicle.provider_id !== currentUser.id) {
             alert('Sie haben keine Berechtigung, dieses Fahrzeug zu bearbeiten.');
             return false;
         }
 
-        // Parse Features (komma-getrennt)
+        // Parse Features aus komma-getrenntem String zu Array
+        // trim() entfernt Leerzeichen, filter() entfernt leere Einträge
         const featuresValue = document.getElementById('editFeatures').value.trim();
         const features = featuresValue ? featuresValue.split(',').map(f => f.trim()).filter(f => f) : [];
 
-        // Parse Images (komma-getrennt)
+        // Parse Images aus komma-getrenntem String zu Array
         const imagesValue = document.getElementById('editVehicleImages').value.trim();
         const images = imagesValue ? imagesValue.split(',').map(url => url.trim()).filter(url => url) : [];
 
-        // Update alle bearbeitbaren Felder
+        // Erstelle aktualisiertes Vehicle-Objekt
+        // Spread-Operator (...) behält bestehende Felder, neue Werte überschreiben
         const updatedVehicle = {
             ...currentVehicle,
             name: document.getElementById('editVehicleName').value,
@@ -446,7 +504,7 @@ async function handleEditVehicle(event) {
             }
         };
 
-        // Speichern
+        // Speichere via API
         await updateVehicle(vehicleId, updatedVehicle);
 
         alert('Fahrzeug wurde erfolgreich aktualisiert!');
@@ -455,7 +513,7 @@ async function handleEditVehicle(event) {
         const modal = bootstrap.Modal.getInstance(document.getElementById('editVehicleModal'));
         modal.hide();
 
-        // Neu laden
+        // Seite neu laden um aktualisierte Daten anzuzeigen
         location.reload();
     } catch (error) {
         console.error('Fehler beim Aktualisieren des Fahrzeugs:', error);
@@ -465,19 +523,23 @@ async function handleEditVehicle(event) {
     return false;
 }
 
-// Fahrzeug löschen
+// Löscht ein Fahrzeug nach Bestätigung
+// Diese Funktion prüft auf bestehende Buchungen und löscht nur wenn keine vorhanden
+// Parameter: vehicleId - ID des zu löschenden Fahrzeugs
 async function deleteVehicleConfirm(vehicleId) {
     const currentUser = getCurrentUser();
 
     try {
         const vehicle = await getVehicleById(vehicleId);
 
-        // Sicherheitsprüfung: Nur eigene Fahrzeuge löschen
+        // SICHERHEIT: Prüfe dass das Fahrzeug dem Provider gehört
         if (vehicle.provider_id !== currentUser.id) {
             alert('Sie haben keine Berechtigung, dieses Fahrzeug zu löschen.');
             return;
         }
 
+        // Prüfe auf bestehende Buchungen
+        // Fahrzeuge mit Buchungen können nicht gelöscht werden um Datenintegrität zu wahren
         const bookings = await getBookingsByVehicle(vehicleId);
 
         if (bookings.length > 0) {
@@ -485,14 +547,16 @@ async function deleteVehicleConfirm(vehicleId) {
             return;
         }
 
+        // Bestätigung einholen
         if (!confirm(`Möchten Sie "${vehicle.name}" wirklich löschen?`)) {
             return;
         }
 
+        // Fahrzeug löschen
         await deleteVehicle(vehicleId);
         alert('Fahrzeug wurde gelöscht.');
 
-        // Neu laden
+        // Seite neu laden
         location.reload();
     } catch (error) {
         console.error('Fehler beim Löschen des Fahrzeugs:', error);
@@ -500,7 +564,8 @@ async function deleteVehicleConfirm(vehicleId) {
     }
 }
 
-// Neues Fahrzeug hinzufügen (Toggle Form)
+// Zeigt/Versteckt das Formular zum Hinzufügen neuer Fahrzeuge
+// Diese Funktion togglet die CSS-Klasse 'hidden' um das Formular ein-/auszublenden
 function toggleAddVehicleForm() {
     const form = document.getElementById('addVehicleForm');
     if (form) {
@@ -508,25 +573,30 @@ function toggleAddVehicleForm() {
     }
 }
 
-// Neues Fahrzeug erstellen
+// Erstellt ein neues Fahrzeug in der Datenbank
+// Diese Funktion wird vom Hinzufügen-Formular aufgerufen
+// Parameter: event - Das Submit-Event des Formulars
+// Rückgabe: false um Standard-Submit zu verhindern
 async function handleCreateVehicle(event) {
     event.preventDefault();
 
     const currentUser = getCurrentUser();
 
-    // Parse Features (komma-getrennt)
+    // Parse Features aus komma-getrenntem String zu Array
     const featuresValue = document.getElementById('features').value.trim();
     const features = featuresValue ? featuresValue.split(',').map(f => f.trim()).filter(f => f) : [];
 
-    // Parse Images (komma-getrennt)
+    // Parse Images aus komma-getrenntem String zu Array
     const imagesValue = document.getElementById('vehicleImages').value.trim();
     const images = imagesValue ? imagesValue.split(',').map(url => url.trim()).filter(url => url) : [];
 
     // Fallback Bild wenn keine Bilder angegeben
+    // Unsplash-Wohnmobil-Bild als Standard
     const defaultImage = 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80';
     const finalImages = images.length > 0 ? images : [defaultImage];
 
-    // Formular-Daten sammeln
+    // Sammle alle Formular-Daten in ein Vehicle-Objekt
+    // generateId('v') erstellt eindeutige ID, provider_id wird automatisch gesetzt
     const newVehicle = {
         id: generateId('v'),
         provider_id: currentUser.id,
@@ -560,16 +630,17 @@ async function handleCreateVehicle(event) {
     };
 
     try {
-        // Fahrzeug hinzufügen
+        // Fahrzeug via API hinzufügen
+        // addVehicle() prüft automatisch Berechtigung (nur Provider)
         await addVehicle(newVehicle);
 
         alert(`Fahrzeug "${newVehicle.name}" wurde erfolgreich hinzugefügt!`);
 
-        // Form zurücksetzen und verstecken
+        // Formular zurücksetzen und verstecken
         event.target.reset();
         toggleAddVehicleForm();
 
-        // Neu laden
+        // Seite neu laden um neues Fahrzeug in Tabelle anzuzeigen
         location.reload();
     } catch (error) {
         console.error('Fehler beim Erstellen des Fahrzeugs:', error);
@@ -579,7 +650,8 @@ async function handleCreateVehicle(event) {
     return false;
 }
 
-// Bei DOM-Ready
+// Automatische Initialisierung beim Seiten-Load
+// Prüft ob DOM bereits geladen ist und ruft initProviderDashboard() auf
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initProviderDashboard);
 } else {

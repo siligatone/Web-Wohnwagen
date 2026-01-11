@@ -5,23 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anbieter Dashboard - InterCamp</title>
 
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 CSS Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Custom CSS -->
+    <!-- Custom Stylesheets -->
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/pages.css">
 </head>
 <body>
 
-    <!-- Header wird dynamisch geladen -->
+    <!-- Header wird dynamisch von shared.js geladen -->
+    <header></header>
 
+    <!-- ===================================
+         MAIN CONTENT
+         =================================== -->
     <main>
         <div class="container py-5">
-            <!-- Header -->
+            <!-- Dashboard Header mit Zurück-Button -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1><i class="fa-solid fa-chart-line me-3"></i>Anbieter Dashboard</h1>
                 <a href="../index.html" class="btn btn-outline-primary">
@@ -29,7 +34,15 @@
                 </a>
             </div>
 
-            <!-- Statistiken -->
+            <!-- ===================================
+                 STATISTIK-KARTEN
+                 ===================================
+                 4 Stat-Cards zeigen Kennzahlen
+                 Wird von provider.js befüllt:
+                 - Anzahl Fahrzeuge
+                 - Gesamt-Buchungen
+                 - Umsatz (€)
+                 - Aktive Buchungen -->
             <div class="provider-stats">
                 <div class="stat-card">
                     <div class="stat-number" id="statVehicles">0</div>
@@ -49,21 +62,50 @@
                 </div>
             </div>
 
-            <!-- Fahrzeug-Verwaltung -->
+            <!-- ===================================
+                 BUCHUNGSÜBERSICHT DIAGRAMM
+                 ===================================
+                 Canvas-Balkendiagramm zeigt Buchungen pro Fahrzeug
+                 Wird von providerStats.js gerendert
+                 Hover zeigt Fahrzeugdetails im canvasLegend -->
+            <div class="card mb-5">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-chart-bar me-2"></i>Buchungsübersicht nach Fahrzeug</h5>
+                </div>
+                <div class="card-body">
+                    <div class="canvas-container">
+                        <canvas id="bookingStatsCanvas"></canvas>
+                    </div>
+                    <!-- Hover-Tooltip für Canvas -->
+                    <div id="canvasLegend" class="mt-3 text-center text-muted">
+                        <small>Fahren Sie mit der Maus über die Balken für Details</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================================
+                 FAHRZEUG-VERWALTUNG
+                 =================================== -->
             <div class="provider-vehicle-table">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3><i class="fa-solid fa-van-shuttle me-2"></i>Meine Fahrzeuge</h3>
+                    <!-- Button öffnet Formular zum Hinzufügen -->
                     <button class="btn btn-success" onclick="toggleAddVehicleForm()">
                         <i class="fa-solid fa-plus me-2"></i>Neues Fahrzeug
                     </button>
                 </div>
 
-                <!-- Fahrzeug hinzufügen Form -->
+                <!-- ===================================
+                     FAHRZEUG HINZUFÜGEN FORMULAR
+                     ===================================
+                     Standardmäßig hidden (class="hidden")
+                     toggleAddVehicleForm() blendet ein/aus
+                     onsubmit ruft handleCreateVehicle() aus provider.js auf -->
                 <div id="addVehicleForm" class="card mb-4 hidden">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Neues Fahrzeug hinzufügen</h5>
                         <form onsubmit="return handleCreateVehicle(event)">
-                            <!-- Grunddaten -->
+                            <!-- Grunddaten: Name, Preis, Betten, Kraftstoff, Bilder, Beschreibung -->
                             <h6 class="fw-bold mb-3 text-primary">Grunddaten</h6>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
@@ -97,7 +139,7 @@
                                 </div>
                             </div>
 
-                            <!-- Technische Daten -->
+                            <!-- Technische Daten: Sitzplätze, Verbrauch, Leistung, etc. -->
                             <h6 class="fw-bold mb-3 text-primary">Technische Daten</h6>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">
@@ -126,7 +168,7 @@
                                 </div>
                             </div>
 
-                            <!-- Abmessungen & Gewicht -->
+                            <!-- Abmessungen & Gewicht: Länge, Breite, Höhe, Gewichte -->
                             <h6 class="fw-bold mb-3 text-primary">Abmessungen & Gewicht</h6>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">
@@ -155,7 +197,7 @@
                                 </div>
                             </div>
 
-                            <!-- Ausstattung -->
+                            <!-- Ausstattung: Features komma-getrennt -->
                             <h6 class="fw-bold mb-3 text-primary">Ausstattung</h6>
                             <div class="row g-3 mb-3">
                                 <div class="col-12">
@@ -165,6 +207,7 @@
                                 </div>
                             </div>
 
+                            <!-- Formular Buttons -->
                             <div class="col-12">
                                 <button type="submit" class="btn btn-success me-2">Speichern</button>
                                 <button type="button" class="btn btn-secondary" onclick="toggleAddVehicleForm()">Abbrechen</button>
@@ -173,7 +216,12 @@
                     </div>
                 </div>
 
-                <!-- Fahrzeug-Tabelle -->
+                <!-- ===================================
+                     FAHRZEUG-TABELLE
+                     ===================================
+                     Zeigt alle Fahrzeuge des Providers
+                     Wird von provider.js befüllt
+                     Jede Zeile hat Aktions-Buttons: Bearbeiten/Löschen/Buchungen -->
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
@@ -187,7 +235,7 @@
                             </tr>
                         </thead>
                         <tbody id="providerVehicleTable">
-                            <!-- Wird von provider.js gefüllt -->
+                            <!-- Tabellenzeilen werden von provider.js hier eingefügt -->
                         </tbody>
                     </table>
                 </div>
@@ -195,7 +243,13 @@
         </div>
     </main>
 
-    <!-- Fahrzeug bearbeiten Modal -->
+    <!-- ===================================
+         FAHRZEUG BEARBEITEN MODAL
+         ===================================
+         Bootstrap Modal für Fahrzeug-Bearbeitung
+         Identische Felder wie Hinzufügen-Formular
+         Wird von showEditModal() in provider.js geöffnet
+         onsubmit ruft handleEditVehicle() auf -->
     <div class="modal fade" id="editVehicleModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -205,9 +259,10 @@
                 </div>
                 <div class="modal-body">
                     <form id="editVehicleForm" onsubmit="return handleEditVehicle(event)">
+                        <!-- Hidden Input für Fahrzeug-ID -->
                         <input type="hidden" id="editVehicleId">
 
-                        <!-- Grunddaten -->
+                        <!-- Grunddaten (identisch zum Hinzufügen-Formular) -->
                         <h6 class="fw-bold mb-3 text-primary">Grunddaten</h6>
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
@@ -309,6 +364,7 @@
                             </div>
                         </div>
 
+                        <!-- Formular Buttons -->
                         <div class="mt-3">
                             <button type="submit" class="btn btn-primary">Speichern</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
@@ -319,16 +375,28 @@
         </div>
     </div>
 
-    <!-- Footer wird dynamisch geladen -->
+    <!-- Footer wird dynamisch von shared.js geladen -->
+    <footer></footer>
 
-    <!-- Bootstrap JS -->
+    <!-- ===================================
+         JAVASCRIPT DEPENDENCIES
+         =================================== -->
+
+    <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom JS -->
+    <!-- Custom JavaScript Files
+         - api.js: API-Kommunikation
+         - data.js: Datenverwaltung
+         - shared.js: Header/Footer
+         - auth.js: Auth-Check (requireAuth für Provider)
+         - providerStats.js: Canvas-Diagramm-Rendering
+         - provider.js: Dashboard-Logik und CRUD-Operationen -->
     <script src="../js/api.js"></script>
     <script src="../js/data.js"></script>
     <script src="../js/shared.js"></script>
     <script src="../js/auth.js"></script>
+    <script src="../js/providerStats.js"></script>
     <script src="../js/provider.js"></script>
 </body>
 </html>

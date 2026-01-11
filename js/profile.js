@@ -1,28 +1,38 @@
-/* ===================================
-   PROFILE.JS - Kundenprofil & Buchungshistorie
-   =================================== */
+// ===================================
+// PROFILE.JS - Benutzerprofil und Buchungsverwaltung
+// ===================================
+// Diese Datei verwaltet die Profil-Seite für beide Benutzertypen (Customer und Provider).
+// Customers sehen ihre Buchungshistorie mit Status-Anzeige (Aktiv, Bevorstehend, Abgeschlossen).
+// Provider sehen einen Link zum Dashboard sowie optional ihre eigenen Buchungen.
+// Die Buchungsstornierung mit Gebühren-Berechnung (20% für Kunden, kostenlos für Provider) ist ebenfalls implementiert.
 
-// Profil-Seite initialisieren
+// Initialisiert die Profil-Seite basierend auf dem eingeloggten Benutzer
+// Diese Funktion wird beim Seiten-Load aufgerufen und verzweigt je nach Benutzer-Rolle
+// Führt Auth-Check durch, zeigt Profil-Informationen und lädt rollenspezifische Inhalte
 async function initProfile() {
-    // Auth-Check
+    // Prüfe ob Benutzer eingeloggt ist
+    // requireAuth() leitet zum Login weiter falls nicht eingeloggt
     if (!requireAuth()) return;
 
     const currentUser = getCurrentUser();
 
-    // Profilinformationen anzeigen
+    // Zeige grundlegende Profilinformationen (Name, Email, Rolle)
     displayProfileInfo(currentUser);
 
-    // Anbieter oder Kunde?
+    // Unterscheidung zwischen Provider und Customer
+    // Provider sehen Dashboard-Link und optional Buchungen
+    // Customers sehen nur ihre Buchungshistorie
     if (currentUser.role === 'provider') {
-        // Anbieter: Zeige Dashboard-Link
         displayProviderProfile(currentUser.id);
     } else {
-        // Kunde: Zeige Buchungshistorie
         await displayBookingHistory(currentUser.id);
     }
 }
 
-// Profilinformationen anzeigen
+// Zeigt grundlegende Profilinformationen in der Header-Card an
+// Diese Funktion füllt die Profil-Anzeige mit Name, Email und Rolle des Benutzers
+// Parameter: user - Das User-Objekt mit allen Benutzerinformationen
+// Die Rolle wird in lesbarem Format angezeigt: 'provider' -> 'Anbieter', 'customer' -> 'Kunde'
 function displayProfileInfo(user) {
     document.getElementById('profileName').textContent = user.name;
     document.getElementById('profileEmail').textContent = user.email;
@@ -30,14 +40,18 @@ function displayProfileInfo(user) {
         user.role === 'provider' ? 'Anbieter' : 'Kunde';
 }
 
-// Anbieter-Profil anzeigen
+// Zeigt das Provider-spezifische Profil mit Dashboard-Link
+// Provider sehen primär einen Button zum Anbieter-Dashboard
+// Falls der Provider auch selbst Buchungen hat, werden diese zusätzlich angezeigt
+// Parameter: providerId - Die User-ID des Providers
 async function displayProviderProfile(providerId) {
     const dashboardButtonContainer = document.getElementById('providerDashboardButton');
     const bookingContainer = document.getElementById('bookingHistoryContainer');
 
     if (!dashboardButtonContainer) return;
 
-    // Dashboard-Button immer anzeigen
+    // Zeige Dashboard-Button prominent an
+    // Dieser Button leitet zum Provider-Dashboard (anbieter.html) wo Fahrzeuge verwaltet werden
     dashboardButtonContainer.innerHTML = `
         <div class="text-center">
             <a href="anbieter.html" class="btn btn-primary btn-lg">
@@ -46,14 +60,16 @@ async function displayProviderProfile(providerId) {
         </div>
     `;
 
-    // Buchungen anzeigen (wenn vorhanden)
+    // Prüfe ob Provider auch Buchungen als Kunde gemacht hat
+    // Manche Provider buchen auch Fahrzeuge bei anderen Providern
     try {
         const bookings = await getBookingsByUser(providerId);
 
         if (bookings.length > 0) {
+            // Provider hat Buchungen: zeige Buchungshistorie zusätzlich an
             await displayBookingHistory(providerId);
         } else {
-            // Keine Buchungen - leere Nachricht im Booking-Container
+            // Provider hat keine Buchungen: zeige leere Nachricht
             if (bookingContainer) {
                 bookingContainer.innerHTML = `
                     <div class="empty-state">
@@ -77,13 +93,17 @@ async function displayProviderProfile(providerId) {
     }
 }
 
-// Buchungshistorie anzeigen
+// Zeigt die Buchungshistorie des Benutzers an
+// Diese Funktion lädt alle Buchungen, rendert sie als Cards und zeigt Status-Badges an
+// Buchungen werden chronologisch sortiert (neueste zuerst) und nach Status kategorisiert
+// Parameter: userId - Die User-ID des Benutzers, append - Falls true wird an bestehende Liste angehängt
 async function displayBookingHistory(userId, append = false) {
     const container = document.getElementById('bookingHistoryContainer');
 
     if (!container) return;
 
-    // SICHERHEIT: Nutzer darf nur eigene Buchungen sehen
+    // SICHERHEIT: Prüfe dass der angemeldete Benutzer seine eigenen Buchungen sieht
+    // Verhindert dass User-IDs in der URL manipuliert werden um fremde Buchungen zu sehen
     const currentUser = getCurrentUser();
     if (currentUser.id !== userId) {
         container.innerHTML = `
@@ -95,8 +115,10 @@ async function displayBookingHistory(userId, append = false) {
     }
 
     try {
+        // Lade alle Buchungen des Benutzers vom Server
         const bookings = await getBookingsByUser(userId);
 
+        // Falls keine Buchungen: zeige leere Nachricht mit Call-to-Action
         if (bookings.length === 0) {
             if (!append) {
                 container.innerHTML = `
@@ -111,14 +133,17 @@ async function displayBookingHistory(userId, append = false) {
             return;
         }
 
-        // Sortiere nach Datum (neueste zuerst)
+        // Sortiere Buchungen nach Startdatum (neueste zuerst)
+        // Damit sieht der Benutzer aktuelle und zukünftige Buchungen zuerst
         bookings.sort((a, b) => new Date(b.start) - new Date(a.start));
 
-        // Lade alle Fahrzeuge parallel
+        // Lade alle Fahrzeug-Informationen parallel für bessere Performance
+        // Promise.all() wartet bis alle Requests fertig sind
         const vehiclePromises = bookings.map(booking => getVehicleById(booking.vehicle_id));
         const vehicles = await Promise.all(vehiclePromises);
 
-        // Erstelle Map für schnellen Zugriff
+        // Erstelle Map für schnellen Zugriff auf Fahrzeug-Daten
+        // Map ist effizienter als Array.find() bei vielen Buchungen
         const vehicleMap = new Map();
         vehicles.forEach((vehicle, index) => {
             if (vehicle) {
@@ -126,17 +151,20 @@ async function displayBookingHistory(userId, append = false) {
             }
         });
 
+        // Generiere HTML für jede Buchung
         const bookingsHTML = bookings.map(booking => {
             const vehicle = vehicleMap.get(booking.vehicle_id);
             if (!vehicle) return '';
 
+            // Berechne Status der Buchung basierend auf Daten
             const start = new Date(booking.start);
             const end = new Date(booking.end);
             const today = new Date();
-            const isUpcoming = start > today;
-            const isActive = start <= today && end >= today;
-            const isPast = end < today;
+            const isUpcoming = start > today;       // Buchung liegt in der Zukunft
+            const isActive = start <= today && end >= today;  // Buchung läuft aktuell
+            const isPast = end < today;             // Buchung ist vorbei
 
+            // Wähle Status-Badge und Border-Farbe basierend auf Status
             let statusBadge = '';
             let statusClass = '';
 
@@ -151,7 +179,8 @@ async function displayBookingHistory(userId, append = false) {
                 statusClass = 'border-secondary';
             }
 
-            // Extras formatieren (falls vorhanden)
+            // Formatiere Extras für Anzeige falls vorhanden
+            // Extras werden als kommaseparierte Liste angezeigt
             let extrasHTML = '';
             if (booking.extras && booking.extras.length > 0) {
                 extrasHTML = `
@@ -162,6 +191,8 @@ async function displayBookingHistory(userId, append = false) {
                 `;
             }
 
+            // Erstelle Buchungs-Card mit allen Informationen
+            // Stornieren-Button nur für aktive und zukünftige Buchungen
             return `
                 <div class="booking-history-card ${statusClass}">
                     <div class="row align-items-center">
@@ -199,6 +230,7 @@ async function displayBookingHistory(userId, append = false) {
             `;
         }).join('');
 
+        // Füge HTML zum Container hinzu oder ersetze bestehenden Inhalt
         if (append) {
             container.insertAdjacentHTML('beforeend', bookingsHTML);
         } else {
@@ -216,7 +248,10 @@ async function displayBookingHistory(userId, append = false) {
     }
 }
 
-// Berechne Anzahl der Nächte
+// Berechnet die Anzahl Nächte zwischen zwei Daten
+// Diese Hilfsfunktion wird verwendet falls nights nicht in der Buchung gespeichert ist
+// Parameter: startDate/endDate - Datum-Strings im Format YYYY-MM-DD
+// Rückgabe: Anzahl Nächte (aufgerundet bei Teilnächten)
 function calculateNights(startDate, endDate) {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -224,9 +259,13 @@ function calculateNights(startDate, endDate) {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// Buchungsdetails in Modal anzeigen
+// Zeigt detaillierte Buchungsinformationen in einem Modal an
+// Dieses Modal zeigt eine vollständige Preisaufstellung mit allen Kostenpositionen
+// Parameter: bookingId - ID der Buchung, vehicleId - ID des Fahrzeugs
+// Das Modal wird dynamisch erstellt und via Bootstrap angezeigt
 async function viewBookingDetails(bookingId, vehicleId) {
     try {
+        // Lade Buchungs- und Fahrzeugdaten
         const booking = await getBookingById(bookingId);
         const vehicle = await getVehicleById(vehicleId);
         if (!booking || !vehicle) {
@@ -234,13 +273,15 @@ async function viewBookingDetails(bookingId, vehicleId) {
             return;
         }
 
+        // Berechne Status für Stornierungsmöglichkeit
         const start = new Date(booking.start);
         const end = new Date(booking.end);
         const today = new Date();
         const isUpcoming = start > today;
         const isActive = start <= today && end >= today;
-        const canCancel = isUpcoming || isActive;
+        const canCancel = isUpcoming || isActive;  // Nur aktive/zukünftige Buchungen stornierbar
 
+        // Status-Badge bestimmen
         let statusBadge = '';
         if (isActive) {
             statusBadge = '<span class="badge bg-success">Aktiv</span>';
@@ -250,6 +291,7 @@ async function viewBookingDetails(bookingId, vehicleId) {
             statusBadge = '<span class="badge bg-secondary">Abgeschlossen</span>';
         }
 
+        // Extras-Liste und Gesamtpreis berechnen
         let extrasHTML = '';
         let extrasTotal = 0;
         if (booking.extras && booking.extras.length > 0) {
@@ -257,11 +299,14 @@ async function viewBookingDetails(bookingId, vehicleId) {
             extrasHTML = `<h6 class="mt-3 mb-2">Gebuchte Extras:</h6><ul class="list-unstyled">${booking.extras.map(e => `<li class="mb-1"><i class="fa-solid fa-check text-success me-2"></i>${e.name} - ${e.price}€</li>`).join('')}</ul>`;
         }
 
+        // Preisaufstellung berechnen
         const nights = booking.nights || calculateNights(booking.start, booking.end);
         const basePrice = nights * vehicle.price;
         const serviceFee = 15;
         const totalPrice = booking.totalPrice || (basePrice + extrasTotal + serviceFee);
 
+        // Erstelle Modal HTML mit vollständiger Buchungsübersicht
+        // Zeigt Check-in/out, Nächte, Extras, detaillierte Preisaufstellung
         const modalHTML = `
             <div class="modal fade" id="bookingDetailsModal" tabindex="-1">
                 <div class="modal-dialog">
@@ -311,9 +356,11 @@ async function viewBookingDetails(bookingId, vehicleId) {
             </div>
         `;
 
+        // Entferne altes Modal falls vorhanden (verhindert Duplikate)
         const oldModal = document.getElementById('bookingDetailsModal');
         if (oldModal) oldModal.remove();
-        
+
+        // Füge neues Modal zum DOM hinzu und zeige es an
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         new bootstrap.Modal(document.getElementById('bookingDetailsModal')).show();
     } catch (error) {
@@ -322,79 +369,91 @@ async function viewBookingDetails(bookingId, vehicleId) {
     }
 }
 
-// Buchung aus Modal stornieren
+// Storniert eine Buchung aus dem Details-Modal heraus
+// Diese Wrapper-Funktion schließt das Modal und ruft dann die Hauptstornierungsfunktion auf
+// Parameter: bookingId - ID der zu stornierenden Buchung
 async function cancelBookingFromModal(bookingId) {
     const modal = bootstrap.Modal.getInstance(document.getElementById('bookingDetailsModal'));
     if (modal) modal.hide();
     await cancelBooking(bookingId);
 }
 
-// Zu Fahrzeug-Seite navigieren (wird nicht mehr verwendet, behalten für Kompatibilität)
+// Legacy-Funktion: Navigation zur Fahrzeug-Detailseite
+// Wird nicht mehr aktiv verwendet, bleibt für Kompatibilität erhalten
+// Parameter: vehicleId - ID des Fahrzeugs
 function viewVehicle(vehicleId) {
     window.location.href = `fahrzeug.html?id=${vehicleId}`;
 }
 
-// Buchung stornieren
+// Storniert eine Buchung mit Gebühren-Berechnung
+// Diese Funktion implementiert die Geschäftslogik für Buchungsstornierungen
+// Provider stornieren kostenlos, Kunden zahlen 20% des Basispreises als Stornierungsgebühr
+// Parameter: bookingId - ID der zu stornierenden Buchung
 async function cancelBooking(bookingId) {
     const currentUser = getCurrentUser();
-    
+
     try {
-        // Lade Buchungsdetails
+        // Lade Buchungsdetails für Berechtigungsprüfung und Gebühren-Berechnung
         const booking = await getBookingById(bookingId);
         if (!booking) {
             alert('Buchung konnte nicht gefunden werden.');
             return;
         }
 
-        // SICHERHEIT: Prüfe ob die Buchung dem aktuellen Nutzer gehört
+        // SICHERHEIT: Prüfe ob die Buchung dem aktuellen Benutzer gehört
+        // Verhindert dass Benutzer fremde Buchungen stornieren
         if (booking.user_id !== currentUser.id) {
             alert('Sie haben keine Berechtigung, diese Buchung zu stornieren.');
             return;
         }
 
-        // Prüfe ob Nutzer Anbieter ist
+        // Unterscheide zwischen Provider und Customer für Gebühren-Berechnung
         const isProvider = currentUser.role === 'provider';
-        
+
         let cancellationFee = 0;
         let confirmMessage = '';
-        
+
         if (isProvider) {
-            // Anbieter storniert kostenlos
+            // Provider stornieren kostenlos
+            // Anbieter haben mehr Flexibilität da sie ihre eigenen Buchungen verwalten
             confirmMessage = 'Möchten Sie diese Buchung wirklich stornieren?\n\nDie Stornierung kann nicht rückgängig gemacht werden.';
         } else {
-            // Kunde zahlt Stornierungsgebühr
-            // Berechne Stornierungskosten: 20% des Basispreises (ohne Extras und Verwaltungskosten)
-            const serviceFee = 15; // Verwaltungskosten
-            
+            // Kunden zahlen Stornierungsgebühr
+            // Berechne 20% des Basispreises (ohne Extras und Verwaltungskosten)
+            const serviceFee = 15;
+
             // Berechne Extra-Kosten
             let extrasTotal = 0;
             if (booking.extras && booking.extras.length > 0) {
                 extrasTotal = booking.extras.reduce((sum, extra) => sum + (extra.price || 0), 0);
             }
-            
-            // Basispreis = Gesamtpreis - Extras - Verwaltungskosten
+
+            // Basispreis = Gesamtpreis minus Extras minus Verwaltungsgebühr
+            // Stornierungsgebühr wird nur vom Basispreis berechnet
             const basePrice = booking.totalPrice - extrasTotal - serviceFee;
-            
-            // Stornierungsgebühr: 20% des Basispreises
+
+            // Stornierungsgebühr: 20% des Basispreises, aufgerundet
             cancellationFee = Math.round(basePrice * 0.20);
-            
+
             confirmMessage = `STORNIERUNGSKOSTEN\n\nBitte beachten Sie: Bei der Stornierung dieser Buchung fallen folgende Kosten an:\n\nStornierungsgebühr: ${cancellationFee}€ \n\nMöchten Sie die Buchung trotzdem stornieren?`;
         }
-        
+
+        // Bestätigung einholen
         if (!confirm(confirmMessage)) {
             return;
         }
 
-        // Buchung löschen
+        // Buchung aus Datenbank löschen
         await deleteBooking(bookingId);
-        
+
+        // Erfolgsmeldung mit Gebühren-Information
         if (isProvider) {
             alert('✓ Buchung wurde erfolgreich storniert.');
         } else {
             alert(`✓ Buchung wurde storniert.\n\nEs wurden Stornierungskosten in Höhe von ${cancellationFee}€ berechnet.`);
         }
 
-        // Seite neu laden
+        // Seite neu laden um aktualisierte Buchungsliste zu zeigen
         location.reload();
     } catch (error) {
         console.error('Fehler beim Stornieren:', error);
@@ -402,7 +461,9 @@ async function cancelBooking(bookingId) {
     }
 }
 
-// Bei DOM-Ready
+// Automatische Initialisierung beim Seiten-Load
+// Prüft ob DOM bereits geladen ist und ruft initProfile() auf
+// document.readyState prüft den Lade-Status der Seite
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initProfile);
 } else {
