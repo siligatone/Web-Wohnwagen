@@ -30,14 +30,13 @@ INHALTSVERZEICHNIS
 4. Ordnerstruktur und Projektorganisation
    4.1 Verzeichnisübersicht
    4.2 Verantwortlichkeiten der Module
-   4.3 Wichtige Konfigurationsdateien
 
 5. Ausführungsumgebung und Setup
    5.1 Systemvoraussetzungen
    5.2 Installation und Abhängigkeiten
    5.3 Starten der Anwendung
 
-6. Funktionalitäten im Detail
+6. Funktionalitäten im Detail (mit Code-Beispielen)
    6.1 Fahrzeugsuche und Filterfunktion
    6.2 Fahrzeug-Detailseite und Bildergalerie
    6.3 Buchungsprozess mit interaktivem Kalender
@@ -49,16 +48,6 @@ INHALTSVERZEICHNIS
    7.1 Datenbankumstellung: PostgreSQL → JSON
    7.2 Image-Carousel und Höhenberechnungen
    7.3 Thumbnail-Optimierung und Caching
-
-8. Code-Beispiele
-   8.1 REST API Endpoint (Flask)
-   8.2 Filterfunktion (JavaScript)
-   8.3 Session-Management mit LocalStorage
-   8.4 Thumbnail-Generierung (Python/Pillow)
-   8.5 Interaktiver Kalender
-   8.6 Rollenbasierte Zugriffskontrolle
-
-9. PDF-Export Anleitung
 
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -125,7 +114,11 @@ Sekundäre Stakeholder:
 ═══════════════════════════════════════════════════════════════════════════════
 
 Die Entwicklung erfolgte über einen Zeitraum von etwa 8 Wochen mit insgesamt
-ca. 52+ Arbeitsstunden. Die Chronik basiert auf der Datei Zeitstempel.xlsx.
+ca. 52+ Arbeitsstunden. Die detaillierte Zeiterfassung ist in der Excel-Datei
+Zeitstempel.xlsx dokumentiert (siehe Screenshot in Dokumentation/screenshots/).
+
+TODO Screenshot: Zeitstempel.xlsx Übersicht
+Pfad: Dokumentation/screenshots/zeitstempel_overview.png
 
 
 2.1 Entwicklungsphasen im Überblick
@@ -221,29 +214,51 @@ GESAMT                                  ~52 Std.     100%
 ─────────────────────────────────────────────────────────────────────────────
 
 Frontend-Technologien:
-┌────────────────────────────────────────────────────────────────────────────┐
-│ HTML5              Semantisches Markup, moderne HTML-Elemente             │
-│ CSS3               Custom Properties (Variablen), Flexbox, Grid           │
-│ Bootstrap 5.3.0    Responsive Grid-System, UI-Komponenten                 │
-│ Font Awesome 6.4.0 Icon-Bibliothek für Benutzeroberfläche                 │
-│ Vanilla JavaScript ES6+, Async/Await, Module Pattern                      │
-└────────────────────────────────────────────────────────────────────────────┘
+
+• HTML5
+  - Semantisches Markup, moderne HTML-Elemente
+
+• CSS3
+  - Custom Properties (Variablen), Flexbox, Grid
+
+• Bootstrap 5.3.0
+  - Responsive Grid-System, UI-Komponenten
+
+• Font Awesome 6.4.0
+  - Icon-Bibliothek für Benutzeroberfläche
+
+• Vanilla JavaScript
+  - ES6+, Async/Await, Module Pattern
+
 
 Backend-Technologien:
-┌────────────────────────────────────────────────────────────────────────────┐
-│ Python 3.x         Server-Programmiersprache                              │
-│ Flask              Micro-Framework für REST API                           │
-│ Flask-CORS         Cross-Origin Resource Sharing für Frontend-Backend     │
-│ Pillow (PIL)       Bildverarbeitung für Thumbnail-Generierung             │
-│ Requests           HTTP-Bibliothek für externe Bildabfragen               │
-└────────────────────────────────────────────────────────────────────────────┘
+
+• Python 3.x
+  - Server-Programmiersprache
+
+• Flask
+  - Micro-Framework für REST API
+
+• Flask-CORS
+  - Cross-Origin Resource Sharing für Frontend-Backend
+
+• Pillow (PIL)
+  - Bildverarbeitung für Thumbnail-Generierung
+
+• Requests
+  - HTTP-Bibliothek für externe Bildabfragen
+
 
 Datenpersistenz:
-┌────────────────────────────────────────────────────────────────────────────┐
-│ JSON-Datei         datenbank.json als leichtgewichtige Datenbank          │
-│ LocalStorage       Browser-seitige Speicherung der Nutzersession          │
-│ Dateisystem-Cache  thumbnail_cache/ für optimierte Bilder                 │
-└────────────────────────────────────────────────────────────────────────────┘
+
+• JSON-Datei
+  - datenbank.json als leichtgewichtige Datenbank
+
+• LocalStorage
+  - Browser-seitige Speicherung der Nutzersession
+
+• Dateisystem-Cache
+  - thumbnail_cache/ für optimierte Bilder
 
 
 3.2 Architektur und Design Patterns
@@ -251,82 +266,282 @@ Datenpersistenz:
 
 Gesamtarchitektur: Klassische Client-Server-Architektur mit REST API
 
-┌──────────────────────────────────────────────────────────────────────────┐
-│                           CLIENT (Browser)                               │
-│  ┌────────────────────────────────────────────────────────────────────┐  │
-│  │ HTML Pages (index.html, fahrzeug.html, anbieter.html, etc.)       │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-│  ┌────────────────────────────────────────────────────────────────────┐  │
-│  │ JavaScript Module                                                  │  │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐            │  │
-│  │  │ vehicles.js  │  │ booking.js   │  │ provider.js  │  ...       │  │
-│  │  └──────────────┘  └──────────────┘  └──────────────┘            │  │
-│  │  ┌──────────────────────────────────────────────────────────────┐ │  │
-│  │  │ data.js (Business Logic Layer)                               │ │  │
-│  │  └──────────────────────────────────────────────────────────────┘ │  │
-│  │  ┌──────────────────────────────────────────────────────────────┐ │  │
-│  │  │ api.js (HTTP Abstraction Layer)                              │ │  │
-│  │  └──────────────────────────────────────────────────────────────┘ │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-│  ┌────────────────────────────────────────────────────────────────────┐  │
-│  │ LocalStorage (Session: currentUser, Cookie-Consent)               │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    │ HTTP (fetch)
-                                    │
-┌──────────────────────────────────────────────────────────────────────────┐
-│                           SERVER (Python/Flask)                          │
-│  ┌────────────────────────────────────────────────────────────────────┐  │
-│  │ server.py                                                          │  │
-│  │  • REST Endpoints: /users, /vehicles, /bookings, /api/thumbnail   │  │
-│  │  • Business Logic: CRUD-Operationen, Validierung                  │  │
-│  │  • Image Processing: Thumbnail-Generierung mit Pillow             │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-│  ┌────────────────────────────────────────────────────────────────────┐  │
-│  │ datenbank.json (users, vehicles, bookings)                         │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-│  ┌────────────────────────────────────────────────────────────────────┐  │
-│  │ thumbnail_cache/ (optimierte JPEG-Thumbnails)                      │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────────────┘
+
+CLIENT (Browser):
+
+  HTML Pages:
+  - index.html, fahrzeug.html, anbieter.html, profil.html, etc.
+
+  JavaScript Module:
+  - UI-Module: vehicles.js, booking.js, provider.js, profile.js
+  - Business Logic Layer: data.js (Validierung, Berechtigungen)
+  - HTTP Abstraction Layer: api.js (fetch-Wrapper)
+
+  LocalStorage:
+  - Session: currentUser
+  - Cookie-Consent
+
+                    ↓ HTTP (fetch) ↓
+
+SERVER (Python/Flask):
+
+  server.py:
+  - REST Endpoints: /users, /vehicles, /bookings, /api/thumbnail
+  - Business Logic: CRUD-Operationen, Validierung
+  - Image Processing: Thumbnail-Generierung mit Pillow
+
+  datenbank.json:
+  - Enthält: users, vehicles, bookings
+
+  thumbnail_cache/:
+  - Optimierte JPEG-Thumbnails
 
 
 Design Patterns:
 
 1. MODULE PATTERN (JavaScript)
-   Zweck: Kapselung von Funktionalität, klare Verantwortlichkeiten
-   Umsetzung: Jede JS-Datei ist ein eigenständiges Modul
-   Beispiel: api.js (HTTP), data.js (Business Logic), vehicles.js (UI)
+─────────────────────────────────────────────────────────────────────────────
 
-2. LAYERED ARCHITECTURE
-   Zweck: Trennung von Präsentation, Logik und Datenzugriff
-   Schichten:
-   • Presentation Layer: HTML + CSS + UI-JavaScript
-   • Business Logic Layer: data.js (Validierung, Berechtigungen)
-   • API Layer: api.js (HTTP-Wrapper)
-   • Data Access Layer: server.py (CRUD)
-   • Persistence Layer: datenbank.json
+Zweck: Kapselung von Funktionalität und klare Verantwortlichkeiten
+
+Das Module Pattern organisiert Code in eigenständige, wiederverwendbare Einheiten.
+Jede JavaScript-Datei fungiert als Modul mit klar definierter Schnittstelle.
+
+Umsetzung im Projekt:
+• api.js: Kümmert sich ausschließlich um HTTP-Kommunikation
+• data.js: Verwaltet Business-Logic und Datenzugriff
+• vehicles.js: Verantwortlich für UI der Fahrzeugübersicht
+• booking.js: Handhabt nur Buchungslogik
+
+Beispiel aus dem Projekt (vehicles.js):
+```javascript
+// Modul-interne Variable (nicht von außen zugänglich)
+let allVehicles = [];
+
+// Öffentliche Funktion zum Laden der Fahrzeuge
+async function loadVehicles() {
+    allVehicles = await getAllVehicles();
+    renderVehicles(allVehicles);
+}
+
+// Öffentliche Funktion zum Filtern
+function applyFilters() {
+    const filtered = allVehicles.filter(/* ... */);
+    renderVehicles(filtered);
+}
+```
+
+Vorteil: Andere Module können loadVehicles() aufrufen, haben aber keinen direkten
+Zugriff auf die interne Variable allVehicles. Dies verhindert ungewollte
+Seiteneffekte und macht den Code wartbarer.
+
+
+2. LAYERED ARCHITECTURE (Schichtenarchitektur)
+─────────────────────────────────────────────────────────────────────────────
+
+Zweck: Trennung von Präsentation, Logik und Datenzugriff
+
+Die Layered Architecture organisiert die Anwendung in horizontale Schichten,
+wobei jede Schicht nur mit der direkt darunterliegenden kommuniziert.
+
+Die 5 Schichten im Projekt:
+
+┌─────────────────────────────────────────────────────────────────┐
+│ Presentation Layer (HTML + CSS + UI-JavaScript)                 │
+│ - index.html, fahrzeug.html, anbieter.html                      │
+│ - vehicles.js, booking.js (UI-Rendering)                        │
+└─────────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ Business Logic Layer (data.js)                                  │
+│ - Validierung, Berechtigungen, Geschäftslogik                   │
+│ - getCurrentUser(), requireAuth(), addBooking()                 │
+└─────────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ API Layer (api.js)                                              │
+│ - HTTP-Wrapper, Fehlerbehandlung                                │
+│ - apiGet(), apiPost(), apiPut(), apiDelete()                    │
+└─────────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ Data Access Layer (server.py)                                   │
+│ - REST Endpoints, CRUD-Operationen                              │
+│ - /users, /vehicles, /bookings                                  │
+└─────────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ Persistence Layer (datenbank.json)                              │
+│ - Datenspeicherung                                              │
+└─────────────────────────────────────────────────────────────────┘
+
+Beispiel-Datenfluss:
+vehicles.js (Presentation) → data.js (Business Logic) → api.js (API) →
+server.py (Data Access) → datenbank.json (Persistence)
+
+Vorteil: Änderungen in einer Schicht (z.B. Wechsel von JSON zu SQL) betreffen
+nur diese Schicht, nicht die gesamte Anwendung.
+
 
 3. REST ARCHITECTURAL STYLE
-   Zweck: Standardisierte, zustandslose Kommunikation
-   Umsetzung: HTTP-Methoden (GET, POST, PUT, DELETE)
-   Endpoints: /users, /vehicles, /bookings mit konsistenter Struktur
+─────────────────────────────────────────────────────────────────────────────
+
+Zweck: Standardisierte, zustandslose Client-Server-Kommunikation
+
+REST (Representational State Transfer) definiert ein einheitliches Interface
+für die Kommunikation zwischen Frontend und Backend.
+
+Umsetzung im Projekt:
+
+HTTP-Methoden mit semantischer Bedeutung:
+• GET: Daten abrufen (z.B. GET /vehicles → alle Fahrzeuge)
+• POST: Neue Ressource erstellen (z.B. POST /vehicles → neues Fahrzeug)
+• PUT: Ressource aktualisieren (z.B. PUT /vehicles/v1 → Fahrzeug bearbeiten)
+• DELETE: Ressource löschen (z.B. DELETE /bookings/b1 → Buchung stornieren)
+
+Konsistente Endpoint-Struktur:
+• /users - Benutzerverwaltung
+• /vehicles - Fahrzeugverwaltung
+• /bookings - Buchungsverwaltung
+• /api/thumbnail - Bildoptimierung
+
+Beispiel aus server.py:
+```python
+@app.route('/vehicles/<vehicle_id>', methods=['GET', 'PUT', 'DELETE'])
+def vehicle_detail(vehicle_id):
+    if request.method == 'GET':
+        return jsonify(get_vehicle_by_id(vehicle_id))
+    elif request.method == 'PUT':
+        return jsonify(update_vehicle(vehicle_id, request.json))
+    elif request.method == 'DELETE':
+        return jsonify(delete_vehicle(vehicle_id))
+```
+
+Vorteil: Andere Entwickler verstehen die API intuitiv, da REST-Konventionen
+eingehalten werden.
+
 
 4. REPOSITORY PATTERN
-   Zweck: Abstraktion des Datenzugriffs
-   Umsetzung: data.js bietet Funktionen wie getAllVehicles(), addBooking()
-   Vorteil: Frontend kennt keine Implementierungsdetails der Datenspeicherung
+─────────────────────────────────────────────────────────────────────────────
+
+Zweck: Abstraktion des Datenzugriffs
+
+Das Repository Pattern kapselt die Datenzugriffslogik hinter einer einheitlichen
+Schnittstelle. Das Frontend muss nicht wissen, ob Daten aus einer Datenbank,
+einer API oder dem LocalStorage kommen.
+
+Umsetzung im Projekt (data.js):
+
+```javascript
+// Repository-Funktionen für Fahrzeuge
+async function getAllVehicles() {
+    return await apiGet('/vehicles');
+}
+
+async function getVehicleById(id) {
+    return await apiGet(`/vehicles/${id}`);
+}
+
+async function addVehicle(vehicle) {
+    return await apiPost('/vehicles', vehicle);
+}
+```
+
+Das Frontend ruft einfach getAllVehicles() auf, ohne zu wissen:
+• Ob die Daten von einem Server kommen oder gecacht sind
+• Welche HTTP-Methode verwendet wird
+• Wie Fehler behandelt werden
+
+Beispiel-Migration:
+Wenn man von JSON auf PostgreSQL wechselt, muss nur server.py angepasst werden.
+Die Funktionen in data.js bleiben identisch, ebenso alle UI-Module.
+
+Vorteil: Änderungen an der Datenschicht erfordern keine Änderungen im Frontend.
+
 
 5. OBSERVER PATTERN
-   Zweck: Reaktive UI-Updates
-   Umsetzung: Event Listener triggern Funktionen bei Nutzerinteraktionen
-   Beispiel: Filter-Input → applyFilters() → renderVehicles()
+─────────────────────────────────────────────────────────────────────────────
 
-6. SINGLE RESPONSIBILITY PRINCIPLE
-   Zweck: Wartbarkeit und Testbarkeit
-   Umsetzung: Jedes Modul hat genau eine Aufgabe
-   Beispiel: calendar.js nur für Kalender, booking.js nur für Buchungslogik
+Zweck: Reaktive UI-Updates bei Zustandsänderungen
+
+Das Observer Pattern ermöglicht es, dass UI-Komponenten automatisch reagieren,
+wenn sich Daten ändern. In JavaScript wird dies über Event Listener umgesetzt.
+
+Umsetzung im Projekt:
+
+```javascript
+// Filter-Input beobachtet Änderungen
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('fuelFilter').addEventListener('change', applyFilters);
+document.getElementById('priceFilter').addEventListener('input', applyFilters);
+
+function applyFilters() {
+    // Wenn sich ein Filter ändert, wird die Fahrzeugdarstellung aktualisiert
+    const filtered = allVehicles.filter(/* Filterlogik */);
+    renderVehicles(filtered);  // Observer reagiert → UI wird aktualisiert
+}
+```
+
+Weiteres Beispiel (Kalender):
+```javascript
+// Klick auf Kalendertag
+dayCell.addEventListener('click', () => selectDate(dateStr));
+
+function selectDate(dateStr) {
+    selectedStartDate = dateStr;
+    renderCalendar();  // UI aktualisiert sich automatisch
+    calculatePrice();  // Preis wird neu berechnet
+}
+```
+
+Datenfluss:
+User-Input → Event → Handler-Funktion → State-Update → UI-Update
+
+Vorteil: Die UI bleibt automatisch synchron mit dem Anwendungszustand.
+
+
+6. SINGLE RESPONSIBILITY PRINCIPLE (SRP)
+─────────────────────────────────────────────────────────────────────────────
+
+Zweck: Jedes Modul hat genau eine Verantwortung
+
+Das Single Responsibility Principle besagt, dass jede Klasse/Modul nur eine
+Aufgabe haben und nur einen Grund zur Änderung haben sollte.
+
+Umsetzung im Projekt:
+
+Klare Aufgabentrennung:
+• calendar.js: NUR Kalender-Rendering und Datumsauswahl
+• booking.js: NUR Buchungslogik und Preisberechnung
+• auth.js: NUR Login/Logout und Authentifizierung
+• api.js: NUR HTTP-Requests
+
+Gegenbeispiel (schlecht):
+```javascript
+// booking.js würde NICHT auch Login-Logik enthalten
+// auth.js würde NICHT auch Preis-Berechnung enthalten
+```
+
+Beispiel aus dem Projekt:
+
+calendar.js macht NUR:
+```javascript
+function renderCalendar(year, month, bookings) { /* ... */ }
+function selectDate(dateStr) { /* ... */ }
+function isDateBooked(dateStr, bookings) { /* ... */ }
+```
+
+booking.js macht NUR:
+```javascript
+function calculatePrice() { /* ... */ }
+function handleBooking() { /* ... */ }
+function validateBookingDates() { /* ... */ }
+```
+
+Vorteil:
+• Wartbarkeit: Bugfix im Kalender betrifft nur calendar.js
+• Testbarkeit: Kalender kann unabhängig von Buchungslogik getestet werden
+• Wiederverwendbarkeit: Kalender könnte in anderem Projekt verwendet werden
 
 
 3.3 Techniken im Zusammenspiel
@@ -428,49 +643,82 @@ Beispiel 3: Thumbnail-Optimierung Pipeline
 4.1 Verzeichnisübersicht
 ─────────────────────────────────────────────────────────────────────────────
 
-d:\Downloads\Abgabe_web\
-│
-├── css/                           CSS-Dateien für Styling
-│   ├── components.css             Wiederverwendbare UI-Komponenten
-│   ├── main.css                   Globale Styles, CSS-Variablen, Navigation
-│   └── pages.css                  Seitenspezifische Styles
-│
-├── js/                            JavaScript-Module
-│   ├── api.js                     HTTP-Abstraktionsschicht (fetch-Wrapper)
-│   ├── auth.js                    Authentifizierung (Login, Register, Logout)
-│   ├── booking.js                 Buchungslogik, Preisberechnung
-│   ├── calendar.js                Interaktiver Buchungskalender
-│   ├── data.js                    Business-Logic-Layer, Datenzugriff
-│   ├── profile.js                 Benutzerprofil, Buchungshistorie
-│   ├── provider.js                Anbieter-Dashboard, Fahrzeugverwaltung
-│   ├── providerStats.js           Canvas-Charts für Statistiken
-│   ├── shared.js                  Geteilte Komponenten (Header, Footer)
-│   ├── vehicleDetail.js           Fahrzeug-Detailseite
-│   └── vehicles.js                Fahrzeugübersicht, Filterlogik
-│
-├── pages/                         HTML-Unterseiten
-│   ├── anbieter.html              Provider-Dashboard
-│   ├── anmelden.html              Login-Seite
-│   ├── datenschutz.html           Datenschutzerklärung
-│   ├── fahrzeug.html              Fahrzeug-Detailseite
-│   ├── impressum.html             Impressum
-│   └── profil.html                Benutzerprofil
-│
-├── thumbnail_cache/               Generierte Bild-Thumbnails (Cache)
-│   └── [MD5-Hash].jpg             Optimierte JPEG-Dateien
-│
-├── Dokumentation/                 Projektdokumentation
-│   ├── Plan_für_Dokumentation     Dokumentationsplan
-│   ├── Zeitstempel.xlsx           Arbeitszeitaufzeichnung
-│   └── dokumentation.txt          Diese Datei
-│
-├── datenbank.json                 JSON-Datenbank (users, vehicles, bookings)
-├── index.html                     Startseite mit Fahrzeugübersicht
-└── server.py                      Flask-Backend-Server
+Projektverzeichnis: d:\Downloads\Abgabe_web\
+
+- css/
+  - components.css (Wiederverwendbare UI-Komponenten)
+  - main.css (Globale Styles, CSS-Variablen, Navigation)
+  - pages.css (Seitenspezifische Styles)
+
+- js/
+  - api.js (HTTP-Abstraktionsschicht, fetch-Wrapper)
+  - auth.js (Authentifizierung: Login, Register, Logout)
+  - booking.js (Buchungslogik, Preisberechnung)
+  - calendar.js (Interaktiver Buchungskalender)
+  - data.js (Business-Logic-Layer, Datenzugriff)
+  - profile.js (Benutzerprofil, Buchungshistorie)
+  - provider.js (Anbieter-Dashboard, Fahrzeugverwaltung)
+  - providerStats.js (Canvas-Charts für Statistiken)
+  - shared.js (Geteilte Komponenten: Header, Footer)
+  - vehicleDetail.js (Fahrzeug-Detailseite)
+  - vehicles.js (Fahrzeugübersicht, Filterlogik)
+
+- pages/
+  - anbieter.html (Provider-Dashboard)
+  - anmelden.html (Login-Seite)
+  - datenschutz.html (Datenschutzerklärung)
+  - fahrzeug.html (Fahrzeug-Detailseite)
+  - impressum.html (Impressum)
+  - profil.html (Benutzerprofil)
+
+- thumbnail_cache/
+  - [MD5-Hash].jpg (Generierte Bild-Thumbnails, optimierte JPEG-Dateien)
+
+- Dokumentation/
+  - Plan_für_Dokumentation (Dokumentationsplan)
+  - Zeitstempel.xlsx (Arbeitszeitaufzeichnung)
+  - dokumentation.txt (Diese Datei)
+
+- datenbank.json (JSON-Datenbank: users, vehicles, bookings)
+- index.html (Startseite mit Fahrzeugübersicht)
+- server.py (Flask-Backend-Server)
 
 
 4.2 Verantwortlichkeiten der Module
 ─────────────────────────────────────────────────────────────────────────────
+
+HTML-Seiten (pages/ und Root):
+
+┌──────────────────┬────────────────────────────────────────────────────────┐
+│ Datei            │ Verantwortung                                          │
+├──────────────────┼────────────────────────────────────────────────────────┤
+│ index.html       │ Startseite mit Fahrzeugübersicht                       │
+│                  │ Filter-UI und Hero-Section                             │
+│                  │ Responsive Grid-Layout für Fahrzeugkarten              │
+├──────────────────┼────────────────────────────────────────────────────────┤
+│ anmelden.html    │ Login- und Registrierungsformulare                     │
+│                  │ Rollenwahl (Kunde/Anbieter)                            │
+│                  │ Authentifizierung-UI                                   │
+├──────────────────┼────────────────────────────────────────────────────────┤
+│ fahrzeug.html    │ Fahrzeug-Detailseite                                   │
+│                  │ Bildergalerie mit Carousel                             │
+│                  │ Buchungsformular mit Kalender und Extras               │
+├──────────────────┼────────────────────────────────────────────────────────┤
+│ profil.html      │ Benutzerprofil (Kunde)                                 │
+│                  │ Buchungshistorie mit Stornierungsfunktion              │
+│                  │ Buchungsübersicht (aktiv, kommend, abgeschlossen)      │
+├──────────────────┼────────────────────────────────────────────────────────┤
+│ anbieter.html    │ Provider-Dashboard                                     │
+│                  │ Statistik-Kacheln und Canvas-Diagramme                 │
+│                  │ Fahrzeugverwaltung (CRUD-Funktionen)                   │
+├──────────────────┼────────────────────────────────────────────────────────┤
+│ datenschutz.html │ Datenschutzerklärung (DSGVO)                           │
+│                  │ Rechtliche Informationen                               │
+├──────────────────┼────────────────────────────────────────────────────────┤
+│ impressum.html   │ Impressum und Kontaktinformationen                     │
+│                  │ Anbieterkennzeichnung                                  │
+└──────────────────┴────────────────────────────────────────────────────────┘
+
 
 JavaScript-Module (js/):
 
@@ -545,21 +793,21 @@ CSS-Dateien (css/):
 └──────────────────┴────────────────────────────────────────────────────────┘
 
 
-4.3 Wichtige Konfigurationsdateien
-─────────────────────────────────────────────────────────────────────────────
+Backend und Konfiguration:
 
-datenbank.json (Haupt-Datenspeicher):
-• Struktur: {"users": [...], "vehicles": [...], "bookings": [...]}
-• Größe: ~12 KB
-• Encoding: UTF-8
-• Format: Pretty-Printed JSON (indent=2)
-• Zugriff: Exklusiv über server.py
-
-server.py (Backend-Konfiguration):
-• Port: 3000
-• Host: localhost (0.0.0.0 für LAN-Zugriff)
-• CORS: Aktiviert für alle Origins (Development-Setting)
-• Debug-Modus: Aktiv (app.run(debug=True))
+┌──────────────────┬────────────────────────────────────────────────────────┐
+│ Datei            │ Verantwortung                                          │
+├──────────────────┼────────────────────────────────────────────────────────┤
+│ server.py        │ Flask-Backend-Server (Port 3000)                       │
+│                  │ REST API Endpoints (CRUD für Users, Vehicles, Bookings│
+│                  │ Thumbnail-Generierung mit Pillow                       │
+│                  │ CORS-Konfiguration für Frontend-Backend-Kommunikation │
+├──────────────────┼────────────────────────────────────────────────────────┤
+│ datenbank.json   │ JSON-basierte Datenbank                                │
+│                  │ Struktur: {users, vehicles, bookings}                  │
+│                  │ UTF-8 Encoding, Pretty-Printed (indent=2)              │
+│                  │ Zugriff exklusiv über server.py                        │
+└──────────────────┴────────────────────────────────────────────────────────┘
 
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -688,11 +936,11 @@ Problem: Bilder werden nicht geladen
 
 
 ═══════════════════════════════════════════════════════════════════════════════
-6. FUNKTIONALITÄTEN IM DETAIL
+6. FUNKTIONALITÄTEN IM DETAIL (MIT CODE-BEISPIELEN)
 ═══════════════════════════════════════════════════════════════════════════════
 
 Dieser Abschnitt erklärt jede Hauptfunktionalität mit Screenshots, technischer
-Umsetzung und Code-Referenzen.
+Umsetzung, Code-Beispielen und Dateireferenzen.
 
 
 6.1 Fahrzeugsuche und Filterfunktion
@@ -712,29 +960,91 @@ Technische Umsetzung:
 • Layout: Bootstrap Grid mit col-lg-4 col-md-6 (3 Spalten Desktop, 2 Tablet)
 • Echtzeit: Input-Events (oninput, onchange) triggern applyFilters()
 
-Implementierung (vehicles.js:25-46):
+Code-Beispiel 1: Filterfunktion (JavaScript)
+─────────────────────────────────────────────────────────────────────────────
+Datei: js/vehicles.js:25-46
+Zweck: Client-seitige Fahrzeugfilterung
+
 ```javascript
 function applyFilters() {
+    // Input-Werte sammeln
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const fuelFilter = document.getElementById('fuelFilter').value;
     const bedsFilter = document.getElementById('bedsFilter').value;
     const maxPrice = parseInt(document.getElementById('priceFilter').value);
 
+    // Filterlogik (AND-verknüpft)
     const filtered = allVehicles.filter(vehicle => {
+        // Freitext: Name ODER Beschreibung
         const matchesSearch = !searchTerm ||
             vehicle.name.toLowerCase().includes(searchTerm) ||
             vehicle.desc.toLowerCase().includes(searchTerm);
 
+        // Kraftstoff: Exakter Match oder kein Filter
         const matchesFuel = !fuelFilter || vehicle.fuel === fuelFilter;
+
+        // Betten: Exakter Match oder kein Filter
         const matchesBeds = !bedsFilter || vehicle.beds === parseInt(bedsFilter);
+
+        // Preis: Kleiner-gleich
         const matchesPrice = vehicle.price <= maxPrice;
 
+        // Alle Bedingungen müssen erfüllt sein (AND)
         return matchesSearch && matchesFuel && matchesBeds && matchesPrice;
     });
 
+    // UI aktualisieren
     renderVehicles(filtered);
+    document.getElementById('resultCount').textContent =
+        `${filtered.length} Fahrzeug(e) gefunden`;
 }
 ```
+
+Techniken:
+• Array.filter() für deklarative Filterung
+• Kurzschluss-Evaluation (!searchTerm ||)
+• String-Methoden (toLowerCase, includes)
+• Type-Conversion (parseInt)
+• Logische Operatoren (&&, ||)
+
+Code-Beispiel 2: REST API Endpoint für Fahrzeuge (Flask/Python)
+─────────────────────────────────────────────────────────────────────────────
+Datei: server.py:82-106
+Zweck: CRUD-Operationen für Fahrzeuge
+
+```python
+@app.route('/vehicles', methods=['GET', 'POST'])
+def vehicles():
+    """
+    GET: Alle Fahrzeuge oder gefiltert nach provider_id
+    POST: Neues Fahrzeug erstellen
+    """
+    db = read_db()
+
+    if request.method == 'GET':
+        # Filter nach Anbieter
+        provider_id = request.args.get('provider_id')
+        if provider_id:
+            filtered = [v for v in db['vehicles'] if v['provider_id'] == provider_id]
+            return jsonify(filtered)
+        return jsonify(db['vehicles'])
+
+    elif request.method == 'POST':
+        # Neues Fahrzeug hinzufügen
+        new_vehicle = request.json
+        new_vehicle['id'] = f"v{len(db['vehicles']) + 1}"
+        db['vehicles'].append(new_vehicle)
+        write_db(db)
+        return jsonify(new_vehicle), 201
+```
+
+Techniken:
+• Flask-Decorator @app.route für Routing
+• Method-Dispatch (GET vs. POST)
+• Query-Parameter mit request.args.get()
+• JSON-Body mit request.json
+• List Comprehension für Filterung
+• HTTP-Statuscodes (200, 201)
 
 Dateiverweise:
 • Frontend: index.html:105-147 (Filter-UI), js/vehicles.js:25-123
@@ -787,7 +1097,11 @@ Herausforderung (siehe Kapitel 7.2):
 Die Höhenberechnung des Carousels war problematisch, da Bilder asynchron
 laden. Lösung: Event-Listener auf image.onload + Neuberechnung.
 
-Implementierung (vehicleDetail.js:72-145):
+Code-Beispiel 3: Bildergalerie mit Carousel (JavaScript)
+─────────────────────────────────────────────────────────────────────────────
+Datei: js/vehicleDetail.js:72-145
+Zweck: Dynamische Bildergalerie mit Thumbnails
+
 ```javascript
 function displayVehicleDetails(vehicle) {
     // Bildergalerie rendern
@@ -811,6 +1125,13 @@ function displayVehicleDetails(vehicle) {
     `).join('');
 }
 ```
+
+Techniken:
+• Template Literals für HTML-Generierung
+• Array.map() für Transformation
+• Ternary Operator für bedingte CSS-Klassen
+• encodeURIComponent() für URL-Encoding
+• Bootstrap Carousel API
 
 Dateiverweise:
 • Frontend: pages/fahrzeug.html:28-185, js/vehicleDetail.js
@@ -860,20 +1181,83 @@ Kalender-Features:
   - Verfügbare Tage: Weiß/Grün
 • Auswahl: Erster Klick = Startdatum, zweiter Klick = Enddatum
 
-Algorithmus – Verfügbarkeitsprüfung (calendar.js:98-107):
+Code-Beispiel 4: Interaktiver Kalender (JavaScript)
+─────────────────────────────────────────────────────────────────────────────
+Datei: js/calendar.js:29-126
+Zweck: Monatskalender mit Verfügbarkeitsanzeige
+
 ```javascript
+function renderCalendar(year, month, bookings) {
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+
+    // Wochenstart: Montag (1) statt Sonntag (0)
+    let startDayOfWeek = firstDay.getDay();
+    startDayOfWeek = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1;
+
+    const calendarGrid = document.getElementById('calendarGrid');
+    calendarGrid.innerHTML = '';
+
+    // Leere Zellen vor dem Monat
+    for (let i = 0; i < startDayOfWeek; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'calendar-day empty';
+        calendarGrid.appendChild(emptyCell);
+    }
+
+    // Tage des Monats
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const cellDate = new Date(year, month, day);
+        const today = new Date();
+
+        const dayCell = document.createElement('div');
+        dayCell.className = 'calendar-day';
+        dayCell.textContent = day;
+        dayCell.dataset.date = dateStr;
+
+        // Vergangene Tage (grau, nicht klickbar)
+        if (cellDate < today.setHours(0, 0, 0, 0)) {
+            dayCell.classList.add('past');
+        }
+        // Gebuchte Tage (rot, nicht klickbar)
+        else if (isDateBooked(dateStr, bookings)) {
+            dayCell.classList.add('booked');
+        }
+        // Verfügbare Tage (klickbar)
+        else {
+            dayCell.classList.add('available');
+            dayCell.addEventListener('click', () => selectDate(dateStr));
+        }
+
+        calendarGrid.appendChild(dayCell);
+    }
+}
+
+// Verfügbarkeitsprüfung
 function isDateBooked(dateStr, bookings) {
     const checkDate = new Date(dateStr);
     return bookings.some(booking => {
         const start = new Date(booking.start);
         const end = new Date(booking.end);
-        // Datum ist gebucht, wenn es im Bereich [start, end] liegt
         return checkDate >= start && checkDate <= end;
     });
 }
 ```
 
-Preisberechnung (booking.js:123-148):
+Techniken:
+• Date-Arithmetik (getDay, setHours, Vergleiche)
+• DOM-Manipulation (createElement, appendChild)
+• CSS-Klassen für Zustände (past, booked, available, selected)
+• Array.some() für Existenzprüfung
+• Event-Listener für Interaktivität
+
+Code-Beispiel 5: Preisberechnung mit Extras (JavaScript)
+─────────────────────────────────────────────────────────────────────────────
+Datei: js/booking.js:123-148
+Zweck: Dynamische Berechnung des Buchungspreises
+
 ```javascript
 function calculatePrice() {
     const startDate = new Date(document.getElementById('bookStart').value);
@@ -895,6 +1279,14 @@ function calculatePrice() {
     document.getElementById('nightsDisplay').textContent = nights;
 }
 ```
+
+Techniken:
+• Date-Differenz-Berechnung (Millisekunden → Tage)
+• Math.ceil() für Aufrundung
+• querySelectorAll() mit Pseudo-Klasse :checked
+• forEach() für Iteration
+• parseFloat() für Preiskonvertierung
+• data-Attribute (dataset.price)
 
 Dateiverweise:
 • Kalender: js/calendar.js:1-210 (komplette Implementierung)
@@ -934,7 +1326,11 @@ Technische Umsetzung:
 • Kategorisierung: JavaScript Date-Vergleich für aktiv/kommend/abgeschlossen
 • Stornierung: DELETE /bookings/{id}, dann 20% des Preises als Gebühr
 
-Buchungs-Kategorisierung (profile.js:45-78):
+Code-Beispiel 6: Buchungs-Kategorisierung (JavaScript)
+─────────────────────────────────────────────────────────────────────────────
+Datei: js/profile.js:45-78
+Zweck: Buchungen nach Status gruppieren
+
 ```javascript
 function categorizeBookings(bookings) {
     const now = new Date();
@@ -959,7 +1355,17 @@ function categorizeBookings(bookings) {
 }
 ```
 
-Stornierungslogik (profile.js:198-225):
+Techniken:
+• Date-Vergleiche für Zeitbereich-Prüfung
+• Array.push() für Gruppierung
+• Object Shorthand Notation ({active, upcoming})
+• forEach() für Iteration
+
+Code-Beispiel 7: Stornierungslogik mit Gebührenberechnung (JavaScript)
+─────────────────────────────────────────────────────────────────────────────
+Datei: js/profile.js:198-225
+Zweck: Buchung stornieren mit 20% Stornierungsgebühr
+
 ```javascript
 async function cancelBooking(bookingId) {
     const booking = await getBookingById(bookingId);
@@ -981,6 +1387,13 @@ async function cancelBooking(bookingId) {
     }
 }
 ```
+
+Techniken:
+• Async/Await für asynchrone Operationen
+• Prozentrechnung (20%)
+• toFixed() für Dezimalstellen
+• confirm() für Benutzerbestätigung
+• Template Literals für mehrzeilige Strings
 
 Dateiverweise:
 • Frontend: pages/profil.html:1-125, js/profile.js:1-680
@@ -1021,7 +1434,11 @@ Technische Umsetzung:
 • Chart: Vollständig selbst mit Canvas 2D Context gezeichnet (keine Bibliothek!)
 • CRUD: Create (POST), Read (GET), Update (PUT), Delete (DELETE)
 
-Canvas-Chart-Implementierung (providerStats.js:67-145):
+Code-Beispiel 8: Canvas-basierte Statistik-Diagramme (JavaScript)
+─────────────────────────────────────────────────────────────────────────────
+Datei: js/providerStats.js:67-145
+Zweck: Buchungen pro Fahrzeug als Balkendiagramm
+
 ```javascript
 function renderBookingChart(vehicles, allBookings) {
     const canvas = document.getElementById('bookingStatsCanvas');
@@ -1057,7 +1474,14 @@ function renderBookingChart(vehicles, allBookings) {
 }
 ```
 
-Fahrzeug-CRUD (provider.js:234-456):
+Techniken:
+• Canvas 2D Context API
+• Daten-Aggregation mit map() und filter()
+• Spread Operator (...) mit Math.max()
+• Skalierung (Normalisierung auf Canvas-Höhe)
+• Modulo-Operator (%) für Farbrotation
+
+Fahrzeug-CRUD-Operationen (provider.js:234-456):
 • Erstellen: Formular → POST /vehicles (provider_id automatisch gesetzt)
 • Bearbeiten: Formular vorausfüllen → PUT /vehicles/{id}
 • Löschen: Bestätigung → DELETE /vehicles/{id}
@@ -1115,7 +1539,11 @@ Sicherheitsüberlegungen (nur Demo!):
 • HTTPS für Transport-Verschlüsselung
 • Rate-Limiting für Login-Versuche
 
-Login-Prozess (auth.js:30-87):
+Code-Beispiel 9: Login-Prozess mit Rollenbasiertem Routing (JavaScript)
+─────────────────────────────────────────────────────────────────────────────
+Datei: js/auth.js:30-87
+Zweck: Authentifizierung und Session-Management
+
 ```javascript
 async function handleLogin(event) {
     event.preventDefault();
@@ -1154,19 +1582,58 @@ async function handleLogin(event) {
 }
 ```
 
-Zugriffskontrolle (data.js:189-205):
+Techniken:
+• Async/Await für API-Calls
+• event.preventDefault() für Form-Handling
+• Try-Catch für Fehlerbehandlung
+• Early Returns für Validation
+• Rollenbasiertes Routing
+
+Code-Beispiel 10: Session-Management mit LocalStorage (JavaScript)
+─────────────────────────────────────────────────────────────────────────────
+Datei: js/data.js:189-205
+Zweck: Benutzersession speichern und prüfen
+
 ```javascript
+// Session-Keys als Konstanten
+const STORAGE_KEYS = {
+    CURRENT_USER: 'currentUser',
+    COOKIE_CONSENT: 'interCamp_cookie_consent'
+};
+
+/**
+ * Aktuellen Nutzer aus LocalStorage laden
+ */
+function getCurrentUser() {
+    const userStr = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+    return userStr ? JSON.parse(userStr) : null;
+}
+
+/**
+ * Nutzer in Session speichern
+ */
+function setCurrentUser(user) {
+    if (user === null) {
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+    } else {
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+    }
+}
+
+/**
+ * Zugriffskontrolle: Prüft ob Nutzer eingeloggt und autorisiert ist
+ */
 function requireAuth(requiredRole = null) {
     const currentUser = getCurrentUser();
 
-    // Nicht eingeloggt?
+    // Nicht eingeloggt? → Redirect zu Login
     if (!currentUser) {
         const currentPage = window.location.pathname;
         window.location.href = '/pages/anmelden.html?redirect=' + currentPage;
         return false;
     }
 
-    // Falsche Rolle?
+    // Falsche Rolle? → Fehlermeldung
     if (requiredRole && currentUser.role !== requiredRole) {
         alert('Keine Berechtigung für diese Seite');
         window.location.href = '/index.html';
@@ -1175,7 +1642,18 @@ function requireAuth(requiredRole = null) {
 
     return true;
 }
+
+// Verwendung auf geschützten Seiten:
+// requireAuth();  // Jede eingeloggte Person
+// requireAuth('provider');  // Nur Anbieter
 ```
+
+Techniken:
+• LocalStorage API (getItem, setItem, removeItem)
+• JSON-Serialisierung (JSON.stringify, JSON.parse)
+• Null-Checking mit Ternary Operator
+• Redirect mit window.location.href
+• Query-Parameter für Rückleitung (?redirect=...)
 
 Dateiverweise:
 • Frontend: pages/anmelden.html:1-210, js/auth.js:1-205
@@ -1354,243 +1832,8 @@ Implementierung eines serverseitigen Thumbnail-Services, der:
 3. Format auf JPEG konvertiert (kleinere Dateigröße)
 4. Ergebnisse cacht (keine redundanten Downloads)
 
-Implementierung (server.py:190-276):
-
-Schritt 1 – Cache-Key-Generierung:
-```python
-import hashlib
-
-cache_key = hashlib.md5(f"{image_url}_{width}".encode()).hexdigest()
-cache_path = os.path.join('thumbnail_cache', f"{cache_key}.jpg")
-
-# Beispiel:
-# URL: https://cdn.discordapp.com/attachments/.../image.png
-# Breite: 400
-# Hash: a3f5b9c1e8d2f4a6b7c9e1d3f5a7b9c1
-# Cache: thumbnail_cache/a3f5b9c1e8d2f4a6b7c9e1d3f5a7b9c1.jpg
-```
-
-Schritt 2 – Cache-Check:
-```python
-if os.path.exists(cache_path):
-    # Cache-Hit: Sofort zurückgeben
-    return send_file(cache_path, mimetype='image/jpeg')
-```
-
-Schritt 3 – Bildverarbeitung:
-```python
-# Download
-response = requests.get(image_url, timeout=10)
-img = Image.open(BytesIO(response.content))
-
-# PNG → RGB (entfernt Transparenz)
-if img.mode in ('RGBA', 'LA', 'P'):
-    background = Image.new('RGB', img.size, (255, 255, 255))
-    background.paste(img, mask=img.split()[-1] if 'A' in img.mode else None)
-    img = background
-
-# Resize mit Seitenverhältnis
-aspect_ratio = img.height / img.width
-new_height = int(width * aspect_ratio)
-img = img.resize((width, new_height), Image.Resampling.LANCZOS)
-
-# JPEG-Speicherung
-img.save(cache_path, 'JPEG', quality=85, optimize=True)
-```
-
-Ergebnisse:
-• Dateigrößenreduktion: 4 MB PNG → 120 KB JPEG (97% kleiner!)
-• Ladezeit Homepage: 12s → 1,5s (8× schneller)
-• Cache-Hit-Rate: ~80% (bei wiederholten Besuchen)
-• Disk-Space: ~10 MB für 60 gecachte Thumbnails
-
-Herausforderungen:
-• CORS-Probleme bei einigen Bild-URLs (gelöst durch Server-seitige Requests)
-• Timeout-Handling für langsame externe Server (timeout=10s)
-• Transparenz-Handling bei PNG-Dateien (weißer Hintergrund)
-
-Lessons Learned:
-✓ Caching ist essentiell für Performance
-✓ Serverseitige Bildverarbeitung umgeht Browser-Limitierungen
-✓ MD5-Hashing ist perfekt für Cache-Keys
-✗ Keine Fehlerbehandlung für defekte Bilder (verbesserungswürdig)
-
-
-═══════════════════════════════════════════════════════════════════════════════
-8. CODE-BEISPIELE
-═══════════════════════════════════════════════════════════════════════════════
-
-8.1 REST API Endpoint (Flask)
+Code-Beispiel 11: Thumbnail-Generierung mit Caching (Python/Pillow)
 ─────────────────────────────────────────────────────────────────────────────
-
-Datei: server.py:82-106
-Zweck: CRUD-Operationen für Fahrzeuge
-
-```python
-@app.route('/vehicles', methods=['GET', 'POST'])
-def vehicles():
-    """
-    GET: Alle Fahrzeuge oder gefiltert nach provider_id
-    POST: Neues Fahrzeug erstellen
-    """
-    db = read_db()
-
-    if request.method == 'GET':
-        # Filter nach Anbieter
-        provider_id = request.args.get('provider_id')
-        if provider_id:
-            filtered = [v for v in db['vehicles'] if v['provider_id'] == provider_id]
-            return jsonify(filtered)
-        return jsonify(db['vehicles'])
-
-    elif request.method == 'POST':
-        # Neues Fahrzeug hinzufügen
-        new_vehicle = request.json
-        new_vehicle['id'] = f"v{len(db['vehicles']) + 1}"
-        db['vehicles'].append(new_vehicle)
-        write_db(db)
-        return jsonify(new_vehicle), 201
-```
-
-Techniken:
-• Flask-Decorator @app.route für Routing
-• Method-Dispatch (GET vs. POST)
-• Query-Parameter mit request.args.get()
-• JSON-Body mit request.json
-• List Comprehension für Filterung
-• HTTP-Statuscodes (200, 201)
-
-
-─────────────────────────────────────────────────────────────────────────────
-
-8.2 Filterfunktion (JavaScript)
-─────────────────────────────────────────────────────────────────────────────
-
-Datei: js/vehicles.js:25-46
-Zweck: Client-seitige Fahrzeugfilterung
-
-```javascript
-function applyFilters() {
-    // Input-Werte sammeln
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const fuelFilter = document.getElementById('fuelFilter').value;
-    const bedsFilter = document.getElementById('bedsFilter').value;
-    const maxPrice = parseInt(document.getElementById('priceFilter').value);
-
-    // Filterlogik (AND-verknüpft)
-    const filtered = allVehicles.filter(vehicle => {
-        // Freitext: Name ODER Beschreibung
-        const matchesSearch = !searchTerm ||
-            vehicle.name.toLowerCase().includes(searchTerm) ||
-            vehicle.desc.toLowerCase().includes(searchTerm);
-
-        // Kraftstoff: Exakter Match oder kein Filter
-        const matchesFuel = !fuelFilter || vehicle.fuel === fuelFilter;
-
-        // Betten: Exakter Match oder kein Filter
-        const matchesBeds = !bedsFilter || vehicle.beds === parseInt(bedsFilter);
-
-        // Preis: Kleiner-gleich
-        const matchesPrice = vehicle.price <= maxPrice;
-
-        // Alle Bedingungen müssen erfüllt sein (AND)
-        return matchesSearch && matchesFuel && matchesBeds && matchesPrice;
-    });
-
-    // UI aktualisieren
-    renderVehicles(filtered);
-    document.getElementById('resultCount').textContent =
-        `${filtered.length} Fahrzeug(e) gefunden`;
-}
-```
-
-Techniken:
-• Array.filter() für deklarative Filterung
-• Kurzschluss-Evaluation (!searchTerm ||)
-• String-Methoden (toLowerCase, includes)
-• Type-Conversion (parseInt)
-• Logische Operatoren (&&, ||)
-
-
-─────────────────────────────────────────────────────────────────────────────
-
-8.3 Session-Management mit LocalStorage
-─────────────────────────────────────────────────────────────────────────────
-
-Datei: js/data.js:189-205
-Zweck: Benutzersession speichern und prüfen
-
-```javascript
-// Session-Keys als Konstanten
-const STORAGE_KEYS = {
-    CURRENT_USER: 'currentUser',
-    COOKIE_CONSENT: 'interCamp_cookie_consent'
-};
-
-/**
- * Aktuellen Nutzer aus LocalStorage laden
- * @returns {Object|null} User-Objekt oder null
- */
-function getCurrentUser() {
-    const userStr = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-    return userStr ? JSON.parse(userStr) : null;
-}
-
-/**
- * Nutzer in Session speichern
- * @param {Object} user - User-Objekt (id, email, role, name)
- */
-function setCurrentUser(user) {
-    if (user === null) {
-        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-    } else {
-        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
-    }
-}
-
-/**
- * Zugriffskontrolle: Prüft ob Nutzer eingeloggt und autorisiert ist
- * @param {string} requiredRole - Optional: 'customer' oder 'provider'
- * @returns {boolean} true wenn autorisiert
- */
-function requireAuth(requiredRole = null) {
-    const currentUser = getCurrentUser();
-
-    // Nicht eingeloggt? → Redirect zu Login
-    if (!currentUser) {
-        const currentPage = window.location.pathname;
-        window.location.href = '/pages/anmelden.html?redirect=' + currentPage;
-        return false;
-    }
-
-    // Falsche Rolle? → Fehlermeldung
-    if (requiredRole && currentUser.role !== requiredRole) {
-        alert('Keine Berechtigung für diese Seite');
-        window.location.href = '/index.html';
-        return false;
-    }
-
-    return true;
-}
-
-// Verwendung auf geschützten Seiten:
-// requireAuth();  // Jede eingeloggte Person
-// requireAuth('provider');  // Nur Anbieter
-```
-
-Techniken:
-• LocalStorage API (getItem, setItem, removeItem)
-• JSON-Serialisierung (JSON.stringify, JSON.parse)
-• Null-Checking mit Ternary Operator
-• Redirect mit window.location.href
-• Query-Parameter für Rückleitung (?redirect=...)
-
-
-─────────────────────────────────────────────────────────────────────────────
-
-8.4 Thumbnail-Generierung (Python/Pillow)
-─────────────────────────────────────────────────────────────────────────────
-
 Datei: server.py:223-268
 Zweck: Bilder optimieren und cachen
 
@@ -1661,300 +1904,22 @@ Techniken:
 • BytesIO für In-Memory-Streams
 • Dateisystem-Cache mit os.path
 
+Ergebnisse:
+• Dateigrößenreduktion: 4 MB PNG → 120 KB JPEG (97% kleiner!)
+• Ladezeit Homepage: 12s → 1,5s (8× schneller)
+• Cache-Hit-Rate: ~80% (bei wiederholten Besuchen)
+• Disk-Space: ~10 MB für 60 gecachte Thumbnails
 
-─────────────────────────────────────────────────────────────────────────────
+Herausforderungen:
+• CORS-Probleme bei einigen Bild-URLs (gelöst durch Server-seitige Requests)
+• Timeout-Handling für langsame externe Server (timeout=10s)
+• Transparenz-Handling bei PNG-Dateien (weißer Hintergrund)
 
-8.5 Interaktiver Kalender
-─────────────────────────────────────────────────────────────────────────────
-
-Datei: js/calendar.js:29-126
-Zweck: Monatskalender mit Verfügbarkeitsanzeige
-
-```javascript
-function renderCalendar(year, month, bookings) {
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-
-    // Wochenstart: Montag (1) statt Sonntag (0)
-    let startDayOfWeek = firstDay.getDay();
-    startDayOfWeek = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1;
-
-    const calendarGrid = document.getElementById('calendarGrid');
-    calendarGrid.innerHTML = '';
-
-    // Leere Zellen vor dem Monat
-    for (let i = 0; i < startDayOfWeek; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'calendar-day empty';
-        calendarGrid.appendChild(emptyCell);
-    }
-
-    // Tage des Monats
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const cellDate = new Date(year, month, day);
-        const today = new Date();
-
-        const dayCell = document.createElement('div');
-        dayCell.className = 'calendar-day';
-        dayCell.textContent = day;
-        dayCell.dataset.date = dateStr;
-
-        // Vergangene Tage (grau, nicht klickbar)
-        if (cellDate < today.setHours(0, 0, 0, 0)) {
-            dayCell.classList.add('past');
-        }
-        // Gebuchte Tage (rot, nicht klickbar)
-        else if (isDateBooked(dateStr, bookings)) {
-            dayCell.classList.add('booked');
-        }
-        // Verfügbare Tage (klickbar)
-        else {
-            dayCell.classList.add('available');
-            dayCell.addEventListener('click', () => selectDate(dateStr));
-        }
-
-        // Ausgewählter Bereich (blau)
-        if (selectedStartDate && selectedEndDate) {
-            const start = new Date(selectedStartDate);
-            const end = new Date(selectedEndDate);
-            if (cellDate >= start && cellDate <= end) {
-                dayCell.classList.add('selected');
-            }
-        }
-
-        calendarGrid.appendChild(dayCell);
-    }
-}
-
-/**
- * Prüft ob ein Datum bereits gebucht ist
- */
-function isDateBooked(dateStr, bookings) {
-    const checkDate = new Date(dateStr);
-    return bookings.some(booking => {
-        const start = new Date(booking.start);
-        const end = new Date(booking.end);
-        return checkDate >= start && checkDate <= end;
-    });
-}
-
-/**
- * Datumsauswahl: Erster Klick = Start, zweiter Klick = Ende
- */
-function selectDate(dateStr) {
-    if (!selectedStartDate) {
-        selectedStartDate = dateStr;
-        selectedEndDate = null;
-    } else if (!selectedEndDate) {
-        selectedEndDate = dateStr;
-        // Sicherstellen: Start < Ende
-        if (new Date(selectedEndDate) < new Date(selectedStartDate)) {
-            [selectedStartDate, selectedEndDate] = [selectedEndDate, selectedStartDate];
-        }
-    } else {
-        // Neue Auswahl beginnen
-        selectedStartDate = dateStr;
-        selectedEndDate = null;
-    }
-
-    // Form-Inputs aktualisieren
-    document.getElementById('bookStart').value = selectedStartDate || '';
-    document.getElementById('bookEnd').value = selectedEndDate || '';
-
-    // Kalender neu rendern + Preis berechnen
-    renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), currentBookings);
-    if (selectedStartDate && selectedEndDate) {
-        calculatePrice();
-    }
-}
-```
-
-Techniken:
-• Date-Arithmetik (getDay, setHours, Vergleiche)
-• DOM-Manipulation (createElement, appendChild)
-• CSS-Klassen für Zustände (past, booked, available, selected)
-• Array.some() für Existenzprüfung
-• Destructuring Assignment für Swap ([a, b] = [b, a])
-
-
-─────────────────────────────────────────────────────────────────────────────
-
-8.6 Rollenbasierte Zugriffskontrolle
-─────────────────────────────────────────────────────────────────────────────
-
-Datei: js/data.js:66-118
-Zweck: Sicherstellen, dass nur autorisierte Nutzer Operationen durchführen
-
-```javascript
-/**
- * Fahrzeug hinzufügen (nur für Anbieter)
- */
-async function addVehicle(vehicle) {
-    const currentUser = getCurrentUser();
-
-    // Berechtigung prüfen
-    if (!currentUser || currentUser.role !== 'provider') {
-        throw new Error('Nur Anbieter können Fahrzeuge hinzufügen');
-    }
-
-    // Provider-ID automatisch setzen
-    vehicle.provider_id = currentUser.id;
-
-    // API-Call
-    return await createVehicle(vehicle);
-}
-
-/**
- * Fahrzeug bearbeiten (nur eigene Fahrzeuge)
- */
-async function updateVehicleData(vehicleId, updates) {
-    const currentUser = getCurrentUser();
-
-    // Berechtigung prüfen
-    if (!currentUser || currentUser.role !== 'provider') {
-        throw new Error('Nur Anbieter können Fahrzeuge bearbeiten');
-    }
-
-    // Ownership prüfen
-    const vehicle = await getVehicleById(vehicleId);
-    if (vehicle.provider_id !== currentUser.id) {
-        throw new Error('Sie können nur Ihre eigenen Fahrzeuge bearbeiten');
-    }
-
-    // API-Call
-    return await updateVehicle(vehicleId, updates);
-}
-
-/**
- * Buchung löschen (Kunde: nur eigene, Anbieter: für eigene Fahrzeuge)
- */
-async function deleteBookingData(bookingId) {
-    const currentUser = getCurrentUser();
-
-    if (!currentUser) {
-        throw new Error('Bitte melden Sie sich an');
-    }
-
-    // Buchung laden
-    const booking = await getBookingById(bookingId);
-
-    if (currentUser.role === 'provider') {
-        // Anbieter darf Buchungen für eigene Fahrzeuge löschen
-        const vehicle = await getVehicleById(booking.vehicle_id);
-        if (vehicle.provider_id !== currentUser.id) {
-            throw new Error('Sie können nur Buchungen für Ihre Fahrzeuge löschen');
-        }
-    } else {
-        // Kunde darf nur eigene Buchungen löschen
-        if (booking.user_id !== currentUser.id) {
-            throw new Error('Sie können nur Ihre eigenen Buchungen löschen');
-        }
-    }
-
-    // API-Call
-    return await deleteBooking(bookingId);
-}
-```
-
-Techniken:
-• Async/Await für sequenzielle API-Calls
-• Error Throwing für Fehlerbehandlung
-• Ownership-Checks (provider_id, user_id)
-• Rollenbasierte Logik (if role === 'provider')
-• Early Returns / Guard Clauses
-
-
-═══════════════════════════════════════════════════════════════════════════════
-9. PDF-EXPORT ANLEITUNG
-═══════════════════════════════════════════════════════════════════════════════
-
-Diese Dokumentation liegt im Markdown-Format vor und kann einfach in PDF
-konvertiert werden.
-
-
-Methode 1: Pandoc (empfohlen, beste Qualität)
-─────────────────────────────────────────────────────────────────────────────
-
-Voraussetzung: Pandoc installiert (https://pandoc.org/installing.html)
-
-```bash
-pandoc dokumentation.txt -o dokumentation.pdf \
-    --pdf-engine=xelatex \
-    --toc \
-    --number-sections \
-    -V geometry:margin=2cm \
-    -V fontsize=11pt \
-    -V lang=de
-```
-
-Parameter:
-• --toc: Inhaltsverzeichnis generieren
-• --number-sections: Kapitelnummern hinzufügen
-• -V geometry:margin=2cm: 2cm Seitenrand
-• -V fontsize=11pt: Schriftgröße 11pt
-• -V lang=de: Deutsche Spracheinstellungen
-
-
-Methode 2: VS Code Extension "Markdown PDF"
-─────────────────────────────────────────────────────────────────────────────
-
-1. VS Code öffnen
-2. Extension installieren: "Markdown PDF" von yzane
-3. Diese Datei (dokumentation.txt) öffnen
-4. STRG+SHIFT+P → "Markdown PDF: Export (pdf)"
-5. PDF wird im gleichen Ordner gespeichert
-
-Vorteile:
-• Keine externe Software nötig
-• Einfache Bedienung
-• Automatische Syntax-Highlighting für Code
-
-
-Methode 3: Browser (Print to PDF)
-─────────────────────────────────────────────────────────────────────────────
-
-1. Markdown Preview öffnen (VS Code oder GitHub Desktop)
-2. Rechtsklick → "Drucken" oder STRG+P
-3. Ziel: "Als PDF speichern" / "Save as PDF"
-4. Einstellungen:
-   • Layout: Hochformat
-   • Ränder: Normal
-   • Skalierung: 100%
-   • Hintergrundgrafiken: Aktiviert
-5. Speichern
-
-
-Methode 4: Online-Konverter
-─────────────────────────────────────────────────────────────────────────────
-
-Für schnelle Konvertierung ohne Installation:
-
-• https://www.markdowntopdf.com/
-• https://dillinger.io/ (mit Export-Funktion)
-• https://www.convertio.co/md-pdf/
-
-⚠️ Datenschutz beachten: Dokumentation enthält keine sensiblen Daten,
-aber generell bei Online-Tools vorsichtig sein.
-
-
-Screenshots nachträglich einfügen
-─────────────────────────────────────────────────────────────────────────────
-
-Nach Erstellung der Screenshots:
-
-1. Ordner erstellen: Dokumentation/screenshots/
-2. Screenshots benennen: 01_homepage_overview.png, 02_homepage_filters.png, ...
-3. In diesem Dokument sind Platzhalter mit "TODO Screenshot X" markiert
-4. Bildverweise sind bereits als Markdown-Syntax vorbereitet:
-   ![Beschreibung](Dokumentation/screenshots/XX_name.png)
-5. Nach Einfügen der Bilder: PDF neu generieren
-
-Empfohlene Screenshot-Auflösung:
-• Desktop: 1920x1080px (Full HD)
-• Mobile: 375x812px (iPhone X)
-• Format: PNG (verlustfrei) oder JPG (komprimiert)
+Lessons Learned:
+✓ Caching ist essentiell für Performance
+✓ Serverseitige Bildverarbeitung umgeht Browser-Limitierungen
+✓ MD5-Hashing ist perfekt für Cache-Keys
+✗ Keine Fehlerbehandlung für defekte Bilder (verbesserungswürdig)
 
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -1962,11 +1927,10 @@ ENDE DER DOKUMENTATION
 ═══════════════════════════════════════════════════════════════════════════════
 
 Gesamtumfang (ohne Screenshots): ~15 Seiten
-Mit 20+ Screenshots: ~20-25 Seiten (erfüllt Anforderung 10-20 Seiten)
+Mit 12+ Screenshots: ~20-25 Seiten (erfüllt Anforderung 10-20 Seiten)
 
 Erstellt: 11. Januar 2026
 Projekt: InterCamp – Wohnmobil-Vermietungsplattform
 Technologien: HTML5, CSS3, JavaScript (ES6+), Python, Flask, Bootstrap 5
 
 Alle 10 Anforderungen erfüllt ✓
-Bereit für PDF-Export ✓
