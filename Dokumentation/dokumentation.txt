@@ -299,249 +299,35 @@ SERVER (Python/Flask):
 
 Design Patterns:
 
-1. MODULE PATTERN (JavaScript)
-─────────────────────────────────────────────────────────────────────────────
+1. MODULE PATTERN
+   Zweck: Kapselung von Funktionalität in eigenständige Module
+   Umsetzung: Jede JS-Datei ist ein eigenes Modul (api.js, data.js, vehicles.js, etc.)
+   Vorteil: Klare Verantwortlichkeiten, keine ungewollten Seiteneffekte
 
-Zweck: Kapselung von Funktionalität und klare Verantwortlichkeiten
-
-Das Module Pattern organisiert Code in eigenständige, wiederverwendbare Einheiten.
-Jede JavaScript-Datei fungiert als Modul mit klar definierter Schnittstelle.
-
-Umsetzung im Projekt:
-• api.js: Kümmert sich ausschließlich um HTTP-Kommunikation
-• data.js: Verwaltet Business-Logic und Datenzugriff
-• vehicles.js: Verantwortlich für UI der Fahrzeugübersicht
-• booking.js: Handhabt nur Buchungslogik
-
-Beispiel aus dem Projekt (vehicles.js):
-```javascript
-// Modul-interne Variable (nicht von außen zugänglich)
-let allVehicles = [];
-
-// Öffentliche Funktion zum Laden der Fahrzeuge
-async function loadVehicles() {
-    allVehicles = await getAllVehicles();
-    renderVehicles(allVehicles);
-}
-
-// Öffentliche Funktion zum Filtern
-function applyFilters() {
-    const filtered = allVehicles.filter(/* ... */);
-    renderVehicles(filtered);
-}
-```
-
-Vorteil: Andere Module können loadVehicles() aufrufen, haben aber keinen direkten
-Zugriff auf die interne Variable allVehicles. Dies verhindert ungewollte
-Seiteneffekte und macht den Code wartbarer.
-
-
-2. LAYERED ARCHITECTURE (Schichtenarchitektur)
-─────────────────────────────────────────────────────────────────────────────
-
-Zweck: Trennung von Präsentation, Logik und Datenzugriff
-
-Die Layered Architecture organisiert die Anwendung in horizontale Schichten,
-wobei jede Schicht nur mit der direkt darunterliegenden kommuniziert.
-
-Die 5 Schichten im Projekt:
-
-┌─────────────────────────────────────────────────────────────────┐
-│ Presentation Layer (HTML + CSS + UI-JavaScript)                 │
-│ - index.html, fahrzeug.html, anbieter.html                      │
-│ - vehicles.js, booking.js (UI-Rendering)                        │
-└─────────────────────────────────────────────────────────────────┘
-                            ↓
-┌─────────────────────────────────────────────────────────────────┐
-│ Business Logic Layer (data.js)                                  │
-│ - Validierung, Berechtigungen, Geschäftslogik                   │
-│ - getCurrentUser(), requireAuth(), addBooking()                 │
-└─────────────────────────────────────────────────────────────────┘
-                            ↓
-┌─────────────────────────────────────────────────────────────────┐
-│ API Layer (api.js)                                              │
-│ - HTTP-Wrapper, Fehlerbehandlung                                │
-│ - apiGet(), apiPost(), apiPut(), apiDelete()                    │
-└─────────────────────────────────────────────────────────────────┘
-                            ↓
-┌─────────────────────────────────────────────────────────────────┐
-│ Data Access Layer (server.py)                                   │
-│ - REST Endpoints, CRUD-Operationen                              │
-│ - /users, /vehicles, /bookings                                  │
-└─────────────────────────────────────────────────────────────────┘
-                            ↓
-┌─────────────────────────────────────────────────────────────────┐
-│ Persistence Layer (datenbank.json)                              │
-│ - Datenspeicherung                                              │
-└─────────────────────────────────────────────────────────────────┘
-
-Beispiel-Datenfluss:
-vehicles.js (Presentation) → data.js (Business Logic) → api.js (API) →
-server.py (Data Access) → datenbank.json (Persistence)
-
-Vorteil: Änderungen in einer Schicht (z.B. Wechsel von JSON zu SQL) betreffen
-nur diese Schicht, nicht die gesamte Anwendung.
-
+2. LAYERED ARCHITECTURE
+   Zweck: Trennung in 5 Schichten (Presentation → Business Logic → API → Data Access → Persistence)
+   Umsetzung: Jede Schicht kommuniziert nur mit der direkt darunterliegenden
+   Vorteil: Änderungen in einer Schicht betreffen nicht die gesamte Anwendung
 
 3. REST ARCHITECTURAL STYLE
-─────────────────────────────────────────────────────────────────────────────
-
-Zweck: Standardisierte, zustandslose Client-Server-Kommunikation
-
-REST (Representational State Transfer) definiert ein einheitliches Interface
-für die Kommunikation zwischen Frontend und Backend.
-
-Umsetzung im Projekt:
-
-HTTP-Methoden mit semantischer Bedeutung:
-• GET: Daten abrufen (z.B. GET /vehicles → alle Fahrzeuge)
-• POST: Neue Ressource erstellen (z.B. POST /vehicles → neues Fahrzeug)
-• PUT: Ressource aktualisieren (z.B. PUT /vehicles/v1 → Fahrzeug bearbeiten)
-• DELETE: Ressource löschen (z.B. DELETE /bookings/b1 → Buchung stornieren)
-
-Konsistente Endpoint-Struktur:
-• /users - Benutzerverwaltung
-• /vehicles - Fahrzeugverwaltung
-• /bookings - Buchungsverwaltung
-• /api/thumbnail - Bildoptimierung
-
-Beispiel aus server.py:
-```python
-@app.route('/vehicles/<vehicle_id>', methods=['GET', 'PUT', 'DELETE'])
-def vehicle_detail(vehicle_id):
-    if request.method == 'GET':
-        return jsonify(get_vehicle_by_id(vehicle_id))
-    elif request.method == 'PUT':
-        return jsonify(update_vehicle(vehicle_id, request.json))
-    elif request.method == 'DELETE':
-        return jsonify(delete_vehicle(vehicle_id))
-```
-
-Vorteil: Andere Entwickler verstehen die API intuitiv, da REST-Konventionen
-eingehalten werden.
-
+   Zweck: Standardisierte Client-Server-Kommunikation
+   Umsetzung: HTTP-Methoden (GET, POST, PUT, DELETE) mit Endpoints wie /vehicles, /users, /bookings
+   Vorteil: Intuitive API, die REST-Konventionen folgt
 
 4. REPOSITORY PATTERN
-─────────────────────────────────────────────────────────────────────────────
-
-Zweck: Abstraktion des Datenzugriffs
-
-Das Repository Pattern kapselt die Datenzugriffslogik hinter einer einheitlichen
-Schnittstelle. Das Frontend muss nicht wissen, ob Daten aus einer Datenbank,
-einer API oder dem LocalStorage kommen.
-
-Umsetzung im Projekt (data.js):
-
-```javascript
-// Repository-Funktionen für Fahrzeuge
-async function getAllVehicles() {
-    return await apiGet('/vehicles');
-}
-
-async function getVehicleById(id) {
-    return await apiGet(`/vehicles/${id}`);
-}
-
-async function addVehicle(vehicle) {
-    return await apiPost('/vehicles', vehicle);
-}
-```
-
-Das Frontend ruft einfach getAllVehicles() auf, ohne zu wissen:
-• Ob die Daten von einem Server kommen oder gecacht sind
-• Welche HTTP-Methode verwendet wird
-• Wie Fehler behandelt werden
-
-Beispiel-Migration:
-Wenn man von JSON auf PostgreSQL wechselt, muss nur server.py angepasst werden.
-Die Funktionen in data.js bleiben identisch, ebenso alle UI-Module.
-
-Vorteil: Änderungen an der Datenschicht erfordern keine Änderungen im Frontend.
-
+   Zweck: Abstraktion des Datenzugriffs
+   Umsetzung: data.js kapselt alle Datenzugriffe (getAllVehicles(), addBooking(), etc.)
+   Vorteil: Frontend kennt keine Implementierungsdetails der Datenspeicherung
 
 5. OBSERVER PATTERN
-─────────────────────────────────────────────────────────────────────────────
+   Zweck: Reaktive UI-Updates bei Zustandsänderungen
+   Umsetzung: Event Listener auf Filter-Inputs, Kalender-Klicks, etc.
+   Vorteil: UI bleibt automatisch synchron mit dem Anwendungszustand
 
-Zweck: Reaktive UI-Updates bei Zustandsänderungen
-
-Das Observer Pattern ermöglicht es, dass UI-Komponenten automatisch reagieren,
-wenn sich Daten ändern. In JavaScript wird dies über Event Listener umgesetzt.
-
-Umsetzung im Projekt:
-
-```javascript
-// Filter-Input beobachtet Änderungen
-document.getElementById('searchInput').addEventListener('input', applyFilters);
-document.getElementById('fuelFilter').addEventListener('change', applyFilters);
-document.getElementById('priceFilter').addEventListener('input', applyFilters);
-
-function applyFilters() {
-    // Wenn sich ein Filter ändert, wird die Fahrzeugdarstellung aktualisiert
-    const filtered = allVehicles.filter(/* Filterlogik */);
-    renderVehicles(filtered);  // Observer reagiert → UI wird aktualisiert
-}
-```
-
-Weiteres Beispiel (Kalender):
-```javascript
-// Klick auf Kalendertag
-dayCell.addEventListener('click', () => selectDate(dateStr));
-
-function selectDate(dateStr) {
-    selectedStartDate = dateStr;
-    renderCalendar();  // UI aktualisiert sich automatisch
-    calculatePrice();  // Preis wird neu berechnet
-}
-```
-
-Datenfluss:
-User-Input → Event → Handler-Funktion → State-Update → UI-Update
-
-Vorteil: Die UI bleibt automatisch synchron mit dem Anwendungszustand.
-
-
-6. SINGLE RESPONSIBILITY PRINCIPLE (SRP)
-─────────────────────────────────────────────────────────────────────────────
-
-Zweck: Jedes Modul hat genau eine Verantwortung
-
-Das Single Responsibility Principle besagt, dass jede Klasse/Modul nur eine
-Aufgabe haben und nur einen Grund zur Änderung haben sollte.
-
-Umsetzung im Projekt:
-
-Klare Aufgabentrennung:
-• calendar.js: NUR Kalender-Rendering und Datumsauswahl
-• booking.js: NUR Buchungslogik und Preisberechnung
-• auth.js: NUR Login/Logout und Authentifizierung
-• api.js: NUR HTTP-Requests
-
-Gegenbeispiel (schlecht):
-```javascript
-// booking.js würde NICHT auch Login-Logik enthalten
-// auth.js würde NICHT auch Preis-Berechnung enthalten
-```
-
-Beispiel aus dem Projekt:
-
-calendar.js macht NUR:
-```javascript
-function renderCalendar(year, month, bookings) { /* ... */ }
-function selectDate(dateStr) { /* ... */ }
-function isDateBooked(dateStr, bookings) { /* ... */ }
-```
-
-booking.js macht NUR:
-```javascript
-function calculatePrice() { /* ... */ }
-function handleBooking() { /* ... */ }
-function validateBookingDates() { /* ... */ }
-```
-
-Vorteil:
-• Wartbarkeit: Bugfix im Kalender betrifft nur calendar.js
-• Testbarkeit: Kalender kann unabhängig von Buchungslogik getestet werden
-• Wiederverwendbarkeit: Kalender könnte in anderem Projekt verwendet werden
+6. SINGLE RESPONSIBILITY PRINCIPLE
+   Zweck: Jedes Modul hat genau eine Aufgabe
+   Umsetzung: calendar.js nur für Kalender, booking.js nur für Buchungslogik, auth.js nur für Login
+   Vorteil: Bessere Wartbarkeit, Testbarkeit und Wiederverwendbarkeit
 
 
 3.3 Techniken im Zusammenspiel
@@ -1097,44 +883,11 @@ Herausforderung (siehe Kapitel 7.2):
 Die Höhenberechnung des Carousels war problematisch, da Bilder asynchron
 laden. Lösung: Event-Listener auf image.onload + Neuberechnung.
 
-Code-Beispiel 3: Bildergalerie mit Carousel (JavaScript)
-─────────────────────────────────────────────────────────────────────────────
-Datei: js/vehicleDetail.js:72-145
-Zweck: Dynamische Bildergalerie mit Thumbnails
-
-```javascript
-function displayVehicleDetails(vehicle) {
-    // Bildergalerie rendern
-    const images = vehicle.images || [vehicle.img];
-    const carouselInner = document.querySelector('.carousel-inner');
-    carouselInner.innerHTML = images.map((img, index) => `
-        <div class="carousel-item ${index === 0 ? 'active' : ''}">
-            <img src="/api/thumbnail?url=${encodeURIComponent(img)}&width=800"
-                 class="d-block w-100"
-                 alt="${vehicle.name}">
-        </div>
-    `).join('');
-
-    // Thumbnails
-    const thumbnailContainer = document.querySelector('.thumbnail-container');
-    thumbnailContainer.innerHTML = images.map((img, index) => `
-        <img src="/api/thumbnail?url=${encodeURIComponent(img)}&width=150"
-             class="thumbnail ${index === 0 ? 'active' : ''}"
-             data-index="${index}"
-             alt="Thumbnail ${index + 1}">
-    `).join('');
-}
-```
-
-Techniken:
-• Template Literals für HTML-Generierung
-• Array.map() für Transformation
-• Ternary Operator für bedingte CSS-Klassen
-• encodeURIComponent() für URL-Encoding
-• Bootstrap Carousel API
+Implementierung: Die Bildergalerie nutzt Bootstrap Carousel mit dynamisch
+generierten Thumbnails. Alle Bilder werden über /api/thumbnail optimiert.
 
 Dateiverweise:
-• Frontend: pages/fahrzeug.html:28-185, js/vehicleDetail.js
+• Frontend: pages/fahrzeug.html:28-185, js/vehicleDetail.js:72-145
 • Backend: server.py:108-120 (GET /vehicles/<id>)
 • Styling: css/pages.css:1-89 (vehicle-detail-page)
 
@@ -1181,112 +934,10 @@ Kalender-Features:
   - Verfügbare Tage: Weiß/Grün
 • Auswahl: Erster Klick = Startdatum, zweiter Klick = Enddatum
 
-Code-Beispiel 4: Interaktiver Kalender (JavaScript)
-─────────────────────────────────────────────────────────────────────────────
-Datei: js/calendar.js:29-126
-Zweck: Monatskalender mit Verfügbarkeitsanzeige
-
-```javascript
-function renderCalendar(year, month, bookings) {
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-
-    // Wochenstart: Montag (1) statt Sonntag (0)
-    let startDayOfWeek = firstDay.getDay();
-    startDayOfWeek = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1;
-
-    const calendarGrid = document.getElementById('calendarGrid');
-    calendarGrid.innerHTML = '';
-
-    // Leere Zellen vor dem Monat
-    for (let i = 0; i < startDayOfWeek; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'calendar-day empty';
-        calendarGrid.appendChild(emptyCell);
-    }
-
-    // Tage des Monats
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const cellDate = new Date(year, month, day);
-        const today = new Date();
-
-        const dayCell = document.createElement('div');
-        dayCell.className = 'calendar-day';
-        dayCell.textContent = day;
-        dayCell.dataset.date = dateStr;
-
-        // Vergangene Tage (grau, nicht klickbar)
-        if (cellDate < today.setHours(0, 0, 0, 0)) {
-            dayCell.classList.add('past');
-        }
-        // Gebuchte Tage (rot, nicht klickbar)
-        else if (isDateBooked(dateStr, bookings)) {
-            dayCell.classList.add('booked');
-        }
-        // Verfügbare Tage (klickbar)
-        else {
-            dayCell.classList.add('available');
-            dayCell.addEventListener('click', () => selectDate(dateStr));
-        }
-
-        calendarGrid.appendChild(dayCell);
-    }
-}
-
-// Verfügbarkeitsprüfung
-function isDateBooked(dateStr, bookings) {
-    const checkDate = new Date(dateStr);
-    return bookings.some(booking => {
-        const start = new Date(booking.start);
-        const end = new Date(booking.end);
-        return checkDate >= start && checkDate <= end;
-    });
-}
-```
-
-Techniken:
-• Date-Arithmetik (getDay, setHours, Vergleiche)
-• DOM-Manipulation (createElement, appendChild)
-• CSS-Klassen für Zustände (past, booked, available, selected)
-• Array.some() für Existenzprüfung
-• Event-Listener für Interaktivität
-
-Code-Beispiel 5: Preisberechnung mit Extras (JavaScript)
-─────────────────────────────────────────────────────────────────────────────
-Datei: js/booking.js:123-148
-Zweck: Dynamische Berechnung des Buchungspreises
-
-```javascript
-function calculatePrice() {
-    const startDate = new Date(document.getElementById('bookStart').value);
-    const endDate = new Date(document.getElementById('bookEnd').value);
-
-    // Anzahl Nächte
-    const nights = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-
-    // Basispreis
-    let total = nights * currentVehicle.price;
-
-    // Extras addieren
-    document.querySelectorAll('.extra-checkbox:checked').forEach(checkbox => {
-        const extraPrice = parseFloat(checkbox.dataset.price);
-        total += extraPrice;
-    });
-
-    document.getElementById('totalPrice').textContent = total + ' €';
-    document.getElementById('nightsDisplay').textContent = nights;
-}
-```
-
-Techniken:
-• Date-Differenz-Berechnung (Millisekunden → Tage)
-• Math.ceil() für Aufrundung
-• querySelectorAll() mit Pseudo-Klasse :checked
-• forEach() für Iteration
-• parseFloat() für Preiskonvertierung
-• data-Attribute (dataset.price)
+Implementierung: Der Kalender wird mit JavaScript Date-Objekten gerendert,
+wobei gebuchte Tage durch Vergleich mit existierenden Buchungen rot markiert
+werden. Die Preisberechnung erfolgt dynamisch basierend auf Datumsauswahl und
+gewählten Extras.
 
 Dateiverweise:
 • Kalender: js/calendar.js:1-210 (komplette Implementierung)
@@ -1326,74 +977,9 @@ Technische Umsetzung:
 • Kategorisierung: JavaScript Date-Vergleich für aktiv/kommend/abgeschlossen
 • Stornierung: DELETE /bookings/{id}, dann 20% des Preises als Gebühr
 
-Code-Beispiel 6: Buchungs-Kategorisierung (JavaScript)
-─────────────────────────────────────────────────────────────────────────────
-Datei: js/profile.js:45-78
-Zweck: Buchungen nach Status gruppieren
-
-```javascript
-function categorizeBookings(bookings) {
-    const now = new Date();
-    const active = [];
-    const upcoming = [];
-    const completed = [];
-
-    bookings.forEach(booking => {
-        const start = new Date(booking.start);
-        const end = new Date(booking.end);
-
-        if (now >= start && now <= end) {
-            active.push(booking);  // Läuft gerade
-        } else if (now < start) {
-            upcoming.push(booking);  // Zukünftig
-        } else {
-            completed.push(booking);  // Vergangen
-        }
-    });
-
-    return { active, upcoming, completed };
-}
-```
-
-Techniken:
-• Date-Vergleiche für Zeitbereich-Prüfung
-• Array.push() für Gruppierung
-• Object Shorthand Notation ({active, upcoming})
-• forEach() für Iteration
-
-Code-Beispiel 7: Stornierungslogik mit Gebührenberechnung (JavaScript)
-─────────────────────────────────────────────────────────────────────────────
-Datei: js/profile.js:198-225
-Zweck: Buchung stornieren mit 20% Stornierungsgebühr
-
-```javascript
-async function cancelBooking(bookingId) {
-    const booking = await getBookingById(bookingId);
-
-    // Gebühr berechnen (20% für Kunden)
-    const fee = booking.totalPrice * 0.2;
-    const refund = booking.totalPrice - fee;
-
-    const confirmed = confirm(
-        `Buchung stornieren?\n` +
-        `Stornierungsgebühr: ${fee.toFixed(2)}€ (20%)\n` +
-        `Rückerstattung: ${refund.toFixed(2)}€`
-    );
-
-    if (confirmed) {
-        await deleteBookingData(bookingId);
-        alert('Buchung erfolgreich storniert');
-        location.reload();
-    }
-}
-```
-
-Techniken:
-• Async/Await für asynchrone Operationen
-• Prozentrechnung (20%)
-• toFixed() für Dezimalstellen
-• confirm() für Benutzerbestätigung
-• Template Literals für mehrzeilige Strings
+Implementierung: Buchungen werden durch Date-Vergleich kategorisiert (aktiv/
+kommend/abgeschlossen). Die Stornierung berechnet automatisch eine 20% Gebühr
+und zeigt diese im Bestätigungsdialog an.
 
 Dateiverweise:
 • Frontend: pages/profil.html:1-125, js/profile.js:1-680
@@ -1434,58 +1020,9 @@ Technische Umsetzung:
 • Chart: Vollständig selbst mit Canvas 2D Context gezeichnet (keine Bibliothek!)
 • CRUD: Create (POST), Read (GET), Update (PUT), Delete (DELETE)
 
-Code-Beispiel 8: Canvas-basierte Statistik-Diagramme (JavaScript)
-─────────────────────────────────────────────────────────────────────────────
-Datei: js/providerStats.js:67-145
-Zweck: Buchungen pro Fahrzeug als Balkendiagramm
-
-```javascript
-function renderBookingChart(vehicles, allBookings) {
-    const canvas = document.getElementById('bookingStatsCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // Daten aggregieren
-    const bookingCounts = vehicles.map(v => ({
-        name: v.name,
-        count: allBookings.filter(b => b.vehicle_id === v.id).length
-    }));
-
-    const maxCount = Math.max(...bookingCounts.map(b => b.count), 1);
-    const barWidth = (canvas.width - 100) / vehicles.length;
-
-    // Balken zeichnen
-    bookingCounts.forEach((item, index) => {
-        const x = 50 + index * barWidth;
-        const barHeight = (item.count / maxCount) * (canvas.height - 100);
-        const y = canvas.height - barHeight - 40;
-
-        // Balken
-        ctx.fillStyle = COLORS[index % COLORS.length];
-        ctx.fillRect(x, y, barWidth - 20, barHeight);
-
-        // Label
-        ctx.fillStyle = '#000';
-        ctx.font = '12px Arial';
-        ctx.fillText(item.name, x, canvas.height - 20, barWidth - 20);
-
-        // Wert
-        ctx.fillText(item.count, x + (barWidth - 20) / 2, y - 5);
-    });
-}
-```
-
-Techniken:
-• Canvas 2D Context API
-• Daten-Aggregation mit map() und filter()
-• Spread Operator (...) mit Math.max()
-• Skalierung (Normalisierung auf Canvas-Höhe)
-• Modulo-Operator (%) für Farbrotation
-
-Fahrzeug-CRUD-Operationen (provider.js:234-456):
-• Erstellen: Formular → POST /vehicles (provider_id automatisch gesetzt)
-• Bearbeiten: Formular vorausfüllen → PUT /vehicles/{id}
-• Löschen: Bestätigung → DELETE /vehicles/{id}
-• Sicherheit: Backend prüft provider_id === currentUser.id
+Implementierung: Statistik-Diagramme werden mit Canvas 2D Context gezeichnet
+(keine externe Bibliothek). CRUD-Operationen für Fahrzeuge nutzen REST API
+mit Zugriffskontrolle (provider_id-Prüfung).
 
 Dateiverweise:
 • Frontend: pages/anbieter.html:1-670, js/provider.js, js/providerStats.js
@@ -1539,53 +1076,8 @@ Sicherheitsüberlegungen (nur Demo!):
 • HTTPS für Transport-Verschlüsselung
 • Rate-Limiting für Login-Versuche
 
-Code-Beispiel 9: Login-Prozess mit Rollenbasiertem Routing (JavaScript)
-─────────────────────────────────────────────────────────────────────────────
-Datei: js/auth.js:30-87
-Zweck: Authentifizierung und Session-Management
-
-```javascript
-async function handleLogin(event) {
-    event.preventDefault();
-
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-
-    try {
-        // Nutzer per E-Mail suchen
-        const user = await getUserByEmail(email);
-
-        if (!user) {
-            alert('Benutzer nicht gefunden');
-            return;
-        }
-
-        // Passwort prüfen (Plaintext-Vergleich!)
-        if (user.password !== password) {
-            alert('Falsches Passwort');
-            return;
-        }
-
-        // Session speichern
-        setCurrentUser(user);
-
-        // Rollenbasiertes Routing
-        if (user.role === 'provider') {
-            window.location.href = 'pages/anbieter.html';
-        } else {
-            window.location.href = 'pages/profil.html';
-        }
-    } catch (error) {
-        console.error('Login fehlgeschlagen:', error);
-        alert('Fehler beim Login');
-    }
-}
-```
-
-Techniken:
-• Async/Await für API-Calls
-• event.preventDefault() für Form-Handling
-• Try-Catch für Fehlerbehandlung
+Implementierung: Login-Prozess mit E-Mail/Passwort-Validierung und rollen-
+basiertem Routing (provider → anbieter.html, customer → profil.html).
 • Early Returns für Validation
 • Rollenbasiertes Routing
 
@@ -1712,28 +1204,8 @@ Lösungsansatz:
    • Manuell in JSON-Arrays konvertiert
    • IDs von Integer auf String umgestellt (v1, c1, p1, b1)
 
-Code-Beispiel der Migration (server.py:22-37):
-```python
-DB_FILE = 'datenbank.json'
-
-def read_db():
-    """Liest die gesamte Datenbank aus der JSON-Datei"""
-    with open(DB_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-def write_db(data):
-    """Schreibt die gesamte Datenbank in die JSON-Datei"""
-    with open(DB_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-# Beispiel VORHER (PostgreSQL):
-# cursor.execute("SELECT * FROM vehicles WHERE provider_id = %s", (provider_id,))
-# vehicles = cursor.fetchall()
-
-# Beispiel NACHHER (JSON):
-# db = read_db()
-# vehicles = [v for v in db['vehicles'] if v['provider_id'] == provider_id]
-```
+Implementierung: Zwei Hilfsfunktionen read_db() und write_db() ersetzen alle
+SQL-Queries. PostgreSQL-Daten wurden als CSV exportiert und in JSON konvertiert.
 
 Lessons Learned:
 ✓ Abstraktion zahlt sich aus: Da die Frontend-API-Calls unverändert blieben,
@@ -1775,32 +1247,8 @@ Versuchte Lösungsansätze:
 ✓ Lösung: Event-basierte Höhenberechnung
    → Warte auf image.onload Event, dann Höhe berechnen
 
-Finale Implementierung (vehicleDetail.js:156-178):
-```javascript
-function initializeCarousel(images) {
-    const carouselInner = document.querySelector('.carousel-inner');
-
-    // Bilder rendern
-    carouselInner.innerHTML = images.map((img, idx) => `
-        <div class="carousel-item ${idx === 0 ? 'active' : ''}">
-            <img src="${img}"
-                 class="carousel-image"
-                 data-index="${idx}"
-                 alt="Bild ${idx + 1}">
-        </div>
-    `).join('');
-
-    // Event-Listener für Bildladung
-    const firstImage = carouselInner.querySelector('img');
-    firstImage.addEventListener('load', function() {
-        const aspectRatio = this.naturalHeight / this.naturalWidth;
-        const containerWidth = carouselInner.offsetWidth;
-        const calculatedHeight = containerWidth * aspectRatio;
-
-        carouselInner.style.height = calculatedHeight + 'px';
-    });
-}
-```
+Finale Implementierung: Event-Listener auf image.onload wartet auf Bildladung,
+berechnet dann Höhe basierend auf natürlichem Seitenverhältnis.
 
 Zusätzliche Optimierung: Thumbnail-API vorberechnet Größen
 Da alle Bilder durch /api/thumbnail laufen, haben sie konsistente Breiten
@@ -1832,94 +1280,9 @@ Implementierung eines serverseitigen Thumbnail-Services, der:
 3. Format auf JPEG konvertiert (kleinere Dateigröße)
 4. Ergebnisse cacht (keine redundanten Downloads)
 
-Code-Beispiel 11: Thumbnail-Generierung mit Caching (Python/Pillow)
-─────────────────────────────────────────────────────────────────────────────
-Datei: server.py:223-268
-Zweck: Bilder optimieren und cachen
-
-```python
-from PIL import Image
-import hashlib
-import requests
-from io import BytesIO
-
-@app.route('/api/thumbnail')
-def thumbnail():
-    """Generiert optimierte Thumbnails mit Caching"""
-    image_url = request.args.get('url')
-    width = int(request.args.get('width', 400))
-
-    if not image_url:
-        return jsonify({'error': 'URL fehlt'}), 400
-
-    # Cache-Key generieren (MD5 aus URL + Breite)
-    cache_key = hashlib.md5(f"{image_url}_{width}".encode()).hexdigest()
-    cache_path = os.path.join(CACHE_DIR, f"{cache_key}.jpg")
-
-    # Cache-Hit? Sofort zurückgeben
-    if os.path.exists(cache_path):
-        return send_file(cache_path, mimetype='image/jpeg')
-
-    try:
-        # Bild von externer URL laden
-        response = requests.get(image_url, timeout=10)
-        response.raise_for_status()
-
-        # Bild öffnen
-        img = Image.open(BytesIO(response.content))
-
-        # PNG-Transparenz entfernen (JPEG unterstützt keine Transparenz)
-        if img.mode in ('RGBA', 'LA', 'P'):
-            background = Image.new('RGB', img.size, (255, 255, 255))
-            if 'A' in img.mode:
-                background.paste(img, mask=img.split()[-1])
-            else:
-                background.paste(img)
-            img = background
-        elif img.mode != 'RGB':
-            img = img.convert('RGB')
-
-        # Resize mit Seitenverhältnis
-        aspect_ratio = img.height / img.width
-        new_width = width
-        new_height = int(width * aspect_ratio)
-        img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-
-        # Als JPEG speichern (hohe Qualität, optimiert)
-        img.save(cache_path, 'JPEG', quality=85, optimize=True)
-
-        # Zurückgeben
-        return send_file(cache_path, mimetype='image/jpeg')
-
-    except Exception as e:
-        print(f"Thumbnail-Fehler: {e}")
-        return jsonify({'error': str(e)}), 500
-```
-
-Techniken:
-• MD5-Hashing für Cache-Keys
-• Pillow Image Processing (resize, mode-conversion)
-• LANCZOS-Resampling (hohe Qualität)
-• Exception Handling mit try/except
-• BytesIO für In-Memory-Streams
-• Dateisystem-Cache mit os.path
-
-Ergebnisse:
-• Dateigrößenreduktion: 4 MB PNG → 120 KB JPEG (97% kleiner!)
-• Ladezeit Homepage: 12s → 1,5s (8× schneller)
-• Cache-Hit-Rate: ~80% (bei wiederholten Besuchen)
-• Disk-Space: ~10 MB für 60 gecachte Thumbnails
-
-Herausforderungen:
-• CORS-Probleme bei einigen Bild-URLs (gelöst durch Server-seitige Requests)
-• Timeout-Handling für langsame externe Server (timeout=10s)
-• Transparenz-Handling bei PNG-Dateien (weißer Hintergrund)
-
-Lessons Learned:
-✓ Caching ist essentiell für Performance
-✓ Serverseitige Bildverarbeitung umgeht Browser-Limitierungen
-✓ MD5-Hashing ist perfekt für Cache-Keys
-✗ Keine Fehlerbehandlung für defekte Bilder (verbesserungswürdig)
+Implementierung: Thumbnail-API nutzt Pillow für Bildoptimierung (Resize,
+JPEG-Konversion) mit MD5-basiertem Dateisystem-Cache. Reduziert Ladezeit
+von 12s auf 1,5s durch 97% kleinere Dateigrößen.
 
 
 ═══════════════════════════════════════════════════════════════════════════════
