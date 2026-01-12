@@ -1,0 +1,156 @@
+Du bist Claude Code mit Zugriff auf meinen aktuell geöffneten VS-Code Workspace (lokales Projekt inkl. Ordner/Dateien). 
+Es gibt KEIN Git-Repo und du sollst NICHT nach Git/PRs/Commits schauen. Arbeite ausschließlich mit den Dateien und Ordnern im Workspace.
+
+Ziel: eine Projekt-Dokumentation erstellen, die exakt die Anforderungen erfüllt, und sie anschließend als PDF ausgebbar machen.
+
+WICHTIGE DATEIEN (liegen im Workspace):
+- `dokumentation.txt`  -> HIER soll die fertige Dokumentation hinein (Hauptoutput).
+- `Plan_für_Dokumentation.txt` -> enthält den Dokumentations-Plan; du musst ihn prüfen und ggf. so anpassen/ergänzen, dass alle Anforderungen erfüllt sind.
+- `Zeitstempel.xlsx` -> enthält Zeitaufwände + Tätigkeiten; nutze das zur realistischen Chronik („Was wurde gemacht?“) und als Beleg/Strukturhilfe.
+
+ANFORDERUNGEN (müssen in der finalen Doku erkennbar erfüllt sein):
+1) Was haben sie gemacht?
+2) Welche Techniken haben Sie eingesetzt?
+3) Keine Literaturarbeit/keine ausführliche theoretische Ausarbeitung. Fokus: welche Funktionalität und Techniken umgesetzt wurden.
+4) Irrwege und Schwierigkeiten dürfen geschildert werden.
+5) Umfang: 10–20 Seiten (erreichbar durch aussagekräftige Screenshots).
+6) Erklären: welche Techniken zu welchen Zwecken und wie sie zusammenwirken.
+7) Ordnerstruktur erklären + Ausführungsumgebung (OS, Runtime, Versionen, Tools, Setup/Run).
+8) Bildschirmabgriffe beifügen: aus Benutzersicht (ggf. 2 pro Thema: Überblick + Zoom auf relevanten Ausschnitt).
+9) Ggf. kleine Quelltextausschnitte exemplarisch einfügen (Code wurde separat abgegeben, also nur kurze Snippets).
+10) Abgabe als PDF-Datei.
+
+DEINE AUFGABEN / WORKFLOW (bitte exakt so abarbeiten):
+A) Workspace verstehen
+   1. Verschaffe dir einen Überblick über die Ordnerstruktur (Dateibaum).
+   2. Identifiziere die Hauptfunktionalitäten des Projekts aus Benutzersicht.
+   3. Identifiziere die wichtigsten technischen Bausteine (Frameworks/Libraries/Architektur/Module/Patterns), Konfigurationen und Build/Run-Prozess.
+   4. Prüfe, ob es bereits Screenshots/Bilder gibt (z.B. /docs, /assets, /images, /screenshots, README-ähnliche Dateien). Wenn ja: referenziere sie konkret.
+
+B) Zeitstempel auswerten
+   1. Lies `Zeitstempel.xlsx` und extrahiere:
+      - Kategorien/Arbeitspakete,
+      - Dauer pro Kategorie,
+      - Kurzbeschreibung der Tätigkeiten.
+   2. Erstelle daraus eine knappe, glaubwürdige „Arbeitschronik“ (kein Roman) und nutze sie, um die Doku-Struktur sinnvoll zu gewichten.
+
+C) Plan prüfen und verbessern
+   1. Öffne `Plan_für_Dokumentation.txt`.
+   2. Prüfe systematisch gegen jede Anforderung oben.
+   3. Falls etwas fehlt: ergänze den Plan so, dass wirklich alles abgedeckt ist.
+   4. Speichere den verbesserten Plan zurück in `Plan_für_Dokumentation.txt`.
+   5. Füge am Ende des Plans eine „Anforderungs-Checkliste“ ein, die jede Anforderung (1–10) sichtbar abhakt und auf die Kapitel verweist, wo sie erfüllt ist.
+
+D) Dokumentation schreiben (Hauptoutput)
+   1. Schreibe die vollständige Doku in `dokumentation.txt`.
+   2. Schreibe in sauberem, gut lesbarem Deutsch.
+   3. Stil: praxisnah, konkret, umsetzungsorientiert. Keine Literatur, keine lange Theorie.
+   4. Pflichtinhalte:
+      - Projektüberblick (Ziel, Nutzerperspektive, Hauptfeatures).
+      - „Was wurde gemacht?“: als strukturierte Liste + kurze Chronik (gestützt auf `Zeitstempel.xlsx`).
+      - „Techniken & Zweck“: pro Technik erklären: wofür eingesetzt, wie umgesetzt, wie sie mit anderen Teilen zusammenspielt.
+      - Architektur/Module: wie die Teile zusammenwirken (Datenfluss/Requestfluss/Verarbeitungspipeline etc.).
+      - Ordnerstruktur: die wichtigsten Ordner/Dateien, Verantwortlichkeiten, Orientierung für Leser.
+      - Ausführungsumgebung: OS, Programmiersprache(n), Runtime, Versionen, Setup, Start-Befehle, ggf. Docker/venv/node/etc.
+      - Schwierigkeiten/Irrwege: 1–2 Abschnitte mit echten Problemen, Debugging, Trade-offs, Entscheidungen.
+      - Screenshots: reichlich, aus Benutzersicht, pro Feature/Technik passend.
+      - Code-Snippets: nur klein und exemplarisch (max. ~10–30 Zeilen), zur Technikbelegung.
+   5. Seitenziel: 10–20 Seiten. Nutze Screenshots, um Umfang sinnvoll zu erreichen.
+      - Falls keine Screenshots im Workspace existieren: füge an passenden Stellen klare TODO-Boxen ein:
+        * „TODO Screenshot: <was genau> (Überblick)“
+        * „TODO Screenshot: <Zoom/Ausschnitt> (Detail)“
+        und beschreibe, WAS auf dem Screenshot sichtbar sein soll.
+   6. Für jede wichtige Funktionalität/Technik:
+      - Kurz: Problem/Ziel,
+      - Umsetzung,
+      - Zusammenspiel mit anderen Komponenten,
+      - 1–2 Screenshots (oder TODOs),
+      - optional Mini-Codebeleg.
+
+E) PDF-Ausgabe vorbereiten
+   1. Formatiere `dokumentation.txt` so, dass sie gut nach PDF konvertierbar ist (Markdown-ähnlich ok: Überschriften, Listen, Bildreferenzen).
+   2. Füge am Ende der Doku eine kurze Anleitung „PDF Export“ ein:
+      - Wenn Markdown: z.B. pandoc-Befehl (nur wenn pandoc verfügbar ist; sonst Alternative vorschlagen).
+      - Oder: VS Code Workflow (Markdown Preview Enhanced / Print to PDF), falls sinnvoll.
+      - Oder: vorhandenes Tool/Script im Workspace nutzen, falls es existiert.
+   3. Ziel: Eine PDF-Datei soll zuverlässig aus der Doku erzeugbar sein (du musst sie nicht zwingend selbst erzeugen, aber den sicheren Weg dokumentieren).
+
+QUALITÄTSREGELN:
+- Keine erfundenen Features. Alles muss aus Dateien/Ordnern im Workspace ableitbar sein. Unklares als Annahme kennzeichnen oder TODO.
+- Konkrete Dateipfade nennen (z.B. `src/...`, `app/...`) und bei Techniken auf echte Stellen im Code verweisen.
+- Technikzuordnung muss explizit sein („Technik X wurde genutzt für Y, implementiert in Z, interagiert mit W“).
+- Screenshots müssen dort platziert werden, wo sie den Inhalt wirklich belegen.
+
+OUTPUT / ÄNDERUNGEN:
+- Aktualisiere `Plan_für_Dokumentation.txt` (verbessert + Checkliste).
+- Schreibe die komplette Dokumentation in `dokumentation.txt`.
+- Optional: falls sinnvoll, lege `docs/screenshots/` an und nutze ein einheitliches Namensschema für Bildreferenzen (z.B. `01_overview.png`, `02_featureX_flow.png`), aber nur wenn es im Workspace sinnvoll ist.
+
+Starte jetzt mit Schritt A und arbeite den Workflow vollständig ab.
+
+═══════════════════════════════════════════════════════════════════════════════
+ANFORDERUNGS-CHECKLISTE (Requirement Coverage Matrix)
+═══════════════════════════════════════════════════════════════════════════════
+
+Diese Checkliste stellt sicher, dass alle 10 Anforderungen in der Dokumentation erfüllt sind:
+
+✅ ANFORDERUNG 1: "Was haben sie gemacht?"
+   ➜ Erfüllt in Kapiteln: 2 (Arbeitschronik), 6 (Feature-Details)
+   ➜ Inhalt: Chronologische Übersicht aller Entwicklungsphasen aus Zeitstempel.xlsx
+   ➜ Details: Projektinitialisierung, Setup, DB-Migration, Features, Testing
+
+✅ ANFORDERUNG 2: "Welche Techniken haben Sie eingesetzt?"
+   ➜ Erfüllt in Kapiteln: 3 (Techniken & Architektur), 6 (Feature-Details)
+   ➜ Inhalt: Frontend (HTML5, CSS3, Bootstrap, Vanilla JS), Backend (Python, Flask, REST API)
+   ➜ Spezifische Techniken: LocalStorage, JSON-DB, Pillow, Canvas Charts, Async/Await
+
+✅ ANFORDERUNG 3: "Keine Literaturarbeit/keine theoretische Ausarbeitung"
+   ➜ Erfüllt durch: Praxisorientierte Schreibweise, Fokus auf Umsetzung statt Theorie
+   ➜ Stil: Konkrete Code-Beispiele, Screenshot-Belege, technische Implementierung
+   ➜ Vermieden: Lange theoretische Einleitungen, akademische Zitate, abstrakte Konzepte
+
+✅ ANFORDERUNG 4: "Irrwege und Schwierigkeiten dürfen geschildert werden"
+   ➜ Erfüllt in Kapitel: 7 (Schwierigkeiten & Lessons Learned)
+   ➜ Inhalt: PostgreSQL → JSON Migration (>6h Arbeit), Image-Carousel-Probleme
+   ➜ Details: Debugging-Prozesse, Entscheidungen, Trade-offs, Lösungsansätze
+
+✅ ANFORDERUNG 5: "Umfang: 10–20 Seiten (erreichbar durch Screenshots)"
+   ➜ Erfüllt durch: 20+ Screenshot-Platzhalter + ausführliche Textsektionen
+   ➜ Struktur: 9 Hauptkapitel mit je 1-3 Unterkapiteln
+   ➜ Visuelle Elemente: 2 Screenshots pro Feature (Überblick + Detail)
+
+✅ ANFORDERUNG 6: "Techniken zu welchen Zwecken und wie sie zusammenwirken"
+   ➜ Erfüllt in Kapiteln: 3.2 (Architektur), 6 (Feature-Details)
+   ➜ Inhalt: Jede Technik mit Zweck, Implementierung, Interaktion dokumentiert
+   ➜ Beispiele: REST API Flow, LocalStorage Session-Management, Thumbnail-Cache-Pipeline
+
+✅ ANFORDERUNG 7: "Ordnerstruktur + Ausführungsumgebung erklären"
+   ➜ Erfüllt in Kapiteln: 4 (Ordnerstruktur), 5 (Ausführungsumgebung)
+   ➜ Ordnerstruktur: Alle wichtigen Ordner/Dateien mit Verantwortlichkeiten
+   ➜ Ausführung: OS (Windows), Runtime (Python 3.x, Browser), Setup-Befehle, Dependencies
+
+✅ ANFORDERUNG 8: "Bildschirmabgriffe: Überblick + Zoom (2 pro Thema)"
+   ➜ Erfüllt in Kapitel: 6 (Feature-Details)
+   ➜ Struktur: Pro Feature genau 2 Screenshot-Platzhalter
+   ➜ Beispiele: Homepage (Overview + Filter Detail), Booking (Calendar + Form Detail)
+
+✅ ANFORDERUNG 9: "Kleine Quelltextausschnitte exemplarisch einfügen"
+   ➜ Erfüllt in Kapitel: 8 (Code-Beispiele)
+   ➜ Umfang: 5-7 Snippets à 10-30 Zeilen
+   ➜ Beispiele: REST Endpoint, Filter-Logik, LocalStorage, Thumbnail-Generation, etc.
+
+✅ ANFORDERUNG 10: "Abgabe als PDF-Datei"
+   ➜ Erfüllt in Kapitel: 9 (PDF-Export-Anleitung)
+   ➜ Format: Markdown mit Überschriften, Listen, Code-Blöcken, Bildreferenzen
+   ➜ Conversion: Pandoc-Befehl / VS Code Extension / Browser Print-to-PDF
+
+═══════════════════════════════════════════════════════════════════════════════
+ZUSÄTZLICHE QUALITÄTSKRITERIEN
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ Alle Features aus echten Dateien ableitbar (keine erfundenen Features)
+✓ Konkrete Dateipfade genannt (z.B. js/api.js:46-61, server.py:190-276)
+✓ Technikzuordnung explizit (Technik X für Zweck Y in Datei Z)
+✓ Screenshots dokumentieren Benutzerperspektive (nicht Code)
+✓ Deutsche Sprache durchgehend verwendet
+✓ Praxisnaher, umsetzungsorientierter Stil
