@@ -1,0 +1,844 @@
+================================================================================
+                    INTERCAMP - FUNKTIONEN FUER DIE PRAESENTATION
+================================================================================
+
+4 Funktionen fuer 2 Personen (je 2 Funktionen pro Person)
+
+================================================================================
+PERSON 1: BUCHUNGS-LOGIK
+================================================================================
+
+--------------------------------------------------------------------------------
+FUNKTION 1: calculatePrice()
+--------------------------------------------------------------------------------
+Datei: js/booking.js (Zeile 43-113)
+
+WAS MACHT DIE FUNKTION?
+-----------------------
+Diese Funktion berechnet den Gesamtpreis einer Buchung in Echtzeit.
+Sie wird jedes Mal aufgerufen, wenn der Benutzer das Datum aendert oder
+Extras auswaehlt.
+
+SCHRITT-FUER-SCHRITT ERKLAERUNG MIT CODE:
+-----------------------------------------
+
+1. EINGABEN HOLEN
+   - Liest Start- und Enddatum aus den Input-Feldern
+   - Prueft ob alle notwendigen Elemente existieren
+   - Falls nicht: Funktion bricht ab (return)
+
+   CODE:
+   const startInput = document.getElementById('bookStart');
+   const endInput = document.getElementById('bookEnd');
+   const priceCalcElement = document.getElementById('priceCalculation');
+
+   if (!startInput || !endInput || !priceCalcElement) {
+       return;
+   }
+
+   const startDate = startInput.value;
+   const endDate = endInput.value;
+
+   if (!startDate || !endDate || !currentVehicle) {
+       priceCalcElement.classList.add('hidden');
+       return;
+   }
+
+2. NAECHTE BERECHNEN
+   - Konvertiert die Datum-Strings zu Date-Objekten
+   - Berechnet die Differenz in Millisekunden: end - start
+   - Rechnet Millisekunden in Tage um:
+     diffTime / (1000 * 60 * 60 * 24)
+     = diffTime / (1000 ms * 60 sek * 60 min * 24 std)
+   - Math.ceil() rundet auf (halbe Tage = volle Nacht)
+
+   CODE:
+   const start = new Date(startDate);
+   const end = new Date(endDate);
+
+   // Berechne Anzahl Naechte
+   const diffTime = end - start;
+   const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+   if (nights <= 0) {
+       priceCalcElement.classList.add('hidden');
+       return;
+   }
+
+3. BASISPREIS BERECHNEN
+   - Basispreis = Anzahl Naechte x Preis pro Nacht
+   - Plus: Summe aller ausgewaehlten Extras
+   - Plus: Servicegebuehr (15 Euro fix)
+
+   CODE:
+   // Basispreis: Naechte x Preis pro Nacht
+   const pricePerNight = currentVehicle.price;
+   const totalBase = nights * pricePerNight;
+
+   const extrasTotal = calculateExtrasTotal();
+   const selectedExtras = getSelectedExtras();
+
+   const serviceFee = 15;
+   const totalPrice = totalBase + extrasTotal + serviceFee;
+
+4. UI AKTUALISIEREN
+   - Zeigt alle Werte in den entsprechenden HTML-Elementen
+   - Listet die ausgewaehlten Extras einzeln auf
+   - Zeigt den Gesamtpreis an
+   - Macht die Preisberechnung sichtbar (entfernt "hidden" Klasse)
+
+   CODE:
+   const calcDaysEl = document.getElementById('calcDays');
+   const calcPriceEl = document.getElementById('calcPrice');
+   const calcTotalBaseEl = document.getElementById('calcTotalBase');
+   const calcTotalEl = document.getElementById('calcTotal');
+   const extrasInPriceEl = document.getElementById('extrasInPrice');
+
+   if (!calcDaysEl || !calcPriceEl || !calcTotalBaseEl || !calcTotalEl) {
+       return;
+   }
+
+   // Zeige Basispreis-Berechnung
+   calcDaysEl.textContent = nights;
+   calcPriceEl.textContent = pricePerNight;
+   calcTotalBaseEl.textContent = totalBase;
+
+   // Zeige ausgewaehlte Extras in der Preisaufstellung
+   if (extrasInPriceEl && selectedExtras.length > 0) {
+       extrasInPriceEl.innerHTML = selectedExtras.map(extra => `
+           <div class="d-flex justify-content-between mb-1 text-muted">
+               <span>${extra.name}</span>
+               <span>+${extra.price} EUR</span>
+           </div>
+       `).join('');
+   } else if (extrasInPriceEl) {
+       extrasInPriceEl.innerHTML = '';
+   }
+
+   calcTotalEl.textContent = totalPrice;
+   priceCalcElement.classList.remove('hidden');
+
+
+WARUM IST DAS GUT FUER DIE PRAESENTATION?
+-----------------------------------------
+- Zeigt Datums-Arithmetik (ein haeufiges Problem in der Webentwicklung)
+- Demonstriert die Umrechnung von Millisekunden zu Tagen
+- Klare Trennung: Berechnung -> Anzeige
+- Echtzeit-Updates der UI
+
+
+--------------------------------------------------------------------------------
+FUNKTION 2: cancelBooking()
+--------------------------------------------------------------------------------
+Datei: js/profile.js (Zeile 392-462)
+
+WAS MACHT DIE FUNKTION?
+-----------------------
+Diese Funktion storniert eine Buchung. Je nach Benutzerrolle (Anbieter oder
+Kunde) werden unterschiedliche Stornierungsgebuehren berechnet.
+
+SCHRITT-FUER-SCHRITT ERKLAERUNG MIT CODE:
+-----------------------------------------
+
+1. INITIALISIERUNG & SICHERHEIT
+   - Holt Buchungsdetails vom Server
+   - PRUEFT AUTORISIERUNG: Gehoert die Buchung dem User?
+   - Falls nicht: Abbruch mit Sicherheitswarnung
+
+   CODE:
+   async function cancelBooking(bookingId) {
+       const currentUser = getCurrentUser();
+
+       try {
+           // Lade Buchungsdetails fuer Berechtigungspruefung
+           const booking = await getBookingById(bookingId);
+           if (!booking) {
+               alert('Buchung konnte nicht gefunden werden.');
+               return;
+           }
+
+           // SICHERHEIT: Pruefe ob die Buchung dem aktuellen Benutzer gehoert
+           if (booking.user_id !== currentUser.id) {
+               alert('Sie haben keine Berechtigung, diese Buchung zu stornieren.');
+               return;
+           }
+
+3. ROLLE UNTERSCHEIDEN & GEBUEHREN BERECHNEN
+   WENN PROVIDER (Anbieter):
+   - Kostenlose Stornierung
+   - Einfache Bestaetigung
+
+   WENN CUSTOMER (Kunde):
+   - 20% Stornierungsgebuehr vom Basispreis
+   - Basispreis = Gesamtpreis - Extras - Servicegebuehr
+   - Gebuehr wird aufgerundet (Math.round)
+
+   CODE:
+   // Unterscheide zwischen Provider und Customer fuer Gebuehren-Berechnung
+   const isProvider = currentUser.role === 'provider';
+
+   let cancellationFee = 0;
+   let confirmMessage = '';
+
+   if (isProvider) {
+       // Provider stornieren kostenlos
+       confirmMessage = 'Moechten Sie diese Buchung wirklich stornieren?\n\nDie Stornierung kann nicht rueckgaengig gemacht werden.';
+   } else {
+       // Kunden zahlen Stornierungsgebuehr
+       // Berechne 20% des Basispreises (ohne Extras und Verwaltungskosten)
+       const serviceFee = 15;
+
+       // Berechne Extra-Kosten
+       let extrasTotal = 0;
+       if (booking.extras && booking.extras.length > 0) {
+           extrasTotal = booking.extras.reduce((sum, extra) => sum + (extra.price || 0), 0);
+       }
+
+       // Basispreis = Gesamtpreis minus Extras minus Verwaltungsgebuehr
+       const basePrice = booking.totalPrice - extrasTotal - serviceFee;
+
+       // Stornierungsgebuehr: 20% des Basispreises, aufgerundet
+       cancellationFee = Math.round(basePrice * 0.20);
+
+       confirmMessage = `STORNIERUNGSKOSTEN\n\nBitte beachten Sie: Bei der Stornierung dieser Buchung fallen folgende Kosten an:\n\nStornierungsgebuehr: ${cancellationFee}EUR \n\nMoechten Sie die Buchung trotzdem stornieren?`;
+   }
+
+4. BESTAETIGUNG & LOESCHUNG
+   - Zeigt confirm()-Dialog mit Gebuehren-Info
+   - Bei Bestaetigung: Buchung wird geloescht
+   - Erfolgsmeldung mit Gebuehren-Information
+   - Seite wird neu geladen
+
+   CODE:
+   // Bestaetigung einholen
+   if (!confirm(confirmMessage)) {
+       return;
+   }
+
+   // Buchung aus Datenbank loeschen
+   await deleteBooking(bookingId);
+
+   // Erfolgsmeldung mit Gebuehren-Information
+   if (isProvider) {
+       alert('Buchung wurde erfolgreich storniert.');
+   } else {
+       alert(`Buchung wurde storniert.\n\nEs wurden Stornierungskosten in Hoehe von ${cancellationFee}EUR berechnet.`);
+   }
+
+   // Seite neu laden um aktualisierte Buchungsliste zu zeigen
+   location.reload();
+
+   } catch (error) {
+       console.error('Fehler beim Stornieren:', error);
+       alert('Fehler beim Stornieren der Buchung. Bitte versuchen Sie es erneut.');
+   }
+   }
+
+
+WARUM IST DAS GUT FUER DIE PRAESENTATION?
+-----------------------------------------
+- Zeigt Autorisierung/Sicherheit in der Praxis
+- Rollenbasierte Geschaeftslogik (Provider vs. Customer)
+- Realistische Business-Anforderung
+- Komplexe Preisberechnung mit mehreren Komponenten
+
+
+================================================================================
+PERSON 2: DATEN & ALGORITHMEN
+================================================================================
+
+--------------------------------------------------------------------------------
+FUNKTION 3: displayBookingHistory()
+--------------------------------------------------------------------------------
+Datei: js/profile.js (Zeile 100-249)
+
+WAS MACHT DIE FUNKTION?
+-----------------------
+Diese Funktion laedt alle Buchungen eines Benutzers und zeigt sie als
+Karten an. Sie erkennt automatisch den Status jeder Buchung (aktiv,
+bevorstehend, vergangen).
+
+SCHRITT-FUER-SCHRITT ERKLAERUNG MIT CODE:
+-----------------------------------------
+
+1. VORBEREITUNG & DATEN LADEN
+   - Sicherheitspruefung: Darf User diese Daten sehen?
+   - Laedt alle Buchungen des Users vom Server
+   - Sortiert nach Datum (aktuellste zuerst)
+
+   CODE:
+   async function displayBookingHistory(userId, append = false) {
+       const container = document.getElementById('bookingHistoryContainer');
+       if (!container) return;
+
+       // SICHERHEIT: Pruefe dass der angemeldete Benutzer seine eigenen Buchungen sieht
+       const currentUser = getCurrentUser();
+       if (currentUser.id !== userId) {
+           container.innerHTML = `<div class="alert alert-danger">Keine Berechtigung.</div>`;
+           return;
+       }
+
+       try {
+           // Lade alle Buchungen des Benutzers vom Server
+           const bookings = await getBookingsByUser(userId);
+
+           if (bookings.length === 0) {
+               if (!append) {
+                   container.innerHTML = `
+                       <div class="empty-state">
+                           <h3>Keine Buchungen vorhanden</h3>
+                           <a href="../index.html" class="btn btn-primary mt-3">Fahrzeuge entdecken</a>
+                       </div>
+                   `;
+               }
+               return;
+           }
+
+           // Sortiere Buchungen nach Startdatum (neueste zuerst)
+           bookings.sort((a, b) => new Date(b.start) - new Date(a.start));
+
+2. DATEN AUFBEREITEN (PERFORMANCE & OPTIMIERUNG)
+   - Laedt Fahrzeug-Infos PARALLEL mit Promise.all() (Schneller als nacheinander!)
+   - Erstellt eine Map fuer O(1) Zugriff (Schneller als suchen im Array)
+
+   CODE:
+   // Lade alle Fahrzeug-Informationen parallel fuer bessere Performance
+   // Promise.all() wartet bis alle Requests fertig sind
+   const vehiclePromises = bookings.map(booking => getVehicleById(booking.vehicle_id));
+   const vehicles = await Promise.all(vehiclePromises);
+
+   // Erstelle Map fuer schnellen Zugriff auf Fahrzeug-Daten
+   const vehicleMap = new Map();
+   vehicles.forEach((vehicle, index) => {
+       if (vehicle) {
+           vehicleMap.set(bookings[index].vehicle_id, vehicle);
+       }
+   });
+
+5. STATUS ERKENNEN & HTML GENERIEREN
+   - isUpcoming: start > today (in der Zukunft)
+   - isActive: start <= today && end >= today (gerade aktiv)
+   - isPast: end < today (abgeschlossen)
+   - Je nach Status: Andere Farbe und Badge
+
+   CODE:
+   // Generiere HTML fuer jede Buchung
+   const bookingsHTML = bookings.map(booking => {
+       const vehicle = vehicleMap.get(booking.vehicle_id);
+       if (!vehicle) return '';
+
+       // Berechne Status der Buchung basierend auf Daten
+       const start = new Date(booking.start);
+       const end = new Date(booking.end);
+       const today = new Date();
+       const isUpcoming = start > today;
+       const isActive = start <= today && end >= today;
+       const isPast = end < today;
+
+       // Waehle Status-Badge und Border-Farbe basierend auf Status
+       let statusBadge = '';
+       let statusClass = '';
+
+       if (isActive) {
+           statusBadge = '<span class="badge bg-success">Aktiv</span>';
+           statusClass = 'border-success';
+       } else if (isUpcoming) {
+           statusBadge = '<span class="badge bg-primary">Bevorstehend</span>';
+           statusClass = 'border-primary';
+       } else {
+           statusBadge = '<span class="badge bg-secondary">Abgeschlossen</span>';
+           statusClass = 'border-secondary';
+       }
+
+       // ... (Restlicher HTML Code gekuerzt fuer Uebersicht) ...
+       return `
+           <div class="booking-history-card ${statusClass}">
+               <!-- ... Card Content ... -->
+           </div>
+       `;
+   }).join('');
+
+   if (append) {
+       container.insertAdjacentHTML('beforeend', bookingsHTML);
+   } else {
+       container.innerHTML = bookingsHTML;
+   }
+   } catch (error) { ... }
+   }
+
+
+WARUM IST DAS GUT FUER DIE PRAESENTATION?
+-----------------------------------------
+- Zeigt Promise.all() fuer parallele API-Calls
+- Demonstriert Map-Datenstruktur (O(1) vs O(n))
+- Komplexe bedingte Logik (Status-Erkennung)
+- Sicherheitspruefung am Anfang
+
+
+--------------------------------------------------------------------------------
+FUNKTION 4: isDateRangeBookedAPI()
+--------------------------------------------------------------------------------
+Datei: js/api.js (Zeile 199-209)
+
+WAS MACHT DIE FUNKTION?
+-----------------------
+Diese Funktion prueft, ob ein gewuenschter Buchungszeitraum mit bestehenden
+Buchungen ueberlappt. Sie verhindert Doppelbuchungen.
+
+SCHRITT-FUER-SCHRITT ERKLAERUNG MIT CODE:
+-----------------------------------------
+
+1. DER ALGORITHMUS (Daten laden & ueberpruefen)
+   - Holt alle Buchungen fuer das Fahrzeug
+   - Konvertiert die String-Daten zu Date-Objekten
+   - Prueft fuer jede Buchung mit `some()` auf Ueberlappung
+   - Formel: `start <= bEnd && end >= bStart`
+
+   CODE:
+   async function isDateRangeBookedAPI(vehicleId, startDate, endDate) {
+       const bookings = await fetchBookingsByVehicle(vehicleId);
+       const start = new Date(startDate);
+       const end = new Date(endDate);
+
+       return bookings.some(booking => {
+           const bStart = new Date(booking.start);
+           const bEnd = new Date(booking.end);
+           return (start <= bEnd && end >= bStart);
+       });
+   }
+
+DER ALGORITHMUS - INTERVALL-UEBERLAPPUNG:
+-----------------------------------------
+Zwei Zeitraeume ueberlappen sich, wenn:
+   start <= bEnd && end >= bStart
+
+VISUALISIERUNG (zeichne das auf!):
+
+Fall 1: Keine Ueberlappung (links)
+   Bestehend:  |-----|
+   Neu:                    |-----|
+
+Fall 2: Ueberlappung!
+   Bestehend:  |---------|
+   Neu:            |---------|
+
+DIE FORMEL ERKLAERT:
+start <= bEnd   = Neuer Beginn ist vor oder am Ende der Buchung
+end >= bStart   = Neues Ende ist nach oder am Beginn der Buchung
+Wenn BEIDES wahr ist -> Ueberlappung!
+
+
+WARUM IST DAS GUT FUER DIE PRAESENTATION?
+-----------------------------------------
+- Klassisches algorithmisches Problem
+- Leicht zu erklaeren mit Zeichnung
+- Kritisch wichtig (verhindert Doppelbuchungen)
+- Kompakt aber elegant
+- Zeigt some() Array-Methode
+
+
+================================================================================
+ZUSAETZLICHE THEMEN: SERVER, DATENBANK & CACHING
+================================================================================
+
+--------------------------------------------------------------------------------
+THEMA 5: THUMBNAIL-CACHING (Das Bild-Caching-System)
+--------------------------------------------------------------------------------
+Datei: server.py (Zeile 206-276)
+
+WAS IST DAS PROBLEM?
+--------------------
+- Bilder werden von externen URLs geladen (Discord, Unsplash, etc.)
+- Originalbilder sind oft sehr gross (mehrere MB)
+- Jedes Mal neu herunterladen = langsam und viel Bandbreite
+
+DIE LOESUNG: CACHING MIT THUMBNAILS
+-----------------------------------
+Der Server laedt das Bild einmal, verkleinert es, und speichert es lokal.
+
+SCHRITT-FUER-SCHRITT ERKLAERUNG MIT CODE:
+-----------------------------------------
+
+1. CACHE-KEY GENERIEREN & PRUEFEN (Der "Schnelle" Pfad)
+   - Erstellt eindeutigen Hash aus URL + Breite (MD5)
+   - Prueft, ob Datei schon existiert
+   - JA: Direkt zurueckgeben (kein Download noetig!)
+
+   CODE:
+   @app.route('/api/thumbnail', methods=['GET'])
+   def generate_thumbnail():
+       image_url = request.args.get('url')
+       width = int(request.args.get('width', 400))
+
+       # Cache-Key generieren: MD5-Hash aus URL und Breite
+       cache_key = hashlib.md5(f"{image_url}_{width}".encode()).hexdigest()
+       cache_path = os.path.join(CACHE_DIR, f"{cache_key}.jpg")
+
+       # Wenn das Thumbnail bereits im Cache existiert, direkt zurueckgeben
+       if os.path.exists(cache_path):
+           return send_file(cache_path, mimetype='image/jpeg')
+
+2. BILD VERARBEITEN & SPEICHERN (Der "Langsame" Pfad - nur beim 1. Mal)
+   - Bild herunterladen (mit Timeout)
+   - Transparenz behandeln (PNG -> weisser Hintergrund)
+   - Skalieren (LANCZOS-Filter fuer Qualitaet)
+   - Als JPG speichern und senden
+
+   CODE:
+   # Bild von der externen URL herunterladen
+   response = requests.get(image_url, timeout=10)
+   img = Image.open(BytesIO(response.content))
+
+   # PNG-Bilder mit Transparenz: weissen Hintergrund unterlegen
+   if img.mode in ('RGBA', 'LA', 'P'):
+       background = Image.new('RGB', img.size, (255, 255, 255))
+       if img.mode == 'P': img = img.convert('RGBA')
+       background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+       img = background
+   elif img.mode != 'RGB':
+       img = img.convert('RGB')
+
+   # Neue Groesse berechnen und skalieren
+   aspect_ratio = img.height / img.width
+   new_height = int(width * aspect_ratio)
+   img = img.resize((width, new_height), Image.Resampling.LANCZOS)
+
+   # Als JPG speichern und senden
+   img.save(cache_path, 'JPEG', quality=85, optimize=True)
+   return send_file(cache_path, mimetype='image/jpeg')
+
+
+--------------------------------------------------------------------------------
+THEMA 6: DER SERVER (REST API mit Flask)
+--------------------------------------------------------------------------------
+Datei: server.py
+
+WAS IST EIN REST API SERVER?
+----------------------------
+Rest API = Application Programming Interface
+Der Server ist die "Bruecke" zwischen Frontend (Browser) und Datenbank.
+
+ARCHITEKTUR-UEBERSICHT:
+-----------------------
+   Browser (Frontend)  ->  HTTP Request  ->  Flask Server  ->  datenbank.json
+
+CODE-BEISPIEL - VEHICLES ENDPOINT:
+----------------------------------
+@app.route('/vehicles', methods=['GET', 'POST'])
+def vehicles():
+    db = read_db()
+
+    if request.method == 'GET':
+        provider_id = request.args.get('provider_id')
+        if provider_id:
+            filtered = [v for v in db['vehicles'] if v.get('provider_id') == provider_id]
+            return jsonify(filtered)
+        return jsonify(db['vehicles'])
+
+    elif request.method == 'POST':
+        new_vehicle = request.json
+        db['vehicles'].append(new_vehicle)
+        write_db(db)
+        return jsonify(new_vehicle), 201
+
+
+--------------------------------------------------------------------------------
+THEMA 7: DIE DATENBANK (JSON-basiert)
+--------------------------------------------------------------------------------
+Datei: datenbank.json
+
+STRUKTUR:
+---------
+{
+  "users": [...],      // Alle Benutzer
+  "vehicles": [...],   // Alle Fahrzeuge
+  "bookings": [...]    // Alle Buchungen
+}
+
+VORTEILE DIESER LOESUNG:
+------------------------
+- Einfach zu verstehen (keine SQL-Kenntnisse noetig)
+- Daten sind menschenlesbar (JSON-Format)
+- Gut fuer kleine Projekte und Prototypen
+
+
+================================================================================
+WEITERE FUNKTIONEN (DETAILLIERT)
+================================================================================
+
+--------------------------------------------------------------------------------
+AUTHENTIFIZIERUNG (auth.js)
+--------------------------------------------------------------------------------
+
+FUNKTION: handleLogin()
+-----------------------
+Datei: js/auth.js (Zeile 9-52)
+
+WAS SIE MACHT:
+- Validiert Email und Passwort gegen Datenbank
+- Speichert User in localStorage (Session)
+- Leitet je nach Rolle weiter (Provider -> Dashboard, Customer -> Profil)
+
+CODE:
+async function handleLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value;
+
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+        showError('loginError', 'Diese E-Mail-Adresse ist nicht registriert.');
+        return false;
+    }
+
+    if (user.password !== password) {
+        showError('loginError', 'Falsches Passwort.');
+        return false;
+    }
+
+    setCurrentUser(user);
+
+    // Weiterleitung je nach Rolle
+    if (user.role === 'provider') {
+        window.location.href = 'anbieter.html';
+    } else {
+        window.location.href = 'profil.html';
+    }
+}
+
+
+FUNKTION: handleRegister()
+--------------------------
+Datei: js/auth.js (Zeile 56-108)
+
+WAS SIE MACHT:
+- Validiert alle Eingaben
+- Prueft ob Email bereits vergeben
+- Erstellt neuen User mit eindeutiger ID
+- Loggt automatisch ein nach Registrierung
+
+CODE:
+async function handleRegister(event) {
+    event.preventDefault();
+
+    // Eingaben holen (vereinfacht)
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPass').value;
+
+    // Pruefe ob Email bereits existiert
+    const existingUser = await getUserByEmail(email);
+    if (existingUser) {
+        showError('registerError', 'Diese E-Mail ist bereits registriert.');
+        return false;
+    }
+
+    // Erstelle neuen User
+    const newUser = {
+        id: generateId('u'),
+        email: email,
+        password: password,
+        role: 'customer'
+    };
+
+    await addUser(newUser);
+    setCurrentUser(newUser);
+    window.location.href = 'profil.html';
+}
+
+
+--------------------------------------------------------------------------------
+API-LAYER (api.js)
+--------------------------------------------------------------------------------
+
+DIE 4 HTTP-METHODEN
+-------------------
+Dies sind Wrapper-Funktionen fuer fetch(), um API-Calls zu vereinfachen.
+Sie behandeln JSON-Konvertierung und Basis-URLs automatisch.
+
+CODE:
+// GET - Daten abrufen
+async function apiGet(endpoint) {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`);
+    return await response.json();
+}
+
+// POST - Neue Daten erstellen
+async function apiPost(endpoint, data) {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+}
+
+
+--------------------------------------------------------------------------------
+BUCHUNG (booking.js) und VALIDIERUNG
+--------------------------------------------------------------------------------
+
+FUNKTION: handleBooking()
+-------------------------
+Datei: js/booking.js (Zeile 159-218)
+
+WAS SIE MACHT:
+- Prueft Login-Status
+- Finale Verfuegbarkeitspruefung (Race Condition vermeiden)
+- Erstellt Buchungs-Objekt mit allen Details
+- Speichert in Datenbank
+
+CODE:
+async function handleBooking(event) {
+    event.preventDefault();
+    const currentUser = getCurrentUser();
+
+    // Login-Pruefung
+    if (!currentUser) {
+        if (confirm('Sie muessen eingeloggt sein. Jetzt anmelden?')) {
+            window.location.href = 'anmelden.html';
+        }
+        return false;
+    }
+
+    // Finale Verfuegbarkeitspruefung
+    const isBooked = await isDateRangeBooked(currentVehicle.id, startDate, endDate);
+    if (isBooked) {
+        alert('Der Zeitraum ist nicht mehr verfuegbar.');
+        return false;
+    }
+
+    // Buchungs-Objekt erstellen
+    const booking = {
+        vehicle_id: currentVehicle.id,
+        user_id: currentUser.id,
+        start: startDate,
+        end: endDate,
+        nights: nights,
+        totalPrice: totalPrice,
+        extras: selectedExtras,
+        createdAt: new Date().toISOString()
+    };
+
+    await addBooking(booking);
+    showBookingSuccess(booking);
+}
+
+
+--------------------------------------------------------------------------------
+FAHRZEUGE (vehicles.js)
+--------------------------------------------------------------------------------
+
+FUNKTION: renderVehicles()
+--------------------------
+Datei: js/vehicles.js
+
+WAS SIE MACHT:
+- Rendert Fahrzeuge als Bootstrap-Karten
+- Nutzt Thumbnail-API fuer optimierte Bilder
+- Fallback bei Bild-Fehler (onerror)
+
+CODE:
+function renderVehicles(vehicles) {
+    const container = document.getElementById('vehicleList');
+
+    if (vehicles.length === 0) {
+        container.innerHTML = '<div class="alert">Keine Fahrzeuge gefunden.</div>';
+        return;
+    }
+
+    const cardsHTML = vehicles.map(vehicle => {
+        // Thumbnail-URL fuer optimierte Bilder
+        const thumbnailUrl = `http://localhost:3000/thumbnail?url=${encodeURIComponent(vehicle.img)}&width=400`;
+
+        return `
+            <div class="col-lg-4 col-md-6">
+                <div class="vehicle-card" onclick="goToVehicle('${vehicle.id}')">
+                    <div class="vehicle-image">
+                        <img src="${thumbnailUrl}"
+                             alt="${vehicle.name}"
+                             onerror="this.src='${vehicle.img}';"
+                             loading="lazy">
+                    </div>
+                    <div class="vehicle-info">
+                        <h5>${vehicle.name}</h5>
+                        <div class="vehicle-price">
+                            <strong>${vehicle.price}EUR</strong> / Nacht
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = cardsHTML;
+}
+
+
+--------------------------------------------------------------------------------
+PROVIDER-DASHBOARD (provider.js)
+--------------------------------------------------------------------------------
+
+FUNKTION: displayProviderStats()
+--------------------------------
+Datei: js/provider.js
+
+WAS SIE MACHT:
+- Berechnet Dashboard-Statistiken (Umsatz, aktive Buchungen)
+- Verwendet reduce() fuer Summen
+- Filtert aktive Buchungen nach Datum
+
+CODE:
+async function displayProviderStats(providerId) {
+    const currentUser = getCurrentUser();
+    if (currentUser.id !== providerId) return;
+
+    const vehicles = await getVehiclesByProvider(providerId);
+    const allBookings = await getAllBookings();
+
+    // Nur Buchungen fuer eigene Fahrzeuge
+    const vehicleIds = vehicles.map(v => v.id);
+    const providerBookings = allBookings.filter(b => vehicleIds.includes(b.vehicle_id));
+
+    // Umsatz mit reduce()
+    const totalRevenue = providerBookings.reduce((sum, booking) => {
+        return sum + (booking.totalPrice || 0);
+    }, 0);
+
+    // Aktive Buchungen
+    const today = new Date();
+    const activeBookings = providerBookings.filter(b => {
+        const start = new Date(b.start);
+        const end = new Date(b.end);
+        return start <= today && end >= today;
+    }).length;
+
+    // DOM aktualisieren
+    document.getElementById('statVehicles').textContent = vehicles.length;
+    document.getElementById('statBookings').textContent = providerBookings.length;
+    document.getElementById('statRevenue').textContent = totalRevenue;
+    document.getElementById('statActive').textContent = activeBookings;
+}
+
+
+================================================================================
+TIPPS FUER DIE PRAESENTATION
+================================================================================
+
+1. calculatePrice()
+   - Zeigt die Live-Berechnung im Browser
+   - Erklaert die Millisekunden -> Tage Umrechnung
+
+2. cancelBooking()
+   - Demonstriert die unterschiedlichen Rollen (Provider vs. Customer)
+   - Zeigt die Sicherheitspruefung
+
+3. displayBookingHistory()
+   - Erklaert warum Promise.all schneller ist als for-await
+
+4. isDateRangeBookedAPI()
+   - ZEICHNET DIE ZEITSTRAHLEN AUF!
+   - Zeigt alle 4 Faelle der Ueberlappung
+
+5. Thumbnail-Caching
+   - Zeigt den thumbnail_cache Ordner und wie sie sich fuellen
