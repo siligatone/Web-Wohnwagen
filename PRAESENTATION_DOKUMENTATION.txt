@@ -1,0 +1,1060 @@
+================================================================================
+                    INTERCAMP - PRAESENTATION UND DOKUMENTATION
+                    Wohnmobil-Vermietungsplattform
+================================================================================
+
+Dieses Dokument dient als Leitfaden fuer eure Praesentation und hilft euch,
+technische Fragen des Lehrers zu beantworten.
+
+================================================================================
+                           1. PROJEKTUEBERSICHT
+================================================================================
+
+InterCamp ist eine vollstaendige Web-Anwendung zur Vermietung von Wohnmobilen.
+Die Plattform verbindet Anbieter (Provider) mit Kunden (Customers).
+
+HAUPTFUNKTIONEN:
+- Fahrzeugsuche mit Live-Filterung (Freitext, Kraftstoff, Betten, Preis)
+- Detailansicht mit Bildergalerie und technischen Daten
+- Verfuegbarkeitskalender mit visueller Buchungsanzeige
+- Buchungssystem mit Extras und Preisberechnung
+- Benutzerverwaltung (Login, Registrierung, Profil)
+- Anbieter-Dashboard mit Statistiken und Fahrzeugverwaltung
+
+TECHNOLOGIE-STACK:
+- Frontend: HTML5, CSS3, JavaScript (Vanilla, kein Framework)
+- UI-Framework: Bootstrap 5.3.0
+- Icons: FontAwesome 6.4.0
+- Backend: Python Flask
+- Datenbank: JSON-Datei (datenbank.json)
+- Bildverarbeitung: Python Pillow (PIL)
+
+
+================================================================================
+                           2. PROJEKTSTRUKTUR
+================================================================================
+
+c:\DHBW\Web-Wohnwagen/
+|
+|-- index.html                 <- Startseite mit Fahrzeuguebersicht
+|-- server.py                  <- Python Flask Backend (REST API)
+|-- datenbank.json             <- JSON-Datenbank mit allen Daten
+|
+|-- css/
+|   |-- main.css               <- Globale Styles, Layout, Navigation
+|   |-- components.css         <- Wiederverwendbare UI-Komponenten
+|   |-- pages.css              <- Seiten-spezifische Styles
+|
+|-- js/
+|   |-- api.js                 <- REST API Kommunikation
+|   |-- data.js                <- Datenverwaltung & Sicherheit
+|   |-- shared.js              <- Header, Footer, Cookie-Banner
+|   |-- vehicles.js            <- Fahrzeuguebersicht & LIVE-SUCHE
+|   |-- vehicleDetail.js       <- Detailseite mit Galerie
+|   |-- calendar.js            <- Verfuegbarkeitskalender
+|   |-- booking.js             <- Buchungslogik & Preisberechnung
+|   |-- auth.js                <- Login & Registrierung
+|   |-- profile.js             <- Benutzerprofil & Buchungsverlauf
+|   |-- provider.js            <- Anbieter-Dashboard
+|   |-- providerStats.js       <- Canvas-Diagramme
+|
+|-- pages/
+|   |-- fahrzeug.html          <- Fahrzeug-Detailseite
+|   |-- anmelden.html          <- Login/Registrierung
+|   |-- profil.html            <- Benutzerprofil
+|   |-- anbieter.html          <- Provider-Dashboard
+|   |-- impressum.html         <- Impressum
+|   |-- datenschutz.html       <- Datenschutz
+|
+|-- thumbnail_cache/           <- Cache fuer optimierte Bilder
+
+
+================================================================================
+                    3. JAVASCRIPT - DETAILLIERTE ERKLAERUNG
+================================================================================
+
+-------------------------------------------------------------------------------
+3.1 API.JS - REST API Kommunikation
+-------------------------------------------------------------------------------
+
+ZWECK: Diese Datei ist die zentrale Schnittstelle zum Backend. Alle
+HTTP-Anfragen (GET, POST, PUT, DELETE) werden hier definiert.
+
+WICHTIGE KONZEPTE:
+- Asynchrone Funktionen (async/await) fuer nicht-blockierende API-Calls
+- Zentrale Fehlerbehandlung mit try-catch
+- Basis-URL als Konstante fuer einfache Aenderungen
+
+CODE-BEISPIEL - Generische GET-Funktion:
+------------------------------------------------------------------------
+const API_BASE_URL = 'http://localhost:3000';
+
+async function apiGet(endpoint) {
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`);
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('API GET Error:', error);
+        throw error;
+    }
+}
+------------------------------------------------------------------------
+
+ERKLAERUNG:
+1. async - Markiert die Funktion als asynchron
+2. await fetch() - Wartet auf die Server-Antwort ohne zu blockieren
+3. response.ok - Prueft ob HTTP-Status 200-299 ist
+4. response.json() - Wandelt JSON-Antwort in JavaScript-Objekt um
+5. throw error - Gibt Fehler an aufrufende Funktion weiter
+
+ALLE API-FUNKTIONEN:
+
+User-API:
+- fetchAllUsers()           -> GET /users
+- fetchUserById(id)         -> GET /users/{id}
+- fetchUserByEmail(email)   -> GET /users?email={email}
+- createUser(data)          -> POST /users
+- updateUser(id, data)      -> PUT /users/{id}
+
+Vehicle-API:
+- fetchAllVehicles()              -> GET /vehicles
+- fetchVehicleById(id)            -> GET /vehicles/{id}
+- fetchVehiclesByProvider(id)     -> GET /vehicles?provider_id={id}
+- createVehicle(data)             -> POST /vehicles
+- updateVehicle(id, data)         -> PUT /vehicles/{id}
+- deleteVehicle(id)               -> DELETE /vehicles/{id}
+
+Booking-API:
+- fetchAllBookings()              -> GET /bookings
+- fetchBookingById(id)            -> GET /bookings/{id}
+- fetchBookingsByUser(id)         -> GET /bookings?user_id={id}
+- fetchBookingsByVehicle(id)      -> GET /bookings?vehicle_id={id}
+- createBooking(data)             -> POST /bookings
+- deleteBooking(id)               -> DELETE /bookings/{id}
+
+
+-------------------------------------------------------------------------------
+3.2 DATA.JS - Datenverwaltung und Sicherheit
+-------------------------------------------------------------------------------
+
+ZWECK: Diese Datei ist eine Abstraktionsschicht zwischen der Anwendungslogik
+und der API. Sie fuegt wichtige SICHERHEITSPRUEFUNGEN hinzu.
+
+WICHTIGE KONZEPTE:
+- Session-Management via localStorage
+- Rollenbasierte Zugriffskontrolle (RBAC)
+- Validierung vor jedem API-Call
+
+CODE-BEISPIEL - Fahrzeug hinzufuegen mit Sicherheitspruefung:
+------------------------------------------------------------------------
+async function addVehicle(vehicle) {
+    // 1. Pruefe ob Benutzer eingeloggt ist
+    const currentUser = getCurrentUser();
+    if (!currentUser || currentUser.role !== 'provider') {
+        throw new Error('Nur Anbieter koennen Fahrzeuge hinzufuegen');
+    }
+
+    // 2. Setze automatisch die Provider-ID
+    vehicle.provider_id = currentUser.id;
+
+    // 3. Generiere ID falls nicht vorhanden
+    if (!vehicle.id) {
+        vehicle.id = generateUniqueId('v');
+    }
+
+    // 4. Erst jetzt API-Call ausfuehren
+    return await createVehicle(vehicle);
+}
+------------------------------------------------------------------------
+
+ERKLAERUNG:
+1. getCurrentUser() holt den eingeloggten Benutzer aus localStorage
+2. role !== 'provider' - Nur Provider duerfen Fahrzeuge hinzufuegen
+3. provider_id wird automatisch gesetzt - kann nicht manipuliert werden
+4. generateUniqueId('v') erstellt eine eindeutige ID wie "v_1705234567_abc123"
+
+SESSION-MANAGEMENT:
+------------------------------------------------------------------------
+function getCurrentUser() {
+    const userStr = localStorage.getItem('currentUser');
+    return userStr ? JSON.parse(userStr) : null;
+}
+
+function setCurrentUser(user) {
+    if (user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+    } else {
+        localStorage.removeItem('currentUser');
+    }
+}
+------------------------------------------------------------------------
+
+SICHERHEITSREGELN:
+- Provider koennen NUR ihre eigenen Fahrzeuge bearbeiten/loeschen
+- Kunden koennen NUR ihre eigenen Buchungen stornieren
+- Buchungen koennen NUR fuer den eingeloggten Benutzer erstellt werden
+
+
+-------------------------------------------------------------------------------
+3.3 VEHICLES.JS - Fahrzeuguebersicht und LIVE-SUCHE (WICHTIG!)
+-------------------------------------------------------------------------------
+
+ZWECK: Diese Datei verwaltet die Hauptseite mit der Fahrzeuguebersicht
+und implementiert die Live-Suche mit kombinierten Filtern.
+
+WICHTIGE KONZEPTE:
+- UND-Verknuepfung aller Filter (alle Kriterien muessen erfuellt sein)
+- Live-Update ohne Seiten-Neuladung
+- Event-Handler fuer sofortige Filterung
+
+CODE-BEISPIEL - Die zentrale Filter-Funktion:
+------------------------------------------------------------------------
+let allVehicles = [];  // Globale Variable speichert alle Fahrzeuge
+
+function applyFilters() {
+    // 1. Werte aus Filter-Eingabefeldern holen
+    const searchTerm = document.getElementById('filterSearch')?.value.toLowerCase() || '';
+    const fuelFilter = document.getElementById('filterFuel')?.value || '';
+    const bedsFilter = document.getElementById('filterBeds')?.value || '';
+    const maxPrice = parseInt(document.getElementById('filterPrice')?.value) || 999;
+
+    // 2. Filter anwenden mit Array.filter()
+    const filtered = allVehicles.filter(vehicle => {
+        // Freitext-Suche: Name ODER Beschreibung
+        const matchesSearch = !searchTerm ||
+            vehicle.name.toLowerCase().includes(searchTerm) ||
+            vehicle.desc.toLowerCase().includes(searchTerm);
+
+        // Kraftstoff: Exakter Match (Diesel, Benzin, Elektro)
+        const matchesFuel = !fuelFilter || vehicle.fuel === fuelFilter;
+
+        // Betten: Exakter Match (2, 4, oder 6)
+        const matchesBeds = !bedsFilter || vehicle.beds === parseInt(bedsFilter);
+
+        // Preis: Kleiner oder gleich Maximum
+        const matchesPrice = vehicle.price <= maxPrice;
+
+        // UND-Verknuepfung: ALLE Bedingungen muessen true sein
+        return matchesSearch && matchesFuel && matchesBeds && matchesPrice;
+    });
+
+    // 3. Gefilterte Fahrzeuge anzeigen
+    renderVehicles(filtered);
+}
+------------------------------------------------------------------------
+
+ERKLAERUNG DER LIVE-SUCHE:
+
+1. INITIALISIERUNG:
+   - Beim Laden der Seite werden alle Fahrzeuge geladen
+   - allVehicles speichert die komplette Liste
+
+2. FILTER-LOGIK:
+   - searchTerm: Sucht in Name und Beschreibung (case-insensitive)
+   - fuelFilter: Prueft exakte Uebereinstimmung des Kraftstoffs
+   - bedsFilter: Prueft exakte Anzahl der Betten
+   - maxPrice: Prueft ob Preis im Budget liegt
+
+3. UND-VERKNUEPFUNG:
+   - Ein Fahrzeug wird NUR angezeigt wenn ALLE Filter erfuellt sind
+   - Beispiel: "Diesel" + "4 Betten" + "max 100 Euro" = alle 3 muessen stimmen
+
+4. HTML-INTEGRATION (in index.html):
+   <input type="text" id="filterSearch" oninput="applyFilters()">
+   <select id="filterFuel" onchange="applyFilters()">
+   <select id="filterBeds" onchange="applyFilters()">
+   <input type="range" id="filterPrice" oninput="applyFilters()">
+
+   -> oninput/onchange rufen applyFilters() bei jeder Aenderung auf
+   -> Sofortige Aktualisierung ohne Button-Klick = "Live-Suche"
+
+
+-------------------------------------------------------------------------------
+3.4 VEHICLEDETAIL.JS - Fahrzeug-Detailseite mit Bildergalerie
+-------------------------------------------------------------------------------
+
+ZWECK: Zeigt alle Details eines Fahrzeugs an, inklusive einer
+intelligenten Bildergalerie die sich an die Anzahl der Bilder anpasst.
+
+CODE-BEISPIEL - Intelligente Galerie-Entscheidung:
+------------------------------------------------------------------------
+function displayVehicleImages() {
+    const container = document.getElementById('vehicleImageContainer');
+    let images = currentVehicle.images || [];
+
+    // Fall 1: Nur ein Bild - einfaches img-Tag
+    if (images.length === 1) {
+        container.innerHTML = `
+            <img src="${images[0]}"
+                 class="vehicle-single-image"
+                 alt="${currentVehicle.name}">
+        `;
+        return;
+    }
+
+    // Fall 2: Mehrere Bilder - Bootstrap Carousel mit Thumbnails
+    const carouselItems = images.map((imgUrl, index) => `
+        <div class="carousel-item ${index === 0 ? 'active' : ''}">
+            <img src="${imgUrl}" alt="${currentVehicle.name}">
+        </div>
+    `).join('');
+
+    // Carousel mit Navigation und Thumbnails erstellen
+    container.innerHTML = `
+        <div id="vehicleCarousel" class="carousel slide">
+            <div class="carousel-inner">
+                ${carouselItems}
+            </div>
+            <button class="carousel-control-prev" data-bs-slide="prev">
+            <button class="carousel-control-next" data-bs-slide="next">
+        </div>
+    `;
+}
+------------------------------------------------------------------------
+
+ERKLAERUNG:
+- images.map() erstellt HTML fuer jedes Bild
+- index === 0 ? 'active' : '' setzt das erste Bild als aktiv
+- .join('') verbindet alle HTML-Strings zu einem
+
+
+-------------------------------------------------------------------------------
+3.5 CALENDAR.JS - Verfuegbarkeitskalender
+-------------------------------------------------------------------------------
+
+ZWECK: Zeigt einen visuellen Kalender der gebuchte Tage (rot),
+vergangene Tage (grau) und verfuegbare Tage (weiss/gruen) markiert.
+
+WICHTIGE KONZEPTE:
+- Dynamische Kalender-Generierung
+- Zwei-Klick-Auswahl (Start -> Ende)
+- Echtzeit-Buchungspruefung
+
+CODE-BEISPIEL - Kalender rendern:
+------------------------------------------------------------------------
+async function renderCalendar() {
+    const today = new Date();
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    const lastDay = new Date(year, month + 1, 0);
+
+    // Buchungen vom Server laden
+    const bookings = await getBookingsByVehicle(currentVehicleId);
+
+    let html = '';
+
+    // Fuer jeden Tag im Monat
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const currentDate = new Date(year, month, day);
+        const dateStr = formatDate(currentDate);  // YYYY-MM-DD
+
+        let classes = 'calendar-day';
+        let clickHandler = `onclick="selectDate('${dateStr}')"`;
+
+        // Vergangene Tage: grau, nicht klickbar
+        if (currentDate < today) {
+            classes += ' past';
+            clickHandler = '';
+        }
+        // Gebuchte Tage: rot, nicht klickbar
+        else if (isDateBooked(dateStr, bookings)) {
+            classes += ' booked';
+            clickHandler = '';
+        }
+        // Ausgewaehlte Tage: gruen
+        else if (isDateSelected(dateStr)) {
+            classes += ' selected';
+        }
+
+        html += `<div class="${classes}" ${clickHandler}>${day}</div>`;
+    }
+
+    document.getElementById('calDays').innerHTML = html;
+}
+------------------------------------------------------------------------
+
+ZWEI-KLICK-AUSWAHL:
+------------------------------------------------------------------------
+async function selectDate(dateStr) {
+    if (!selectedStartDate) {
+        // Erster Klick: Startdatum setzen
+        selectedStartDate = dateStr;
+        selectedEndDate = null;
+    } else if (!selectedEndDate) {
+        // Zweiter Klick: Enddatum setzen
+        const start = new Date(selectedStartDate);
+        const end = new Date(dateStr);
+
+        if (end < start) {
+            // Falls Ende vor Start: neues Startdatum
+            selectedStartDate = dateStr;
+            selectedEndDate = null;
+        } else {
+            // Ende ist nach Start: Bereich komplett
+            selectedEndDate = dateStr;
+
+            // Formularfelder aktualisieren
+            document.getElementById('bookStart').value = selectedStartDate;
+            document.getElementById('bookEnd').value = selectedEndDate;
+
+            // Preis berechnen
+            calculatePrice();
+        }
+    } else {
+        // Dritter Klick: Neu starten
+        selectedStartDate = dateStr;
+        selectedEndDate = null;
+    }
+
+    await renderCalendar();
+}
+------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+3.6 BOOKING.JS - Buchungslogik und Preisberechnung
+-------------------------------------------------------------------------------
+
+ZWECK: Verwaltet den kompletten Buchungsprozess mit Extras,
+dynamischer Preisberechnung und Validierung.
+
+PREISFORMEL:
+Gesamtpreis = (Naechte x Preis/Nacht) + Extras + Servicegebuehr (15 Euro)
+
+VERFUEGBARE EXTRAS:
+- Fahrradhalter: 25 Euro
+- Camping-Moebel: 35 Euro
+- Erweiterungszelt: 45 Euro
+- Sonnendach: 30 Euro
+- Bettwaesche-Set: variabel
+- Handtuecher-Set: variabel
+
+CODE-BEISPIEL - Preisberechnung:
+------------------------------------------------------------------------
+function calculatePrice() {
+    const startDate = document.getElementById('bookStart').value;
+    const endDate = document.getElementById('bookEnd').value;
+
+    if (!startDate || !endDate || !currentVehicle) {
+        return;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Anzahl Naechte berechnen
+    const diffTime = end - start;
+    const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (nights <= 0) return;
+
+    // Basispreis
+    const pricePerNight = currentVehicle.price;
+    const totalBase = nights * pricePerNight;
+
+    // Extras summieren
+    const extrasTotal = calculateExtrasTotal();
+    const selectedExtras = getSelectedExtras();
+
+    // Servicegebuehr
+    const serviceFee = 15;
+
+    // Gesamtpreis
+    const totalPrice = totalBase + extrasTotal + serviceFee;
+
+    // Anzeige aktualisieren
+    document.getElementById('calcDays').textContent = nights;
+    document.getElementById('calcPrice').textContent = pricePerNight;
+    document.getElementById('calcTotalBase').textContent = totalBase;
+    document.getElementById('calcTotal').textContent = totalPrice;
+}
+------------------------------------------------------------------------
+
+EXTRAS AUSLESEN:
+------------------------------------------------------------------------
+const EXTRAS_CONFIG = {
+    extraBikeRack: 'Fahrradhalter',
+    extraFurniture: 'Camping-Moebel',
+    extraTent: 'Erweiterungszelt',
+    extraAwning: 'Sonnendach',
+    extraBedding: 'Bettwaesche-Set',
+    extraTowels: 'Handtuecher-Set'
+};
+
+function getSelectedExtras() {
+    const selectedExtras = [];
+
+    for (const [id, name] of Object.entries(EXTRAS_CONFIG)) {
+        const checkbox = document.getElementById(id);
+        if (checkbox && checkbox.checked) {
+            selectedExtras.push({
+                id: id,
+                name: name,
+                price: parseInt(checkbox.dataset.price) || 0
+            });
+        }
+    }
+
+    return selectedExtras;
+}
+------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+3.7 AUTH.JS - Authentifizierung
+-------------------------------------------------------------------------------
+
+ZWECK: Verwaltet Login, Registrierung und Session-Management.
+
+CODE-BEISPIEL - Login-Prozess:
+------------------------------------------------------------------------
+async function handleLogin(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value;
+
+    try {
+        // 1. Benutzer in Datenbank suchen
+        const user = await getUserByEmail(email);
+
+        if (!user) {
+            showError('loginError', 'E-Mail nicht registriert.');
+            return false;
+        }
+
+        // 2. Passwort pruefen
+        if (user.password !== password) {
+            showError('loginError', 'Falsches Passwort.');
+            return false;
+        }
+
+        // 3. Session starten
+        setCurrentUser(user);
+
+        // 4. Weiterleitung basierend auf Rolle
+        if (user.role === 'provider') {
+            window.location.href = 'anbieter.html';
+        } else {
+            window.location.href = 'profil.html';
+        }
+    } catch (error) {
+        showError('loginError', 'Server-Fehler beim Login.');
+    }
+}
+------------------------------------------------------------------------
+
+AUTHENTIFIZIERUNGSPRUEFUNG FUER GESCHUETZTE SEITEN:
+------------------------------------------------------------------------
+function requireAuth(requiredRole = null) {
+    const currentUser = getCurrentUser();
+
+    // Nicht eingeloggt -> zum Login
+    if (!currentUser) {
+        window.location.href = 'anmelden.html';
+        return false;
+    }
+
+    // Falsche Rolle -> zurueck zur Startseite
+    if (requiredRole && currentUser.role !== requiredRole) {
+        alert('Keine Berechtigung fuer diese Seite.');
+        window.location.href = '../index.html';
+        return false;
+    }
+
+    return true;
+}
+------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+3.8 SHARED.JS - Gemeinsame UI-Komponenten
+-------------------------------------------------------------------------------
+
+ZWECK: Stellt wiederverwendbare Komponenten bereit die auf allen Seiten
+benoetigt werden: Header, Footer, Cookie-Banner.
+
+CODE-BEISPIEL - Dynamischer Header basierend auf Login-Status:
+------------------------------------------------------------------------
+function renderHeader() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+    // Pfad-Anpassung: Root oder /pages/ Verzeichnis?
+    const isInPages = window.location.pathname.includes('/pages/');
+    const pathPrefix = isInPages ? '../' : '';
+    const pagesPrefix = isInPages ? '' : 'pages/';
+
+    const headerHTML = `
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <a class="navbar-brand" href="${pathPrefix}index.html">
+                InterCamp
+            </a>
+            <ul class="navbar-nav ms-auto">
+                ${currentUser ? `
+                    <!-- Eingeloggt: Profil und Logout zeigen -->
+                    <li><a href="${pagesPrefix}profil.html">Mein Profil</a></li>
+                    <li><a href="#" onclick="logout()">Logout</a></li>
+                ` : `
+                    <!-- Nicht eingeloggt: Login-Button zeigen -->
+                    <li><a href="${pagesPrefix}anmelden.html">Anmelden</a></li>
+                `}
+            </ul>
+        </nav>
+    `;
+
+    document.querySelector('header').innerHTML = headerHTML;
+}
+------------------------------------------------------------------------
+
+COOKIE-CONSENT (DSGVO):
+------------------------------------------------------------------------
+function checkCookieConsent() {
+    // Banner nur zeigen wenn noch nicht akzeptiert
+    if (!localStorage.getItem('interCamp_cookie_consent')) {
+        setTimeout(() => {
+            document.getElementById('cookie-banner').classList.add('show');
+        }, 1000);
+    }
+}
+
+function acceptCookies() {
+    localStorage.setItem('interCamp_cookie_consent', 'true');
+    document.getElementById('cookie-banner').classList.remove('show');
+}
+------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+3.9 PROFILE.JS - Benutzerprofil und Buchungsverlauf
+-------------------------------------------------------------------------------
+
+ZWECK: Zeigt Profilinformationen und Buchungshistorie.
+Implementiert Buchungsstornierung mit Gebuehren.
+
+STORNIERUNGSLOGIK:
+- Provider: Stornieren kostenlos
+- Kunden: 20% des Basispreises als Stornierungsgebuehr
+
+CODE-BEISPIEL - Stornierung mit Gebuehrenberechnung:
+------------------------------------------------------------------------
+async function cancelBooking(bookingId) {
+    const currentUser = getCurrentUser();
+    const booking = await getBookingById(bookingId);
+
+    // Sicherheitspruefung
+    if (booking.user_id !== currentUser.id) {
+        alert('Keine Berechtigung.');
+        return;
+    }
+
+    const isProvider = currentUser.role === 'provider';
+    let cancellationFee = 0;
+
+    if (isProvider) {
+        // Provider stornieren kostenlos
+        confirmMessage = 'Moechten Sie stornieren?';
+    } else {
+        // Kunden zahlen 20% Gebuehr
+        const serviceFee = 15;
+        let extrasTotal = 0;
+
+        if (booking.extras && booking.extras.length > 0) {
+            extrasTotal = booking.extras.reduce((sum, e) => sum + e.price, 0);
+        }
+
+        const basePrice = booking.totalPrice - extrasTotal - serviceFee;
+        cancellationFee = Math.round(basePrice * 0.20);
+
+        confirmMessage = `Stornierungsgebuehr: ${cancellationFee} Euro`;
+    }
+
+    if (confirm(confirmMessage)) {
+        await deleteBooking(bookingId);
+        location.reload();
+    }
+}
+------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+3.10 PROVIDER.JS - Anbieter-Dashboard
+-------------------------------------------------------------------------------
+
+ZWECK: Vollstaendiges Dashboard fuer Fahrzeug-Anbieter mit Statistiken,
+Fahrzeugtabelle und CRUD-Operationen.
+
+STATISTIK-BERECHNUNG:
+------------------------------------------------------------------------
+async function displayProviderStats(providerId) {
+    // Sicherheitspruefung
+    const currentUser = getCurrentUser();
+    if (currentUser.id !== providerId) return;
+
+    const vehicles = await getVehiclesByProvider(providerId);
+    const allBookings = await getAllBookings();
+
+    // Nur Buchungen fuer eigene Fahrzeuge
+    const vehicleIds = vehicles.map(v => v.id);
+    const providerBookings = allBookings.filter(b =>
+        vehicleIds.includes(b.vehicle_id)
+    );
+
+    // Statistiken berechnen
+    const totalVehicles = vehicles.length;
+    const totalBookings = providerBookings.length;
+
+    // Umsatz: Summe aller totalPrice
+    const totalRevenue = providerBookings.reduce((sum, booking) => {
+        return sum + (booking.totalPrice || 0);
+    }, 0);
+
+    // Aktive Buchungen: heute zwischen Start und Ende
+    const today = new Date();
+    const activeBookings = providerBookings.filter(b => {
+        const start = new Date(b.start);
+        const end = new Date(b.end);
+        return start <= today && end >= today;
+    }).length;
+
+    // Anzeige aktualisieren
+    document.getElementById('statVehicles').textContent = totalVehicles;
+    document.getElementById('statBookings').textContent = totalBookings;
+    document.getElementById('statRevenue').textContent = totalRevenue;
+    document.getElementById('statActive').textContent = activeBookings;
+}
+------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+3.11 PROVIDERSTATS.JS - Canvas-Diagramme
+-------------------------------------------------------------------------------
+
+ZWECK: Zeichnet ein Balkendiagramm mit der HTML5 Canvas API
+ohne externe Bibliotheken wie Chart.js.
+
+CODE-BEISPIEL - Balken zeichnen:
+------------------------------------------------------------------------
+function renderBookingStatsCanvas(bookings, vehicles) {
+    const canvas = document.getElementById('bookingStatsCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Retina-Display Unterstuetzung
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = canvas.parentElement.offsetWidth * dpr;
+    canvas.height = canvas.parentElement.offsetHeight * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Buchungen pro Fahrzeug zaehlen
+    const vehicleBookingCounts = vehicles.map(vehicle => {
+        const count = bookings.filter(b => b.vehicle_id === vehicle.id).length;
+        return {
+            name: vehicle.name,
+            count: count,
+            color: getVehicleColor(vehicle.id)
+        };
+    });
+
+    // Balken zeichnen
+    vehicleBookingCounts.forEach((vehicle, index) => {
+        const x = startX + index * (barWidth + barSpacing);
+        const barHeight = (vehicle.count / yAxisMax) * chartHeight;
+        const y = height - padding - barHeight;
+
+        // Schatten
+        ctx.fillStyle = 'rgba(0,0,0,0.1)';
+        ctx.fillRect(x + 3, y + 3, barWidth, barHeight);
+
+        // Balken
+        ctx.fillStyle = vehicle.color;
+        ctx.fillRect(x, y, barWidth, barHeight);
+
+        // Anzahl ueber dem Balken
+        ctx.fillStyle = '#212529';
+        ctx.fillText(vehicle.count.toString(), x + barWidth/2, y - 8);
+    });
+}
+------------------------------------------------------------------------
+
+
+================================================================================
+                    4. HTML-SEITEN UEBERSICHT
+================================================================================
+
+SEITE                  | DATEI                  | FUNKTION
+-----------------------|------------------------|---------------------------------
+Startseite             | index.html             | Hero, Fahrzeugliste, Filter
+Fahrzeug-Details       | pages/fahrzeug.html    | Galerie, Daten, Kalender, Buchung
+Login/Registrierung    | pages/anmelden.html    | Formular-Toggle, Rollenauswahl
+Benutzerprofil         | pages/profil.html      | Daten, Buchungsverlauf
+Anbieter-Dashboard     | pages/anbieter.html    | Stats, Tabelle, CRUD-Modals
+Impressum              | pages/impressum.html   | Rechtliche Informationen
+Datenschutz            | pages/datenschutz.html | DSGVO-Erklaerung
+
+
+================================================================================
+                    5. CSS-STRUKTUR
+================================================================================
+
+main.css:
+- CSS-Variablen: --primary, --secondary, --accent
+- Flexbox-Layout: body als flex-container, main flex:1 (Footer immer unten)
+- Responsive Navigation mit Bootstrap
+- Hero-Section mit Hintergrundbild und Overlay
+
+components.css:
+- Vehicle-Cards mit Hover-Effekt
+- Buttons in verschiedenen Varianten
+- Form-Styling
+- Alert-Boxen und Badges
+
+pages.css:
+- Fahrzeug-Detailseite: Galerie, Tabellen, Kalender
+- Provider-Dashboard: Stats-Cards, Tabellen
+- Profil-Seite: Buchungs-Cards
+
+
+================================================================================
+                    6. PYTHON BACKEND (server.py)
+================================================================================
+
+Der Server ist eine REST API mit Flask und bietet folgende Endpoints:
+
+USERS:
+- GET  /users              -> Alle Benutzer (optional: ?email=...)
+- POST /users              -> Neuen Benutzer erstellen
+- GET  /users/<user_id>    -> Einzelnen Benutzer abrufen
+
+VEHICLES:
+- GET    /vehicles              -> Alle Fahrzeuge (optional: ?provider_id=...)
+- POST   /vehicles              -> Neues Fahrzeug erstellen
+- GET    /vehicles/<id>         -> Einzelnes Fahrzeug
+- PUT    /vehicles/<id>         -> Fahrzeug aktualisieren
+- DELETE /vehicles/<id>         -> Fahrzeug loeschen
+
+BOOKINGS:
+- GET    /bookings              -> Alle Buchungen (?user_id=... oder ?vehicle_id=...)
+- POST   /bookings              -> Neue Buchung (Auto-ID: b1, b2, ...)
+- GET    /bookings/<id>         -> Einzelne Buchung
+- DELETE /bookings/<id>         -> Buchung loeschen (Stornierung)
+
+THUMBNAIL-API:
+- GET /api/thumbnail?url=...&width=400
+  -> Laedt Bild von URL, skaliert es, konvertiert PNG zu JPG, cached Ergebnis
+
+CODE-BEISPIEL - Vehicles Endpoint:
+------------------------------------------------------------------------
+@app.route('/vehicles', methods=['GET', 'POST'])
+def vehicles():
+    db = read_db()
+
+    if request.method == 'GET':
+        provider_id = request.args.get('provider_id')
+        if provider_id:
+            # Filterung nach Anbieter
+            filtered = [v for v in db['vehicles']
+                       if v.get('provider_id') == provider_id]
+            return jsonify(filtered)
+        return jsonify(db['vehicles'])
+
+    elif request.method == 'POST':
+        new_vehicle = request.json
+        db['vehicles'].append(new_vehicle)
+        write_db(db)
+        return jsonify(new_vehicle), 201
+------------------------------------------------------------------------
+
+DATENBANK-STRUKTUR (datenbank.json):
+------------------------------------------------------------------------
+{
+  "users": [
+    {
+      "id": "u1",
+      "email": "andrea@test.de",
+      "password": "123",
+      "name": "Andrea Schmidt",
+      "role": "provider"
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v1",
+      "name": "VW California",
+      "price": 89,
+      "beds": 4,
+      "fuel": "Diesel",
+      "desc": "Beschreibung...",
+      "img": "https://...",
+      "images": ["url1", "url2"],
+      "features": ["Klimaanlage", "Kueche"],
+      "details": {
+        "tech": { "seats": "4", "consumption": "8L/100km", ... },
+        "dims": { "len": "4.9m", "width": "1.9m", ... }
+      },
+      "provider_id": "u1"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "b1",
+      "vehicle_id": "v1",
+      "user_id": "u3",
+      "start": "2025-07-01",
+      "end": "2025-07-08",
+      "nights": 7,
+      "totalPrice": 653,
+      "extras": [{ "id": "extraBikeRack", "name": "Fahrradhalter", "price": 25 }],
+      "createdAt": "2025-01-15T10:30:00Z"
+    }
+  ]
+}
+------------------------------------------------------------------------
+
+
+================================================================================
+                    7. WICHTIGE FEATURES ERKLAERT
+================================================================================
+
+-------------------------------------------------------------------------------
+7.1 WIE FUNKTIONIERT DIE LIVE-SUCHE?
+-------------------------------------------------------------------------------
+
+1. BEIM LADEN DER SEITE:
+   - displayVehicles() wird aufgerufen
+   - Alle Fahrzeuge werden vom Server geladen
+   - allVehicles speichert die komplette Liste
+   - renderVehicles(allVehicles) zeigt alle an
+
+2. BEI BENUTZEREINGABE:
+   - oninput="applyFilters()" wird ausgeloest
+   - applyFilters() liest alle Filter-Werte
+   - Array.filter() filtert allVehicles
+   - Nur Fahrzeuge die ALLE Kriterien erfuellen bleiben
+   - renderVehicles(filtered) aktualisiert die Anzeige
+
+3. WARUM "LIVE"?
+   - oninput reagiert auf JEDE Tastatureingabe
+   - Keine Verzoegerung, kein Button-Klick noetig
+   - Die Liste aktualisiert sich waehrend der Eingabe
+
+-------------------------------------------------------------------------------
+7.2 WIE WIRD DIE VERFUEGBARKEIT GEPRUEFT?
+-------------------------------------------------------------------------------
+
+1. BEIM OEFFNEN DER DETAILSEITE:
+   - initCalendar(vehicleId) wird aufgerufen
+   - renderCalendar() laedt Buchungen vom Server
+   - Fuer jeden Tag wird geprueft:
+     - Vergangen? -> grau
+     - Gebucht? -> rot
+     - Sonst -> weiss/klickbar
+
+2. BEI BUCHUNGSVERSUCH:
+   - validateDates() prueft nochmal
+   - isDateRangeBooked() prueft Ueberlappung
+   - Ueberlappung = Start <= gebuchtes Ende UND Ende >= gebuchter Start
+
+3. VOR DEM SPEICHERN:
+   - handleBooking() prueft ein letztes Mal
+   - Verhindert Race Conditions bei gleichzeitigen Buchungen
+
+-------------------------------------------------------------------------------
+7.3 WIE IST DIE SICHERHEIT UMGESETZT?
+-------------------------------------------------------------------------------
+
+MEHRSCHICHTIGE SICHERHEIT:
+
+1. FRONTEND (data.js):
+   - getCurrentUser() prueft Login-Status
+   - Rollen-Pruefung vor jeder kritischen Aktion
+   - Provider koennen nur eigene Fahrzeuge bearbeiten
+   - Kunden koennen nur eigene Buchungen stornieren
+
+2. BACKEND (server.py):
+   - API akzeptiert nur gueltige Anfragen
+   - JSON-Validierung
+   - Fehlerbehandlung mit Status-Codes
+
+3. SESSION:
+   - localStorage speichert eingeloggten Benutzer
+   - setCurrentUser(null) zum Ausloggen
+   - requireAuth() schuetzt Seiten
+
+WICHTIG: Das Passwort wird im Klartext gespeichert - in einer
+echten Anwendung muesste es gehasht werden!
+
+
+================================================================================
+                    8. FRAGEN-CHEATSHEET
+================================================================================
+
+FRAGE: "Wie funktioniert die Live-Suche?"
+ANTWORT: Die Live-Suche nutzt oninput-Events auf den Filter-Eingabefeldern.
+Bei jeder Eingabe wird applyFilters() aufgerufen, das alle Fahrzeuge mit
+Array.filter() filtert. Alle Kriterien werden UND-verknuepft - ein Fahrzeug
+muss alle Filter erfuellen um angezeigt zu werden. Die Anzeige wird sofort
+durch renderVehicles() aktualisiert, ohne Seitenneuladung.
+
+FRAGE: "Warum habt ihr kein Framework wie React verwendet?"
+ANTWORT: Fuer dieses Projekt war Vanilla JavaScript ausreichend. Die
+Anwendung ist ueberschaubar und wir wollten die Grundlagen zeigen.
+Frameworks bringen Overhead und Komplexitaet die hier nicht noetig war.
+
+FRAGE: "Wie kommuniziert das Frontend mit dem Backend?"
+ANTWORT: Ueber eine REST API mit der Fetch-API. api.js enthaelt alle
+HTTP-Funktionen (GET, POST, PUT, DELETE). Alle Aufrufe sind asynchron
+mit async/await um den Browser nicht zu blockieren.
+
+FRAGE: "Wie wird geprueft ob ein Datum gebucht ist?"
+ANTWORT: Die Funktion isDateBooked() in calendar.js prueft fuer jeden Tag
+ob er in einem bestehenden Buchungszeitraum liegt. isDateRangeBooked() in
+api.js prueft ob sich zwei Zeitraeume ueberlappen (Start <= bestehendes
+Ende UND Ende >= bestehender Start).
+
+FRAGE: "Was passiert wenn zwei Leute gleichzeitig buchen?"
+ANTWORT: Die finale Verfuegbarkeitspruefung findet direkt vor dem
+Speichern in handleBooking() statt. Falls inzwischen gebucht wurde,
+wird eine Fehlermeldung gezeigt.
+
+FRAGE: "Warum Flask und nicht Node.js?"
+ANTWORT: Flask ist einfach zu lernen und perfekt fuer REST APIs.
+Python ist vielen vertrauter und Flask hat minimalen Boilerplate.
+Fuer diese Projektgroesse ist es ideal.
+
+FRAGE: "Wie funktioniert die Preisberechnung?"
+ANTWORT: Gesamtpreis = (Naechte x Preis/Nacht) + Extras + 15 Euro
+Servicegebuehr. Die Naechte werden aus der Datums-Differenz berechnet,
+Extras werden aus den Checkboxen ausgelesen (getSelectedExtras()).
+
+FRAGE: "Was ist der Unterschied zwischen api.js und data.js?"
+ANTWORT: api.js enthaelt nur die HTTP-Kommunikation - reine API-Aufrufe.
+data.js ist eine Abstraktionsschicht darueber mit Sicherheitspruefungen,
+Session-Management und Geschaeftslogik. Die Trennung macht den Code
+sauberer und wartbarer.
+
+FRAGE: "Wie funktioniert die Thumbnail-API?"
+ANTWORT: Der Server laedt ein Bild von einer URL, skaliert es mit
+Pillow auf die gewuenschte Breite, konvertiert PNG zu JPG (mit weissem
+Hintergrund statt Transparenz) und speichert es im Cache. Bei
+wiederholten Anfragen wird das gecachte Bild direkt ausgeliefert.
+
+FRAGE: "Wie werden Provider und Kunden unterschieden?"
+ANTWORT: Jeder Benutzer hat ein role-Feld: 'provider' oder 'customer'.
+Bei der Registrierung wird die Rolle gewaehlt. Die Anwendung zeigt
+unterschiedliche Inhalte basierend auf der Rolle und prueft
+Berechtigungen vor kritischen Aktionen.
+
+FRAGE: "Ist die Anwendung sicher?"
+ANTWORT: Fuer ein Demo-Projekt ja. Es gibt Rollen-basierte
+Zugriffskontrolle und Berechtigungspruefungen. In einer echten
+Anwendung muessten Passwoerter gehasht, HTTPS verwendet und
+die API-Authentifizierung verbessert werden.
+
+
+================================================================================
+                           ENDE DER DOKUMENTATION
+================================================================================
+
+Viel Erfolg bei der Praesentation!
